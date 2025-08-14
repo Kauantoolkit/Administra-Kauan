@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="lib1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Sistema Vendas (Resolvido)/lib/dom4j-2.0.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Sistema Vendas (Resolvido)/lib/javax.mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Sistema Vendas (Resolvido)/lib/mysql-connector-java-8.0.27.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Sistema Vendas (Resolvido)/lib/activation.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Sistema Vendas (Resolvido)/lib/mail.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
