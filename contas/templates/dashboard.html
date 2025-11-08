@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Administra</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; }
+    </style>
+</head>
+<body>
+    <h1>Olá, {{ user.nome }}!</h1>
+    <p>Você está logado no seu dashboard.</p>
+    <br>
+    <p><a href="{% url 'logout' %}">Sair</a></p>
+</body>
+</html>
