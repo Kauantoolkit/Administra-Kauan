@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %}Administra{% endblock %}</title>
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+
+      .layout-container {
+        display: flex;
+      }
+
+      .sidebar {
+        width: 260px;
+        background-color: #ffffff;
+        border-right: 1px solid #e9ecef;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        box-sizing: border-box;
+      }
+
+      .sidebar-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0d6efd;
+        padding: 0.5rem 0.5rem 1rem 0.5rem;
+      }
+
+      .sidebar-header span {
+        font-size: 0.8rem;
+        color: #6c757d;
+        display: block;
+        font-weight: 400;
+      }
+
+      .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .nav-menu li a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0.5rem;
+        text-decoration: none;
+        color: #495057;
+        border-radius: 8px;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+      }
+
+      .nav-menu li a .material-icons-outlined {
+        margin-right: 12px;
+        color: #6c757d;
+      }
+
+      .nav-menu li a:hover,
+      .nav-menu li a.active {
+        background-color: #0d6efd;
+        color: #ffffff;
+      }
+
+      .nav-menu li a:hover .material-icons-outlined,
+      .nav-menu li a.active .material-icons-outlined {
+        color: #ffffff;
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        border-top: 1px solid #e9ecef;
+        padding-top: 1rem;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        color: #333;
+      }
+
+      .user-profile span {
+        font-weight: 600;
+      }
+
+      .user-profile a {
+        color: #dc3545;
+        text-decoration: none;
+        margin-left: auto;
+        font-weight: 500;
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+      }
+
+      .header-info {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+      }
+
+      .status-badge {
+        background-color: #198754;
+        color: #fff;
+        padding: 0.3rem 0.7rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+
+      .status-badge .material-icons-outlined {
+        font-size: 1rem;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat-card {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        padding: 1.5rem;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .stat-card-info h5 {
+        margin: 0 0 0.5rem 0;
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .stat-card-info h2 {
+        margin: 0;
+        font-size: 2rem;
+      }
+
+      .stat-card-info p {
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+      }
+
+      .stat-card-info .positive {
+        color: #198754;
+      }
+
+      .stat-card-info .negative {
+        color: #dc3545;
+      }
+
+      .stat-card-info .negative strong {
+        font-size: 1rem;
+      }
+
+      .stat-card-icon {
+        font-size: 3rem;
+        color: #0d6efd;
+        background-color: #e7f0ff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: grid;
+        place-items: center;
+      }
+
+      .stat-card-icon.positive {
+        color: #198754;
+        background-color: #e8f5e9;
+      }
+
+      .stat-card-icon.negative {
+        color: #dc3545;
+        background-color: #fde8e8;
+      }
+
+      .stat-card-icon.warning {
+        color: #ffc107;
+        background-color: #fff8e1;
+      }
+
+      .dashboard-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        align-items: flex-start;
+      }
+
+      .card {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+      }
+
+      .card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card-header h4 {
+        margin: 0;
+      }
+
+      .card-header a {
+        text-decoration: none;
+        font-size: 0.9rem;
+        color: #0d6efd;
+        font-weight: 500;
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      .recent-sales-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .recent-sales-list li {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f4f4f4;
+      }
+
+      .recent-sales-list li:last-child {
+        border-bottom: none;
+      }
+
+      .sale-icon {
+        background-color: #e7f0ff;
+        color: #0d6efd;
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-right: 1rem;
+      }
+
+      .sale-details {
+        flex-grow: 1;
+      }
+
+      .sale-details p {
+        margin: 0;
+      }
+
+      .sale-details .customer {
+        font-weight: 600;
+      }
+
+      .sale-details .meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+
+      .sale-amount {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .sale-time {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-left: 1.5rem;
+        width: 50px;
+      }
+
+      .quick-actions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn-action {
+        text-decoration: none;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        color: #333;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+      }
+
+      .btn-action:hover {
+        background-color: #e9ecef;
+      }
+
+      .btn-action .material-icons-outlined {
+        margin-right: 0.5rem;
+      }
+
+      .btn-action.primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+      }
+
+      .btn-action.primary:hover {
+        background-color: #0b5ed7;
+      }
+
+      .alerts-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .alert .material-icons-outlined {
+        margin-right: 0.75rem;
+      }
+
+      .alert.alert-danger {
+        background-color: #fde8e8;
+        color: #dc3545;
+      }
+
+      .alert.alert-warning {
+        background-color: #fff8e1;
+        color: #ffa000;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout-container">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          Administra
+          <span>Sistema de Gestão</span>
+        </div>
+
+        <ul class="nav-menu">
+          <li>
+            <a
+              href="{% url 'dashboard' %}"
+              class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
+              <span class="material-icons-outlined">dashboard</span> Dashboard
+            </a>
+          </li>
+          <li>
+            <a
+              href="{% url 'clientes' %}"
+              class="{% if request.resolver_match.url_name == 'clientes' %}active{% endif %}"
+            >
+              <span class="material-icons-outlined">people</span> Clientes
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">badge</span> Funcionários
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">local_shipping</span>
+              Fornecedores
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">inventory_2</span> Produtos
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">point_of_sale</span> Vendas
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">assessment</span> Relatórios
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="material-icons-outlined">history</span> Histórico
+            </a>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <span>{{ user.nome|default:'Usuário' }}</span>
+
+            <a href="{% url 'logout' %}">Sair</a>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">{% block content %} {% endblock %}</main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Administra{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <h1>Dashboard</h1>
+  <div class="header-info">
+    <div class="status-badge">
+      <span class="material-icons-outlined">circle</span> Sistema Online
+    </div>
+    <span>{{ data_hoje }}</span>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Vendas Hoje</h5>
+      <h2>R$ 2.847</h2>
+      <p class="positive">+12.5%</p>
+    </div>
+    <div class="stat-card-icon positive">
+      <span class="material-icons-outlined">leaderboard</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Produtos Vendidos</h5>
+      <h2>147</h2>
+      <p class="positive">+8.2%</p>
+    </div>
+    <div class="stat-card-icon">
+      <span class="material-icons-outlined">shopping_cart</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Clientes Ativos</h5>
+      <h2>1.234</h2>
+      <p class="positive">+5.1%</p>
+    </div>
+    <div class="stat-card-icon">
+      <span class="material-icons-outlined">groups</span>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Produtos em Falta</h5>
+      <h2>23</h2>
+      <p class="negative"><strong>Atenção</strong></p>
+    </div>
+    <div class="stat-card-icon negative">
+      <span class="material-icons-outlined">warning</span>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-layout">
+  
+  <div class="card">
+    <div class="card-header">
+      <h4>Vendas Recentes</h4>
+      <a href="#">Ver Todas</a>
+    </div>
+    <div class="card-body">
+      <ul class="recent-sales-list">
+        <li>
+          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
+          <div class="sale-details">
+            <p class="customer">Maria Santos</p>
+            <p class="meta">#001247 | CPF: 123.456.789-00</p>
+          </div>
+          <strong class="sale-amount">R$ 247,50</strong>
+          <span class="sale-time">14:25</span>
+        </li>
+        <li>
+          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
+          <div class="sale-details">
+            <p class="customer">Carlos Oliveira</p>
+            <p class="meta">#001246 | CPF: 987.654.321-00</p>
+          </div>
+          <strong class="sale-amount">R$ 89,90</strong>
+          <span class="sale-time">14:10</span>
+        </li>
+        <li>
+          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
+          <div class="sale-details">
+            <p class="customer">Ana Costa</p>
+            <p class="meta">#001245 | CPF: 456.789.123-00</p>
+          </div>
+          <strong class="sale-amount">R$ 156,30</strong>
+          <span class="sale-time">13:45</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div class="card">
+      <div class="card-header">
+        <h4>Ações Rápidas</h4>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions-list">
+          <a href="#" class="btn-action primary">
+            <span class="material-icons-outlined">add_shopping_cart</span> Nova Venda
+          </a>
+          <a href="#" class="btn-action">
+            <span class="material-icons-outlined">person_add</span> Novo Cliente
+          </a>
+          <a href="#" class="btn-action">
+            <span class="material-icons-outlined">add_box</span> Novo Produto
+          </a>
+          <a href="#" class="btn-action">
+            <span class="material-icons-outlined">assessment</span> Gerar Relatório
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h4>Alertas</h4>
+      </div>
+      <div class="card-body">
+        <ul class="alerts-list">
+          <li class="alert alert-danger">
+            <span class="material-icons-outlined">error</span>
+            <div>
+              <strong>Estoque Baixo</strong>
+              <p style="margin:0; font-size: 0.9rem;">23 produtos precisam de reposição.</p>
+            </div>
+          </li>
+          <li class="alert alert-warning">
+            <span class="material-icons-outlined">backup</span>
+            <div>
+              <strong>Backup Pendente</strong>
+              <p style="margin:0; font-size: 0.9rem;">Último backup há 2 dias.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

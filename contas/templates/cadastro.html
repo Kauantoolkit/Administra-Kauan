@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - Administra</title>
+    
+    <style>
+        body {
+            font-family: sans-serif; 
+            display: grid; 
+            place-items: center; 
+            min-height: 100vh; 
+            background-color: #f4f7fa;
+            margin: 0;
+        }
+        
+        .container {
+            background: #fff; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            padding: 2rem; 
+            width: 360px;
+        }
+
+        .container h2 {
+            text-align: center; 
+            margin-top: 0;
+        }
+
+        .container p {
+            color: #555;
+        }
+        
+        form p { 
+            display: flex; 
+            flex-direction: column; 
+            margin-bottom: 1rem; 
+        }
+
+        form label { 
+            margin-bottom: 5px; 
+            font-weight: 600; 
+            font-size: 0.9rem;
+        }
+
+        form input { 
+            padding: 10px 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .errorlist {
+            color: #a94442;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            padding: 10px;
+            border-radius: 4px;
+            list-style-type: none;
+            margin: 0 0 1rem 0;
+            padding-left: 10px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <h2 style="text-align: center; margin-top: 0;">Administra</h2>
+        <p style="text-align: center; margin-top: -10px; color: #555;">Sistema de Gestão Comercial</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #0d6efd; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                Cadastrar
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 1rem;">
+            Já tem conta? <a href="#">Entre aqui</a>
+        </p>
+    </div>
+
+</body>
+</html>
