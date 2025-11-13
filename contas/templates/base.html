@@ -99,7 +99,7 @@
       .user-profile span {
         font-weight: 600;
       }
-      
+
       .user-profile a {
         color: #dc3545;
         text-decoration: none;
@@ -366,7 +366,7 @@
         background-color: #fde8e8;
         color: #dc3545;
       }
-      
+
       .alert.alert-warning {
         background-color: #fff8e1;
         color: #ffa000;
@@ -383,12 +383,18 @@
 
         <ul class="nav-menu">
           <li>
-            <a href="{% url 'dashboard' %}" class="active">
+            <a
+              href="{% url 'dashboard' %}"
+              class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            >
               <span class="material-icons-outlined">dashboard</span> Dashboard
             </a>
           </li>
           <li>
-            <a href="{% url 'clientes' %}">
+            <a
+              href="{% url 'clientes' %}"
+              class="{% if request.resolver_match.url_name == 'clientes' %}active{% endif %}"
+            >
               <span class="material-icons-outlined">people</span> Clientes
             </a>
           </li>
