@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 from .forms import EmailAuthenticationForm
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import datetime
@@ -70,3 +70,7 @@ def dashboard_view(request):
 @login_required
 def clientes_view(request):
     return render(request, 'clientes.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
