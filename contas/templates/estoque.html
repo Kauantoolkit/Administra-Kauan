@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Estoque - Administra{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <h1>Estoque</h1>
+
+  <div class="header-info">
+    <button class="btn-action primary" style="background:#28a745; border-color:#28a745;">
+      + Entrada Estoque
+    </button>
+
+    <button class="btn-action primary" style="background:#0d6efd;">
+      + Novo Produto
+    </button>
+  </div>
+</div>
+
+<h3 style="margin-bottom:20px; color:#6c757d;">Gerencie produtos e controle de estoque</h3>
+
+<!-- ==== CARDS DO TOPO (idênticos ao Figma) ==== -->
+<div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Total Produtos</h5>
+      <h2>{{ total_produtos }}</h2>
+      <p class="positive">+45 este mês</p>
+    </div>
+    <div class="stat-card-icon">
+      <span class="material-icons-outlined">inventory</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Valor Total</h5>
+      <h2>R$ {{ valor_total|floatformat:2 }}</h2>
+      <p class="positive">valor do estoque</p>
+    </div>
+    <div class="stat-card-icon positive">
+      <span class="material-icons-outlined">paid</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Estoque Baixo</h5>
+      <h2>{{ baixo_estoque }}</h2>
+      <p class="negative">produtos críticos</p>
+    </div>
+    <div class="stat-card-icon warning">
+      <span class="material-icons-outlined">warning</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Sem Estoque</h5>
+      <h2>{{ sem_estoque }}</h2>
+      <p class="negative">produtos zerados</p>
+    </div>
+    <div class="stat-card-icon negative">
+      <span class="material-icons-outlined">error_outline</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Categorias</h5>
+      <h2>{{ total_categorias }}</h2>
+      <p class="positive">diferentes</p>
+    </div>
+    <div class="stat-card-icon positive">
+      <span class="material-icons-outlined">category</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= FILTROS ======= -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="display:flex; gap:15px; flex-wrap: wrap;">
+
+    <input type="text" placeholder="Nome do Produto..." 
+      style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:200px;">
+
+    <input type="text" placeholder="Código / SKU..." 
+      style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:180px;">
+
+    <select style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:180px;">
+      <option>Todas Categorias</option>
+    </select>
+
+    <select style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:150px;">
+      <option>Todos Status</option>
+    </select>
+
+    <button class="btn-action primary" style="background:#f1f3f5; color:#333; border:none;">
+      <span class="material-icons-outlined">search</span> Buscar
+    </button>
+
+  </div>
+</div>
+
+<!-- ==== TABELA ==== -->
+<div class="card">
+  <div class="card-header">
+    <h4>Lista de Produtos</h4>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn-action" style="background:#f8f9fa;">Exportar</button>
+      <button class="btn-action" style="background:#f8f9fa;">Imprimir Códigos</button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="text-align:left; border-bottom:1px solid #e9ecef;">
+          <th style="padding:12px;">Produto</th>
+          <th style="padding:12px;">SKU</th>
+          <th style="padding:12px;">Categoria</th>
+          <th style="padding:12px;">Preço</th>
+          <th style="padding:12px;">Quantidade</th>
+          <th style="padding:12px;">Valor Total</th>
+          <th style="padding:12px;">Status</th>
+          <th style="padding:12px;">Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for p in produtos %}
+        <tr style="border-bottom:1px solid #f4f4f4;">
+
+          <td style="padding:12px; display:flex; align-items:center; gap:10px;">
+            <div style="width:40px; height:40px; background:#eef1f7; border-radius:8px;"></div>
+
+            <div>
+              <strong>{{ p.nome }}</strong><br>
+              <span style="font-size:0.85rem; color:#6c757d;">{{ p.marca }}</span>
+            </div>
+          </td>
+
+          <td style="padding:12px;">{{ p.sku }}</td>
+          <td style="padding:12px;">{{ p.categoria }}</td>
+
+          <td style="padding:12px;">R$ {{ p.preco }}</td>
+          <td style="padding:12px;">{{ p.quantidade }}</td>
+          <td style="padding:12px;">R$ {{ p.valor_total|floatformat:2 }}</td>
+
+          <td style="padding:12px;">
+            {% if p.status == 'ok' %}
+              <span class="badge green">Em Estoque</span>
+            {% elif p.status == 'baixo' %}
+              <span class="badge yellow">Estoque Baixo</span>
+            {% else %}
+              <span class="badge red">Sem Estoque</span>
+            {% endif %}
+          </td>
+
+          <td style="padding:12px; display:flex; gap:8px;">
+            <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer;">visibility</span>
+            <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer;">edit</span>
+            <span class="material-icons-outlined" style="color:#198754; cursor:pointer;">add</span>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGINAÇÃO FALSA DO Figma -->
+<div style="margin-top:15px; display:flex; justify-content:center; gap:10px;">
+  <button class="btn-action" style="padding:5px 10px;">Anterior</button>
+  <button class="btn-action primary" style="background:#0d6efd; padding:5px 12px;">1</button>
+  <button class="btn-action" style="padding:5px 12px;">2</button>
+  <button class="btn-action" style="padding:5px 12px;">3</button>
+  <button class="btn-action" style="padding:5px 10px;">Próximo</button>
+</div>
+
+{% endblock %}

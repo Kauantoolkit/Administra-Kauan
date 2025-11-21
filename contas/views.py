@@ -74,3 +74,7 @@ def clientes_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def estoque_view(request):
+    return render(request, 'estoque.html')
