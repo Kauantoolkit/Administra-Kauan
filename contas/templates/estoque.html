@@ -1,491 +1,187 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Administra - Estoque</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% extends 'base.html' %}
+{% load static %}
 
-    <style>
-        /* Variáveis de Cores */
-        :root {
-            --primary: #0d6efd;
-            --bg-page: #f4f7fc;
-            --text-dark: #212529;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-            --card-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            --sidebar-width: 250px;
-        }
+{% block title %}Estoque - Administra{% endblock %}
 
-        /* Estilos Globais e Body */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-dark);
-            margin: 0;
-            display: flex; /* Habilita o layout lateral */
-            min-height: 100vh;
-        }
-        
-        /* Estilos do Menu Lateral (Sidebar) */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: white;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+{% block content %}
 
-        .sidebar-header {
-            font-size: 20px;
-            font-weight: 700;
-            padding: 0 20px 20px;
-            color: var(--primary);
-            border-bottom: 1px solid var(--border-color);
-        }
+<div class="header">
+  <h1>Estoque</h1>
 
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            text-decoration: none;
-            color: var(--text-dark);
-            transition: background-color 0.2s, color 0.2s;
-            font-weight: 500;
-            gap: 15px;
-            border-left: 5px solid transparent;
-        }
+  <div class="header-info">
+    <button class="btn-action primary" style="background:#28a745; border-color:#28a745;">
+      + Entrada Estoque
+    </button>
 
-        .sidebar-nav a:hover {
-            background-color: #f0f3f8;
-        }
+    <button class="btn-action primary" style="background:#0d6efd;">
+      + Novo Produto
+    </button>
+  </div>
+</div>
 
-        .sidebar-nav a.active {
-            background-color: #e6effd; /* Cor mais clara do background ativo */
-            color: var(--primary);
-            border-left-color: var(--primary);
-            font-weight: 600;
-        }
+<h3 style="margin-bottom:20px; color:#6c757d;">Gerencie produtos e controle de estoque</h3>
 
-        .sidebar-user {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            color: var(--text-dark);
-        }
-        
-        .sidebar-user .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #ccc;
-        }
+<!-- ==== CARDS DO TOPO (idênticos ao Figma) ==== -->
+<div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
 
-        /* Área Principal de Conteúdo */
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            margin-left: var(--sidebar-width); /* Ajusta para a largura da sidebar */
-            position: absolute; /* Para ficar lado a lado */
-            left: 0;
-            right: 0;
-            margin-left: var(--sidebar-width);
-            padding-right: 20px;
-        }
-        
-        /* Navbar Superior (Apenas para mostrar o nome e data) */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            height: 60px;
-            background: white;
-            border-bottom: 1px solid var(--border-color);
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-            z-index: 10;
-        }
-        
-        .topbar-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 14px;
-        }
-        
-        .topbar-info .date {
-            color: var(--text-muted);
-        }
-
-        /* Estilos do Conteúdo (já contidos no seu código, ajustados para padding) */
-        .content-area {
-            padding-top: 80px; /* Espaço para a topbar fixa */
-        }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .title h2 { font-size: 24px; font-weight: 700; margin: 0; }
-        .title p { color: var(--text-muted); margin: 5px 0 0 0; font-size: 14px; }
-
-        /* Botões */
-        .btn {
-            padding: 10px 16px; border-radius: 8px; border: none;
-            font-weight: 500; font-size: 14px; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 8px;
-            text-decoration: none; transition: opacity 0.2s;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn-green { background: #22c55e; color: white; }
-        .btn-blue { background: #3b82f6; color: white; }
-        .btn-light { background: #f8f9fa; color: #495057; border: 1px solid var(--border-color); }
-
-        /* Cards Stats */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Ajustado para caber 5 colunas */
-            gap: 20px; margin-bottom: 25px;
-        }
-        .card {
-            background: white; padding: 20px; border-radius: 16px;
-            box-shadow: var(--card-shadow); display: flex; justify-content: space-between;
-        }
-        .stat-val { font-size: 26px; font-weight: 700; margin: 5px 0; }
-        .stat-lbl { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-        
-        /* Ícones coloridos */
-        .icon-box { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .bg-blue { background: #e0f2fe; color: #0ea5e9; }
-        .bg-green { background: #dcfce7; color: #22c55e; }
-        .bg-red { background: #fee2e2; color: #ef4444; }
-        .bg-orange { background: #ffedd5; color: #f97316; }
-        .bg-purple { background: #f3e8ff; color: #a855f7; }
-
-        /* Filtros */
-        .filters {
-            background: white; padding: 15px; border-radius: 12px;
-            box-shadow: var(--card-shadow); margin-bottom: 25px;
-            display: flex; gap: 15px; flex-wrap: wrap;
-        }
-        .form-control {
-            padding: 10px 15px; border: 1px solid var(--border-color);
-            border-radius: 8px; outline: none; font-size: 14px;
-        }
-        .select-status {
-            flex: 1; 
-            min-width: 120px; 
-        }
-
-        /* Tabela */
-        .table-box { background: white; border-radius: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px 20px; font-size: 12px; color: var(--text-muted); background: #f9fafb; text-transform: uppercase; }
-        td { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; font-size: 14px; vertical-align: middle; }
-        
-        /* Status Badges */
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .status-ok { background: #dcfce7; color: #166534; }
-        .status-bajo { background: #fef9c3; color: #854d0e; }
-        .status-zerado { background: #fee2e2; color: #991b1b; }
-    </style>
-</head>
-<body>
-
-    <div class="sidebar">
-        <div>
-            <div class="sidebar-header">
-                Administra
-                <div style="font-size:12px; color:var(--text-muted); font-weight:500;">Painel de Gestão</div>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#"><span class="material-icons-outlined">dashboard</span> Dashboard</a>
-                <a href="#"><span class="material-icons-outlined">point_of_sale</span> Caixa</a>
-                <a href="#"><span class="material-icons-outlined">people_alt</span> Clientes</a>
-                <a href="#"><span class="material-icons-outlined">local_shipping</span> Fornecedores</a>
-                <a href="#" class="active"><span class="material-icons-outlined">inventory_2</span> Estoque</a>
-                <a href="#"><span class="material-icons-outlined">group</span> Funcionários</a>
-                <a href="#"><span class="material-icons-outlined">summarize</span> Relatórios</a>
-            </nav>
-        </div>
-        <div class="sidebar-user">
-            <div class="avatar" style="background-color:#9ca3af;"></div>
-            João Silva
-        </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Total Produtos</h5>
+      <h2>{{ total_produtos }}</h2>
+      <p class="positive">+45 este mês</p>
     </div>
-
-    <div class="topbar">
-        <div class="topbar-info">
-            <span class="date">Hoje: 09/10/2025</span>
-            <span class="material-icons-outlined" style="color:#22c55e;">notifications_active</span>
-            14:30:46
-        </div>
+    <div class="stat-card-icon">
+      <span class="material-icons-outlined">inventory</span>
     </div>
+  </div>
 
-    <div class="main-content">
-        <div class="content-area">
-            <div class="header">
-                <div class="title">
-                    <h2>Controle de Estoque</h2>
-                    <p>Gerencie produtos, preços e quantidades</p>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn btn-green">
-                        <span class="material-icons-outlined">add</span> Entrada Estoque
-                    </button>
-                    <button class="btn btn-blue">
-                        <span class="material-icons-outlined">inventory_2</span> Novo Produto
-                    </button>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="card">
-                    <div>
-                        <div class="stat-lbl">Total Produtos</div>
-                        <div class="stat-val">2.456</div>
-                        <small style="color:#22c55e;">+45 este mês</small>
-                    </div>
-                    <div class="icon-box bg-blue"><span class="material-icons-outlined">inventory</span></div>
-                </div>
-                
-                <div class="card">
-                    <div>
-                        <div class="stat-lbl">Valor Total</div>
-                        <div class="stat-val">R$ 124.850</div>
-                        <small style="color:#22c55e;">valor do estoque</small>
-                    </div>
-                    <div class="icon-box bg-green"><span class="material-icons-outlined">paid</span></div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="stat-lbl">Estoque Baixo</div>
-                        <div class="stat-val" style="color:#dc3545;">23</div>
-                        <small style="color:#dc3545;">produtos críticos</small>
-                    </div>
-                    <div class="icon-box bg-red"><span class="material-icons-outlined">warning</span></div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="stat-lbl">Sem Estoque</div>
-                        <div class="stat-val" style="color:#fd7e14;">8</div>
-                        <small style="color:#fd7e14;">produtos zerados</small>
-                    </div>
-                    <div class="icon-box bg-orange"><span class="material-icons-outlined">block</span></div>
-                </div>
-
-                <div class="card">
-                    <div>
-                        <div class="stat-lbl">Categorias</div>
-                        <div class="stat-val">12</div>
-                        <small style="color:#a855f7;">diferentes</small>
-                    </div>
-                    <div class="icon-box bg-purple"><span class="material-icons-outlined">category</span></div>
-                </div>
-            </div>
-
-            <form class="filters">
-                <input type="text" name="busca_nome" class="form-control" style="flex:2;" placeholder="Nome do produto..." value="">
-                <input type="text" name="busca_sku" class="form-control" style="flex:1;" placeholder="Código / SKU..." value="">
-                
-                <select name="categoria" class="form-control" style="flex:1;">
-                    <option>Todas Categorias</option>
-                    <option value="Eletrônicos">Eletrônicos</option>
-                    <option value="Roupas">Roupas</option>
-                    <option value="Esportes">Esportes</option>
-                    <option value="Casa e Jardim">Casa e Jardim</option>
-                </select>
-                
-                <select name="status" class="form-control select-status">
-                    <option>Todos Status</option>
-                    <option value="ok">Em Estoque</option>
-                    <option value="baixo">Estoque Baixo</option>
-                    <option value="zerado">Sem Estoque</option>
-                </select>
-                
-                <button type="submit" class="btn btn-light">
-                    <span class="material-icons-outlined">search</span> Buscar
-                </button>
-            </form>
-
-            <div class="table-box">
-                <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                    <h3 style="margin:0; font-size:18px;">Lista de Produtos</h3>
-                    <div>
-                        <button class="btn btn-light" style="padding:6px 12px; font-size:12px; margin-right: 5px;">Exportar</button>
-                        <button class="btn btn-light" style="padding:6px 12px; font-size:12px;">Imprimir Códigos</button>
-                    </div>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>SKU</th>
-                            <th>Categoria</th>
-                            <th>Preço</th>
-                            <th>Qtd</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width:40px; height:40px; background:#f3f4f6; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#adb5bd;">
-                                        <span class="material-icons-outlined">image</span>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600;">iPhone 15 Pro Max</div>
-                                        <div style="font-size:12px; color:#6c757d;">Apple</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#6c757d;">IPTISM001</td>
-                            <td style="color:#6c757d;">Eletrônicos</td>
-                            <td style="font-weight:500;">R$ 8.999,00</td>
-                            <td>15</td>
-                            <td style="font-weight:600;">R$ 134.985,00</td>
-                            <td><span class="badge status-ok">Em Estoque</span></td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer; font-size:20px;">visibility</span>
-                                    <span class="material-icons-outlined" style="color:#198754; cursor:pointer; font-size:20px;">edit</span>
-                                    <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer; font-size:20px;">add_circle</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width:40px; height:40px; background:#f3f4f6; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#adb5bd;">
-                                        <span class="material-icons-outlined">image</span>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600;">Camiseta Polo</div>
-                                        <div style="font-size:12px; color:#6c757d;">Lacoste</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#6c757d;">LAC001</td>
-                            <td style="color:#6c757d;">Roupas</td>
-                            <td style="font-weight:500;">R$ 189,90</td>
-                            <td>3</td>
-                            <td style="font-weight:600;">R$ 569,70</td>
-                            <td><span class="badge status-bajo">Estoque Baixo</span></td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer; font-size:20px;">visibility</span>
-                                    <span class="material-icons-outlined" style="color:#198754; cursor:pointer; font-size:20px;">edit</span>
-                                    <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer; font-size:20px;">add_circle</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width:40px; height:40px; background:#f3f4f6; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#adb5bd;">
-                                        <span class="material-icons-outlined">image</span>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600;">MacBook Air M2</div>
-                                        <div style="font-size:12px; color:#6c757d;">Apple</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#6c757d;">MBA001</td>
-                            <td style="color:#6c757d;">Eletrônicos</td>
-                            <td style="font-weight:500;">R$ 12.499,00</td>
-                            <td>0</td>
-                            <td style="font-weight:600;">R$ 0,00</td>
-                            <td><span class="badge status-zerado">Sem Estoque</span></td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer; font-size:20px;">visibility</span>
-                                    <span class="material-icons-outlined" style="color:#198754; cursor:pointer; font-size:20px;">edit</span>
-                                    <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer; font-size:20px;">add_circle</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width:40px; height:40px; background:#f3f4f6; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#adb5bd;">
-                                        <span class="material-icons-outlined">image</span>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600;">Tênis Running</div>
-                                        <div style="font-size:12px; color:#6c757d;">Nike</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#6c757d;">NIK001</td>
-                            <td style="color:#6c757d;">Esportes</td>
-                            <td style="font-weight:500;">R$ 459,90</td>
-                            <td>28</td>
-                            <td style="font-weight:600;">R$ 12.877,20</td>
-                            <td><span class="badge status-ok">Em Estoque</span></td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer; font-size:20px;">visibility</span>
-                                    <span class="material-icons-outlined" style="color:#198754; cursor:pointer; font-size:20px;">edit</span>
-                                    <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer; font-size:20px;">add_circle</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:12px;">
-                                    <div style="width:40px; height:40px; background:#f3f4f6; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#adb5bd;">
-                                        <span class="material-icons-outlined">image</span>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600;">Cadeira Gamer</div>
-                                        <div style="font-size:12px; color:#6c757d;">DXRacer</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="color:#6c757d;">DXR001</td>
-                            <td style="color:#6c757d;">Casa e Jardim</td>
-                            <td style="font-weight:500;">R$ 1.299,00</td>
-                            <td>12</td>
-                            <td style="font-weight:600;">R$ 15.588,00</td>
-                            <td><span class="badge status-ok">Em Estoque</span></td>
-                            <td>
-                                <div style="display:flex; gap:5px;">
-                                    <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer; font-size:20px;">visibility</span>
-                                    <span class="material-icons-outlined" style="color:#198754; cursor:pointer; font-size:20px;">edit</span>
-                                    <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer; font-size:20px;">add_circle</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:13px; color:#6c757d;">Mostrando 1 a 5 de 2.456 produtos</span>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn btn-light" style="padding:5px 10px;">Anterior</button>
-                        <button class="btn btn-blue" style="padding:5px 12px;">1</button>
-                        <button class="btn btn-light" style="padding:5px 12px;">2</button>
-                        <button class="btn btn-light" style="padding:5px 12px;">3</button>
-                        <button class="btn btn-light" style="padding:5px 10px;">Próximo</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Valor Total</h5>
+      <h2>R$ {{ valor_total|floatformat:2 }}</h2>
+      <p class="positive">valor do estoque</p>
     </div>
+    <div class="stat-card-icon positive">
+      <span class="material-icons-outlined">paid</span>
+    </div>
+  </div>
 
-</body>
-</html>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Estoque Baixo</h5>
+      <h2>{{ baixo_estoque }}</h2>
+      <p class="negative">produtos críticos</p>
+    </div>
+    <div class="stat-card-icon warning">
+      <span class="material-icons-outlined">warning</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Sem Estoque</h5>
+      <h2>{{ sem_estoque }}</h2>
+      <p class="negative">produtos zerados</p>
+    </div>
+    <div class="stat-card-icon negative">
+      <span class="material-icons-outlined">error_outline</span>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Categorias</h5>
+      <h2>{{ total_categorias }}</h2>
+      <p class="positive">diferentes</p>
+    </div>
+    <div class="stat-card-icon positive">
+      <span class="material-icons-outlined">category</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= FILTROS ======= -->
+<div class="card" style="margin-bottom:20px;">
+  <div class="card-body" style="display:flex; gap:15px; flex-wrap: wrap;">
+
+    <input type="text" placeholder="Nome do Produto..." 
+      style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:200px;">
+
+    <input type="text" placeholder="Código / SKU..." 
+      style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:180px;">
+
+    <select style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:180px;">
+      <option>Todas Categorias</option>
+    </select>
+
+    <select style="padding:10px; border:1px solid #e9ecef; border-radius:8px; width:150px;">
+      <option>Todos Status</option>
+    </select>
+
+    <button class="btn-action primary" style="background:#f1f3f5; color:#333; border:none;">
+      <span class="material-icons-outlined">search</span> Buscar
+    </button>
+
+  </div>
+</div>
+
+<!-- ==== TABELA ==== -->
+<div class="card">
+  <div class="card-header">
+    <h4>Lista de Produtos</h4>
+
+    <div style="display:flex; gap:10px;">
+      <button class="btn-action" style="background:#f8f9fa;">Exportar</button>
+      <button class="btn-action" style="background:#f8f9fa;">Imprimir Códigos</button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="text-align:left; border-bottom:1px solid #e9ecef;">
+          <th style="padding:12px;">Produto</th>
+          <th style="padding:12px;">SKU</th>
+          <th style="padding:12px;">Categoria</th>
+          <th style="padding:12px;">Preço</th>
+          <th style="padding:12px;">Quantidade</th>
+          <th style="padding:12px;">Valor Total</th>
+          <th style="padding:12px;">Status</th>
+          <th style="padding:12px;">Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for p in produtos %}
+        <tr style="border-bottom:1px solid #f4f4f4;">
+
+          <td style="padding:12px; display:flex; align-items:center; gap:10px;">
+            <div style="width:40px; height:40px; background:#eef1f7; border-radius:8px;"></div>
+
+            <div>
+              <strong>{{ p.nome }}</strong><br>
+              <span style="font-size:0.85rem; color:#6c757d;">{{ p.marca }}</span>
+            </div>
+          </td>
+
+          <td style="padding:12px;">{{ p.sku }}</td>
+          <td style="padding:12px;">{{ p.categoria }}</td>
+
+          <td style="padding:12px;">R$ {{ p.preco }}</td>
+          <td style="padding:12px;">{{ p.quantidade }}</td>
+          <td style="padding:12px;">R$ {{ p.valor_total|floatformat:2 }}</td>
+
+          <td style="padding:12px;">
+            {% if p.status == 'ok' %}
+              <span class="badge green">Em Estoque</span>
+            {% elif p.status == 'baixo' %}
+              <span class="badge yellow">Estoque Baixo</span>
+            {% else %}
+              <span class="badge red">Sem Estoque</span>
+            {% endif %}
+          </td>
+
+          <td style="padding:12px; display:flex; gap:8px;">
+            <span class="material-icons-outlined" style="color:#0d6efd; cursor:pointer;">visibility</span>
+            <span class="material-icons-outlined" style="color:#6f42c1; cursor:pointer;">edit</span>
+            <span class="material-icons-outlined" style="color:#198754; cursor:pointer;">add</span>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGINAÇÃO FALSA DO Figma -->
+<div style="margin-top:15px; display:flex; justify-content:center; gap:10px;">
+  <button class="btn-action" style="padding:5px 10px;">Anterior</button>
+  <button class="btn-action primary" style="background:#0d6efd; padding:5px 12px;">1</button>
+  <button class="btn-action" style="padding:5px 12px;">2</button>
+  <button class="btn-action" style="padding:5px 12px;">3</button>
+  <button class="btn-action" style="padding:5px 10px;">Próximo</button>
+</div>
+
+{% endblock %}
