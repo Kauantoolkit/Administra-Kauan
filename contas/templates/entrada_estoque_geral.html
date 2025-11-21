@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Administra - Entrada de Estoque{% endblock %}
+
+{% block content %}
+
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+
+    <!-- Header e Botão Voltar -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Registro de Entrada de Estoque</h2>
+            <p class="text-sm text-gray-500">Registre a chegada de um ou mais lotes de produtos.</p>
+        </div>
+        <div>
+            <a href="{% url 'estoque' %}" class="inline-flex items-center gap-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg shadow-sm hover:bg-gray-200 transition">
+                <span class="material-icons-outlined text-base">arrow_back</span>
+                Voltar ao Estoque
+            </a>
+        </div>
+    </div>
+
+    <!-- Box Principal do Formulário -->
+    <div class="bg-white shadow-xl rounded-xl overflow-hidden p-6 lg:p-8">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Atenção: O formulário de Entradas Múltiplas não suporta campos de cabeçalho como Fornecedor/Nota Fiscal.
+            Estes campos foram removidos para garantir o funcionamento com o EntradaEstoqueMultiplaForm. -->
+
+            <!-- Formset de Itens -->
+            <h3 class="text-lg font-semibold text-gray-700 border-b pb-3 mb-6">Itens da Entrada</h3>
+            
+            <div class="overflow-x-auto">
+                <table id="item-table" class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr class="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th class="px-3 py-3 text-left w-1/3">Produto *</th>
+                            <th class="px-3 py-3 text-left w-1/6">Qtd. Recebida *</th>
+                            <th class="px-3 py-3 text-left w-1/6">Novo Custo Unitário (R$) *</th>
+                            <th class="px-3 py-3 text-left w-1/6">Validade (Opcional)</th>
+                            <th class="px-3 py-3 text-left w-1/12">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {{ formset.management_form }}
+                        
+                        {% for item_form in formset %}
+                            <tr class="item-entry group">
+                                <td class="px-3 py-3 whitespace-nowrap">
+                                    {{ item_form.produto.errors }}
+                                    <!-- O campo produto está aqui. Ele é um select que puxa o nome dos produtos. -->
+                                    <select name="{{ item_form.produto.name }}" id="{{ item_form.produto.id_for_label }}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                        <option value="">Selecione um produto...</option>
+                                        {% for choice in item_form.produto.field.choices %}
+                                            <option value="{{ choice.0 }}" {% if item_form.produto.value|stringformat:'s' == choice.0|stringformat:'s' %}selected{% endif %}>{{ choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td class="px-3 py-3 whitespace-nowrap">
+                                    {{ item_form.quantidade.errors }}
+                                    <input type="number" name="{{ item_form.quantidade.name }}" id="{{ item_form.quantidade.id_for_label }}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" min="1" required value="{{ item_form.quantidade.value|default:'' }}">
+                                </td>
+                                <td class="px-3 py-3 whitespace-nowrap">
+                                    {{ item_form.custo_unitario.errors }}
+                                    <input type="number" step="0.01" min="0.01" name="{{ item_form.custo_unitario.name }}" id="{{ item_form.custo_unitario.id_for_label }}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" required value="{{ item_form.custo_unitario.value|default:'' }}">
+                                </td>
+                                <td class="px-3 py-3 whitespace-nowrap">
+                                    {{ item_form.validade.errors }}
+                                    <input type="date" name="{{ item_form.validade.name }}" id="{{ item_form.validade.id_for_label }}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" value="{{ item_form.validade.value|default:'' }}">
+                                </td>
+                                <td class="px-3 py-3 whitespace-nowrap text-center">
+                                    {{ item_form.id }}
+                                    {% if item_form.DELETE %}
+                                        <button type="button" class="text-red-500 hover:text-red-700 transition opacity-0 group-hover:opacity-100" title="Remover item" onclick="deleteItem(this)">
+                                            <span class="material-icons-outlined text-lg">delete</span>
+                                        </button>
+                                        {{ item_form.DELETE }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500 text-sm">Clique em "Adicionar Item" para começar.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Botão Adicionar Item -->
+            <div class="mt-4 border-t pt-4 flex justify-center">
+                <button type="button" class="inline-flex items-center gap-1 px-4 py-2 bg-gray-50 text-gray-600 rounded-lg shadow-sm border border-gray-200 hover:bg-gray-100 transition" onclick="addNewItemEntry()">
+                    <span class="material-icons-outlined text-base">add_circle_outline</span> Adicionar Outro Item
+                </button>
+            </div>
+
+            <!-- Botões de Ação Final -->
+            <div class="mt-8 pt-4 border-t border-gray-200 flex justify-end gap-3">
+                <button type="reset" class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
+                <button type="submit" class="inline-flex items-center gap-1 px-4 py-2 text-white bg-green-600 font-semibold rounded-lg shadow-md hover:bg-green-700 transition">
+                    <span class="material-icons-outlined text-lg">archive</span> Registrar Entrada
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Obtém o elemento de gerenciamento de formulários do Django (hidden input)
+    const totalForms = document.querySelector('#id_entrada-TOTAL_FORMS');
+    const tableBody = document.querySelector('#item-table tbody');
+
+    // Template para uma nova linha de entrada (usa 999 como placeholder para o índice)
+    const newEntryTemplate = `
+        <tr class="item-entry group">
+            <td class="px-3 py-3 whitespace-nowrap">
+                <select name="entrada-999-produto" id="id_entrada-999-produto" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+                    <option value="">Selecione um produto...</option>
+                    <!-- Opções serão preenchidas via JavaScript -->
+                </select>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+                <input type="number" name="entrada-999-quantidade" id="id_entrada-999-quantidade" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" min="1" required>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+                <input type="number" step="0.01" min="0.01" name="entrada-999-custo_unitario" id="id_entrada-999-custo_unitario" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm" required>
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap">
+                <input type="date" name="entrada-999-validade" id="id_entrada-999-validade" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+            </td>
+            <td class="px-3 py-3 whitespace-nowrap text-center">
+                <button type="button" class="text-red-500 hover:text-red-700 transition" title="Remover item" onclick="deleteItem(this)">
+                    <span class="material-icons-outlined text-lg">delete</span>
+                </button>
+                <input type="checkbox" name="entrada-999-DELETE" id="id_entrada-999-DELETE" style="display:none;">
+            </td>
+        </tr>
+    `;
+
+    // Função para preencher o <select> com as opções de produto
+    function populateProductOptions(selectElement) {
+        // Pega as opções do primeiro select existente (se houver) para replicar
+        const existingSelect = document.querySelector('select[name$="-produto"]');
+        if (existingSelect) {
+            // Clona todas as opções, exceto o placeholder
+            const optionsToClone = Array.from(existingSelect.options).slice(1); 
+            optionsToClone.forEach(option => {
+                const newOption = option.cloneNode(true);
+                newOption.selected = false;
+                selectElement.appendChild(newOption);
+            });
+        }
+    }
+
+    // Função para adicionar um novo item de entrada
+    function addNewItemEntry() {
+        if (!totalForms || !tableBody) return;
+
+        let currentTotal = parseInt(totalForms.value);
+        let newHtml = newEntryTemplate.replace(/999/g, currentTotal);
+
+        // Cria o elemento <tr>
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = newHtml;
+
+        // Anexa o novo <tr> ao tbody (antes do último <tr> que é o botão 'Adicionar Outro Item')
+        // Encontra o <tr> que contém o botão 'Adicionar Outro Item'
+        const addButtonRow = tableBody.querySelector('tr:last-child');
+        
+        // Se houver itens na tabela, insere antes da última linha. Se não houver, insere no final.
+        if (addButtonRow && addButtonRow.querySelector('button[onclick="addNewItemEntry()"]')) {
+             tableBody.insertBefore(newRow, addButtonRow);
+        } else {
+             // Caso a tabela estava vazia, insere a linha normalmente.
+             // Remove a linha 'Clique para adicionar um item' se ela existir.
+             const emptyRow = tableBody.querySelector('td.text-gray-500');
+             if (emptyRow) emptyRow.parentNode.remove();
+             tableBody.appendChild(newRow);
+        }
+
+
+        // Preenche as opções de produto no novo select
+        const newSelect = newRow.querySelector('select[name$="-produto"]');
+        if (newSelect) {
+            populateProductOptions(newSelect);
+        }
+
+        // Atualiza o TOTAL_FORMS
+        totalForms.value = currentTotal + 1;
+    }
+
+    // Função para marcar o item para exclusão (necessário para formsets)
+    function deleteItem(button) {
+        // Encontra a linha <tr>
+        const row = button.closest('.item-entry');
+        if (!row) return;
+
+        // Encontra o checkbox hidden de DELETE
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
+        if (deleteCheckbox) {
+            // Marca o checkbox para exclusão lógica (no submit)
+            deleteCheckbox.checked = true;
+            
+            // Remove visualmente
+            row.style.display = 'none';
+        } else {
+            // Se for um item recém-adicionado e não persistido, apenas remove a linha
+            row.remove();
+            
+            // Reajusta os índices dos formulários restantes (necessário para formsets)
+            updateFormIndices();
+        }
+    }
+
+    // Função auxiliar para reindexar os formulários após exclusão (se a exclusão não for via checkbox)
+    function updateFormIndices() {
+        const rows = tableBody.querySelectorAll('.item-entry');
+        rows.forEach((row, index) => {
+            // Atualiza o índice nos atributos 'name' e 'id'
+            const newIndex = `entrada-${index}`;
+            row.querySelectorAll('[name]').forEach(input => {
+                const name = input.name;
+                input.name = name.replace(/entrada-\d+/, newIndex);
+                if (input.id) {
+                    input.id = input.id.replace(/entrada_\d+/, `id_${newIndex}`);
+                }
+            });
+        });
+
+        // Atualiza o TOTAL_FORMS se a exclusão foi visual (não apenas ocultando)
+        let currentTotal = parseInt(totalForms.value);
+        if (rows.length < currentTotal) {
+            totalForms.value = rows.length;
+        }
+    }
+
+
+    // Garante que pelo menos um item seja exibido se a tabela estiver completamente vazia (opcional)
+    document.addEventListener('DOMContentLoaded', () => {
+        if (tableBody.querySelectorAll('.item-entry').length === 0) {
+            // Verifica se a linha de "Clique para adicionar" está lá. Se não estiver, adiciona uma linha.
+            if (!tableBody.querySelector('td.text-gray-500')) {
+                 addNewItemEntry();
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}
