@@ -40,17 +40,3 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
-
-class Estoque(models.Model):
-    nome = models.CharField(max_length=255)
-    categoria = models.CharField(max_length=100)
-    quantidade = models.IntegerField(default=0)
-
-    preco = models.DecimalField(
-        max_digits=10,     # Total de dígitos permitidos
-        decimal_places=2   # Quantidade de casas decimais (ex: 10.50)
-    )
-
-    def __str__(self):
-        return self.nome
