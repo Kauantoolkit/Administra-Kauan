@@ -5,11 +5,19 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
 
 @login_required
-def lista_vendas(request):
-    vendas = Venda.objects.all()
-    return render(request, 'vendas/lista_vendas.html', {'vendas': vendas})
+def lista_vendas(request): 
+    vendas_list = Venda.objects.all()
+    
+    paginator = Paginator(vendas_list, 10) 
+    
+    page_number = request.GET.get('page')
+    
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'vendas/lista_vendas.html', {'vendas': page_obj})
 
 @login_required
 def criar_venda(request):
