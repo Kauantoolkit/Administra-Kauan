@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Nova Venda - Administra{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>Nova Venda</h1>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header"><h4>Dados da Venda</h4></div>
+        <div class="card-body">
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: bold;">Cliente</label>
+                {{ form.cliente }}
+            </div>
+            <div>
+                <label style="font-weight: bold;">Observações</label>
+                {{ form.observacoes }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Itens da Venda</h4>
+            <button type="button" id="add-item" class="btn-action">
+                <span class="material-icons-outlined">add</span> Adicionar Produto
+            </button>
+        </div>
+        <div class="card-body">
+            
+            {{ formset.management_form }}
+            
+            <table class="table" id="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60%;">Produto</th>
+                        <th style="width: 20%;">Quantidade</th>
+                        <th style="width: 10%; text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for form in formset %}
+                    <tr class="item-row">
+                        <td>
+                            {{ form.produto }}
+                            {% if form.id %}{{ form.id }}{% endif %}
+                        </td>
+                        <td>{{ form.quantidade }}</td>
+                        <td style="text-align: center;">
+                            <span style="display: none;">{{ form.DELETE }}</span>
+                            
+                            <button type="button" class="btn-remove-item" style="background: none; border: none; color: #dc3545; cursor: pointer;">
+                                <span class="material-icons-outlined">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; text-align: right;">
+        <a href="{% url 'lista_vendas' %}" class="btn-action" style="display: inline-flex; margin-right: 1rem;">Cancelar</a>
+        <button type="submit" class="btn-action primary" style="border:none; font-size: 1rem; cursor: pointer;">
+            Finalizar Venda
+        </button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateElementIndex(el, prefix, ndx) {
+            var id_regex = new RegExp('(' + prefix + '-\\d+)');
+            var replacement = prefix + '-' + ndx;
+            if (el.id) el.id = el.id.replace(id_regex, replacement);
+            if (el.name) el.name = el.name.replace(id_regex, replacement);
+        }
+
+        document.getElementById('add-item').addEventListener('click', function(e) {
+            e.preventDefault();
+            var tableBody = document.querySelector('#items-table tbody');
+            var newRow = tableBody.rows[0].cloneNode(true);
+            var totalForms = document.getElementById('id_itemvenda_set-TOTAL_FORMS');
+            var formIdx = parseInt(totalForms.value);
+
+            var inputs = newRow.querySelectorAll('input, select');
+            inputs.forEach(function(input) {
+                updateElementIndex(input, 'itemvenda_set', formIdx);
+                input.value = '';
+                if(input.type === 'number') input.value = 1;
+            });
+
+            tableBody.appendChild(newRow);
+            totalForms.value = formIdx + 1;
+
+            attachDeleteEvent(newRow.querySelector('.btn-remove-item'));
+        });
+
+        function attachDeleteEvent(button) {
+            button.addEventListener('click', function() {
+                var row = this.closest('tr');
+                var totalForms = document.getElementById('id_itemvenda_set-TOTAL_FORMS');
+                
+                if (document.querySelectorAll('.item-row').length > 1) {
+                    row.remove();
+                    var currentForms = parseInt(totalForms.value);
+                    totalForms.value = currentForms - 1;
+                } else {
+                    alert("A venda precisa ter pelo menos um produto.");
+                }
+            });
+        }
+
+        document.querySelectorAll('.btn-remove-item').forEach(function(button) {
+            attachDeleteEvent(button);
+        });
+    });
+</script>
+
+<style>
+    .form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    #items-table td { vertical-align: middle; }
+</style>
+
+{% endblock %}

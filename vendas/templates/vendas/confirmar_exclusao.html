@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Venda - Administra{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto; text-align: center;">
+    <div class="card-header" style="background-color: #fde8e8; color: #dc3545;">
+        <h4>Confirmar Exclusão</h4>
+    </div>
+    <div class="card-body">
+        <p style="font-size: 1.1rem;">Tem certeza que deseja excluir a venda <strong>#{{ object.id }}</strong>?</p>
+        <p>Cliente: {{ object.cliente.nome }}<br>Total: R$ {{ object.total }}</p>
+        
+        <p style="color: #6c757d; font-size: 0.9rem;">Essa ação não pode ser desfeita.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+                <a href="{% url 'lista_vendas' %}" class="btn-action">Cancelar</a>
+                <button type="submit" class="btn-action" style="background-color: #dc3545; color: white; border: none; cursor: pointer;">
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

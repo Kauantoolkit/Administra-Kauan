@@ -6,6 +6,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import datetime
 import locale
+from django.db.models import Sum
+from django.utils import timezone
+from vendas.models import Venda, ItemVenda
+from clientes.models import Cliente
+from vendas.models import Produto
 
 def cadastro_view(request):
     if request.method == 'POST':
@@ -57,12 +62,29 @@ def dashboard_view(request):
 
     today = datetime.date.today()
     data_formatada = today.strftime('%d de %B de %Y')
+
+    hoje = timezone.now().date()
     
+    total_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
+    
+    produtos_vendidos = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    
+    try:
+        clientes_ativos = Cliente.objects.filter(status='ativo').count()
+    except:
+        clientes_ativos = 0
+
+    try:
+        produtos_falta = Produto.objects.filter(estoque_atual__lt=10).count()
+    except:
+        produtos_falta = 0
+        
     context = {
-        'data_hoje': data_formatada
-        # TODO adicionar valores para que v'ao vir das proximas telas
-        # 'vendas_hoje': 2847,
-        # 'produtos_vendidos': 147,
+        'data_hoje': data_formatada,
+        'vendas_hoje': total_hoje,
+        'produtos_vendidos': produtos_vendidos,
+        'clientes_ativos': clientes_ativos,
+        'produtos_falta': produtos_falta,
     }
     
     return render(request, 'dashboard.html', context)
