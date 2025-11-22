@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatórios - Administra{% endblock %}
+
+{% block content %}
+
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .report-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-filter {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .btn-export {
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.9rem;
+    }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .kpi-info h3 {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kpi-info .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin: 5px 0;
+        display: block;
+    }
+
+    .kpi-badge {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .bg-up { background: #d1e7dd; color: #0f5132; }
+    .bg-down { background: #f8d7da; color: #842029; }
+
+    .kpi-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .icon-blue { background: #e7f0ff; color: #0d6efd; }
+    .icon-green { background: #d1e7dd; color: #198754; }
+    .icon-purple { background: #e0cffc; color: #6f42c1; }
+    .icon-yellow { background: #fff3cd; color: #ffc107; }
+
+    .charts-section {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .chart-header h4 { margin: 0; color: #333; }
+
+    .tables-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .table-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .table-custom th {
+        text-align: left;
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.85rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .table-custom td {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+        font-size: 0.9rem;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+
+    @media (max-width: 992px) {
+        .charts-section, .tables-section {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="report-header">
+    <div>
+        <h1 style="margin:0; font-size: 1.8rem;">Análise de Performance</h1>
+        <span style="color: #6c757d; font-size: 0.9rem;">Dados consolidados do último mês</span>
+    </div>
+    <div class="report-actions">
+        <button class="btn-filter">
+            <span class="material-icons-outlined" style="font-size: 18px;">calendar_today</span>
+            01/09/2025 - 30/09/2025
+        </button>
+        <button class="btn-filter">
+            <span class="material-icons-outlined" style="font-size: 18px;">filter_list</span>
+            Filtrar
+        </button>
+        <button class="btn-export">
+            <span class="material-icons-outlined" style="font-size: 18px;">download</span>
+            Exportar Relatório
+        </button>
+    </div>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Total de Vendas</h3>
+            <span class="value">R$ 128.750</span>
+            <span class="kpi-badge bg-up">↑ 12.5%</span>
+        </div>
+        <div class="kpi-icon icon-blue">
+            <span class="material-icons-outlined">attach_money</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Lucro Bruto</h3>
+            <span class="value">R$ 45.320</span>
+            <span class="kpi-badge bg-up">↑ 8.2%</span>
+        </div>
+        <div class="kpi-icon icon-green">
+            <span class="material-icons-outlined">account_balance_wallet</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Novos Clientes</h3>
+            <span class="value">342</span>
+            <span class="kpi-badge bg-up">↑ 25</span>
+        </div>
+        <div class="kpi-icon icon-purple">
+            <span class="material-icons-outlined">person_add</span>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-info">
+            <h3>Ticket Médio</h3>
+            <span class="value">R$ 152,40</span>
+            <span class="kpi-badge bg-down">↓ 1.8%</span>
+        </div>
+        <div class="kpi-icon icon-yellow">
+            <span class="material-icons-outlined">receipt_long</span>
+        </div>
+    </div>
+</div>
+
+<div class="charts-section">
+    <div class="chart-container">
+        <div class="chart-header">
+            <h4>Evolução das Vendas</h4>
+            <span class="material-icons-outlined" style="color:#ccc; cursor:pointer;">more_horiz</span>
+        </div>
+        <div style="height: 300px;">
+            <canvas id="salesLineChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-container">
+        <div class="chart-header">
+            <h4>Vendas por Categoria</h4>
+            <span class="material-icons-outlined" style="color:#ccc; cursor:pointer;">more_horiz</span>
+        </div>
+        <div style="height: 250px; display:flex; justify-content:center;">
+            <canvas id="categoryPieChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="tables-section">
+    <div class="table-card">
+        <h4>Produtos Mais Vendidos</h4>
+        <table class="table-custom">
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Camiseta Básica Branca</strong><br>
+                        <span style="font-size:0.8rem; color:#999;">ID: 1001</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <strong>215</strong> unid.<br>
+                        <span style="color: #198754; font-size:0.8rem;">R$ 10.750</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Calça Jeans Slim</strong><br>
+                        <span style="font-size:0.8rem; color:#999;">ID: 2003</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <strong>188</strong> unid.<br>
+                        <span style="color: #198754; font-size:0.8rem;">R$ 28.200</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Tênis Casual Urbano</strong><br>
+                        <span style="font-size:0.8rem; color:#999;">ID: 4010</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <strong>152</strong> unid.<br>
+                        <span style="color: #198754; font-size:0.8rem;">R$ 37.848</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-card">
+        <h4>Desempenho dos Vendedores</h4>
+        <table class="table-custom">
+            <thead>
+                <tr>
+                    <th>Vendedor</th>
+                    <th style="text-align: right;">Vendas (R$)</th>
+                    <th style="text-align: right;">Qtd</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="https://ui-avatars.com/api/?name=Maria+Oliveira&background=random" class="user-avatar">
+                        Maria Oliveira
+                    </td>
+                    <td style="text-align: right;">R$ 32.450</td>
+                    <td style="text-align: right;">210</td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="https://ui-avatars.com/api/?name=Pedro+Henrique&background=random" class="user-avatar">
+                        Pedro Henrique
+                    </td>
+                    <td style="text-align: right;">R$ 28.980</td>
+                    <td style="text-align: right;">195</td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="https://ui-avatars.com/api/?name=Carla+Souza&background=random" class="user-avatar">
+                        Carla Souza
+                    </td>
+                    <td style="text-align: right;">R$ 25.120</td>
+                    <td style="text-align: right;">178</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const ctxLine = document.getElementById('salesLineChart').getContext('2d');
+    
+    let gradient = ctxLine.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(13, 110, 253, 0.2)'); 
+    gradient.addColorStop(1, 'rgba(13, 110, 253, 0)');
+
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+            datasets: [{
+                label: 'Vendas',
+                data: [28000, 35000, 32000, 42000],
+                borderColor: '#0d6efd',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Roupas', 'Calçados', 'Acessórios', 'Outros'],
+            datasets: [{
+                data: [35, 45, 15, 5],
+                backgroundColor: ['#0d6efd', '#6610f2', '#198754', '#ffc107'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { position: 'right', labels: { boxWidth: 10, usePointStyle: true } }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
