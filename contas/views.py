@@ -84,60 +84,80 @@ def _create_default_categories():
 
 @login_required
 def estoque_view(request):
-    form = BuscaEstoqueForm(request.GET)
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
     produtos_list = Produto.objects.all()
-    if form.is_valid():
-        if form.cleaned_data['busca_nome']:
-            produtos_list = produtos_list.filter(nome__icontains=form.cleaned_data['busca_nome'])
-        if form.cleaned_data['busca_sku']:
-            produtos_list = produtos_list.filter(sku__icontains=form.cleaned_data['busca_sku'])
-        if form.cleaned_data['categoria']:
-            produtos_list = produtos_list.filter(categoria=form.cleaned_data['categoria'])
-        if form.cleaned_data['status']:
-            produtos_list = produtos_list.filter(status=form.cleaned_data['status'])
+
+    if nome:
+        produtos_list = produtos_list.filter(nome__icontains=nome)
+
+    if sku:
+        produtos_list = produtos_list.filter(sku__icontains=sku)
+
+    if categoria:
+        produtos_list = produtos_list.filter(categoria_id=categoria)
+
+    if status:
+        if status == "ok":
+            produtos_list = produtos_list.filter(
+                quantidade_estoque__gt=F("quantidade_minima_alerta")
+            )
+        elif status == "baixo":
+            produtos_list = produtos_list.filter(
+                quantidade_estoque__gt=0,
+                quantidade_estoque__lte=F("quantidade_minima_alerta")
+            )
+        elif status == "zerado":
+            produtos_list = produtos_list.filter(quantidade_estoque=0)
+
     produtos_list = produtos_list.order_by('nome')
+
     total_de_produtos_cadastrados = Produto.objects.count()
     total_itens_estoque = Produto.objects.aggregate(total=Sum('quantidade_estoque'))['total'] or 0
     valor_total_estoque = Produto.objects.aggregate(total=Sum(F('custo') * F('quantidade_estoque')))['total'] or 0.00
-    estoque_baixo_count = Produto.objects.filter(status='BAIXO').count()
-    produtos_zerados_count = Produto.objects.filter(status='ZERADO').count()
+
+    estoque_baixo_count = Produto.objects.filter(
+        quantidade_estoque__gt=0,
+        quantidade_estoque__lte=F("quantidade_minima_alerta")
+    ).count()
+
+    produtos_zerados_count = Produto.objects.filter(
+        quantidade_estoque=0
+    ).count()
+
     total_categorias = Categoria.objects.count()
+
     trinta_dias_atras = datetime.date.today() - datetime.timedelta(days=30)
+
     produtos_mes_anterior = Produto.objects.filter(data_criacao__date__lt=trinta_dias_atras).count()
     produtos_mes_atual = Produto.objects.filter(data_criacao__date__gte=trinta_dias_atras).count()
     variacao = produtos_mes_atual - produtos_mes_anterior
-    itens_por_pagina = 10
-    paginator = Paginator(produtos_list, itens_por_pagina)
+
+    paginator = Paginator(produtos_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
     context = {
         'page_obj': page_obj,
         'produtos': page_obj.object_list,
-        'form': form,
+        'nome': nome,
+        'sku': sku,
+        'categoria': categoria,
+        'status': status,
         'total_produtos_cadastrados': total_de_produtos_cadastrados,
         'valor_total_estoque': valor_total_estoque,
         'estoque_baixo_count': estoque_baixo_count,
-        'produtos_zerados_count': produtos_zerados_count,
+        'sem_estoque_count': produtos_zerados_count,
         'total_categorias': total_categorias,
         'total_itens_estoque': total_itens_estoque,
         'variacao': variacao,
+        'categorias': Categoria.objects.all(),
     }
-    return render(request, 'estoque.html', context)
 
-@login_required
-def novo_produto_view(request):
-    if request.method == 'POST':
-        form = ProdutoForm(request.POST, request.FILES)
-        if form.is_valid():
-            produto = form.save()
-            add_estoque_message(request, f'Produto "{produto.nome}" criado com sucesso!', level=SUCCESS)
-            return redirect('estoque')
-        else:
-            add_estoque_message(request, 'Erro ao salvar o produto. Verifique os dados inseridos.', level=ERROR)
-    else:
-        form = ProdutoForm()
-        add_estoque_message(request, 'Lembre-se: o estoque inicial é 0. Use a função de Entrada para adicionar unidades.', level=INFO)
-    return render(request, 'novo_produto.html', {'form': form})
+    return render(request, 'estoque.html', context)
 
 @login_required
 def detalhe_produto_view(request, pk):
@@ -238,3 +258,18 @@ def editar_produto_view(request, pk):
         add_estoque_message(request, f'Produto "{produto.nome}" atualizado com sucesso!', level=SUCCESS)
         return redirect("estoque")
     return render(request, "edicao_produto.html", {"produto": produto, "categorias": categorias})
+
+@login_required
+def novo_produto_view(request):
+    if request.method == 'POST':
+        form = ProdutoForm(request.POST, request.FILES)
+        if form.is_valid():
+            produto = form.save()
+            add_estoque_message(request, f'Produto "{produto.nome}" criado com sucesso!', level=SUCCESS)
+            return redirect('estoque')
+        else:
+            add_estoque_message(request, 'Erro ao salvar o produto. Verifique os dados inseridos.', level=ERROR)
+    else:
+        form = ProdutoForm()
+        add_estoque_message(request, 'Lembre-se: o estoque inicial é 0. Use a função de Entrada para adicionar unidades.', level=INFO)
+    return render(request, 'novo_produto.html', {'form': form})
