@@ -19,9 +19,11 @@
     <div class="stat-card-info">
       <h5>Vendas Hoje</h5>
       <h2>R$ {{ vendas_hoje|floatformat:2 }}</h2>
-      <p class="positive">+12.5%</p>
+      <p class="{% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_vendas > 0 %}+{% endif %}{{ perc_vendas|floatformat:1 }}%
+      </p>
     </div>
-    <div class="stat-card-icon positive">
+    <div class="stat-card-icon {% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
       <span class="material-icons-outlined">leaderboard</span>
     </div>
   </div>
@@ -29,7 +31,9 @@
     <div class="stat-card-info">
       <h5>Produtos Vendidos</h5>
       <h2>{{ produtos_vendidos }}</h2>
-      <p class="positive">+8.2%</p>
+      <p class="{% if perc_produtos >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_produtos > 0 %}+{% endif %}{{ perc_produtos|floatformat:1 }}%
+      </p>
     </div>
     <div class="stat-card-icon">
       <span class="material-icons-outlined">shopping_cart</span>
@@ -39,7 +43,9 @@
     <div class="stat-card-info">
       <h5>Clientes Ativos</h5>
       <h2>{{ clientes_ativos }}</h2>
-      <p class="positive">+5.1%</p>
+      <p class="{% if perc_clientes >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_clientes > 0 %}+{% endif %}{{ perc_clientes|floatformat:1 }}%
+      </p>
     </div>
     <div class="stat-card-icon">
       <span class="material-icons-outlined">groups</span>

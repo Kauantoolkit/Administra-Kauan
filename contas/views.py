@@ -53,6 +53,11 @@ def login_view(request):
 
     return render(request, 'login.html', {'form': form})
 
+def calcular_crescimento(atual, anterior):
+    if not anterior or anterior == 0:
+        return 100.0 if atual > 0 else 0.0
+    return ((atual - anterior) / anterior) * 100
+
 @login_required
 def dashboard_view(request):
     try:
@@ -64,28 +69,40 @@ def dashboard_view(request):
     data_formatada = today.strftime('%d de %B de %Y')
 
     hoje = timezone.now().date()
-    
-    total_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
-    
-    produtos_vendidos = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    ontem_data = hoje - datetime.timedelta(days=1)
 
+    vendas_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
+    vendas_ontem = Venda.objects.filter(data_venda__date=ontem_data).aggregate(Sum('total'))['total__sum'] or 0
+    
+    perc_vendas = calcular_crescimento(float(vendas_hoje), float(vendas_ontem))
+
+    prod_hoje = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    prod_ontem = ItemVenda.objects.filter(venda__data_venda__date=ontem_data).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    
+    perc_produtos = calcular_crescimento(prod_hoje, prod_ontem)
+
+    clientes_ativos = Cliente.objects.filter(status='ativo').count()
+    
+    novos_clientes_hoje = Cliente.objects.filter(data_cadastro__date=hoje).count()
+    novos_clientes_ontem = Cliente.objects.filter(data_cadastro__date=ontem_data).count()
+    perc_clientes = calcular_crescimento(novos_clientes_hoje, novos_clientes_ontem)
+
+
+    produtos_falta = Produto.objects.filter(estoque_atual__lt=10).count()
     vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
-    
-    try:
-        clientes_ativos = Cliente.objects.filter(status='ativo').count()
-    except:
-        clientes_ativos = 0
 
-    try:
-        produtos_falta = Produto.objects.filter(estoque_atual__lt=10).count()
-    except:
-        produtos_falta = 0
-        
     context = {
         'data_hoje': data_formatada,
-        'vendas_hoje': total_hoje,
-        'produtos_vendidos': produtos_vendidos,
+        
+        'vendas_hoje': vendas_hoje,
+        'perc_vendas': perc_vendas,
+        
+        'produtos_vendidos': prod_hoje,
+        'perc_produtos': perc_produtos,
+        
         'clientes_ativos': clientes_ativos,
+        'perc_clientes': perc_clientes, 
+        
         'produtos_falta': produtos_falta,
         'vendas_recentes': vendas_recentes,
     }
