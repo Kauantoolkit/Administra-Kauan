@@ -3,7 +3,6 @@ from contas.models import CustomUser
 from django.utils import timezone
 
 
-
 class Funcionario(models.Model):
     STATUS_CHOICES = [
         ("ativo", "Ativo"),
@@ -17,8 +16,6 @@ class Funcionario(models.Model):
         null=True,
         blank=True,
     )
-
-    codigo = models.CharField(max_length=10, unique=True)
 
     nome = models.CharField(max_length=255)
     cpf = models.CharField(max_length=14, unique=True)
@@ -34,6 +31,12 @@ class Funcionario(models.Model):
 
     foto = models.ImageField(upload_to='fotos/', null=True, blank=True)
 
-
     def __str__(self):
         return f"{self.nome} ({self.cargo})"
+
+    @property
+    def codigo(self):
+        """Gera um código de funcionário baseado no ID do banco, tipo F001, F002..."""
+        if self.id is None:
+            return "Novo"  # antes de salvar, ainda não há ID
+        return f"F{self.id:03d}"

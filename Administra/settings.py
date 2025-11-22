@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'contas.apps.ContasConfig',
+    'clientes.apps.ClientesConfig',
     'funcionarios.apps.FuncionariosConfig',]
 
 MIDDLEWARE = [
@@ -122,3 +123,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'contas.CustomUser'
+
+
+
+# Diretório físico para arquivos enviados pelo usuário
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# URL para acessar arquivos de mídia no navegador
+MEDIA_URL = '/media/'

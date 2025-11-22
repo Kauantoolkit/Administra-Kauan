@@ -16,15 +16,25 @@ from .forms import FuncionarioForm
 def funcionarios_list(request):
     funcionarios = Funcionario.objects.all().order_by('-id')
 
-    # --- Filtros ---
-    search = request.GET.get('search', '')
-    if search:
-        funcionarios = funcionarios.filter(nome__icontains=search)
+    # --- Filtros via GET ---
+    nome = request.GET.get('nome', '')
+    cpf = request.GET.get('cpf', '')
+    cargo = request.GET.get('cargo', '')
+    status = request.GET.get('status', '')
+
+    if nome:
+        funcionarios = funcionarios.filter(nome__icontains=nome)
+    if cpf:
+        funcionarios = funcionarios.filter(cpf__icontains=cpf)
+    if cargo:
+        funcionarios = funcionarios.filter(cargo=cargo)
+    if status:
+        funcionarios = funcionarios.filter(status=status)
 
     # --- Estatísticas dos cards ---
     total_funcionarios = funcionarios.count()
-    ativos_hoje = funcionarios.filter(status="Ativo").count()
-    ferias = funcionarios.filter(status="Férias").count()
+    ativos_hoje = funcionarios.filter(status="ativo").count()
+    ferias = funcionarios.filter(status="ferias").count()
 
     salario_medio = funcionarios.aggregate(Avg('salario'))['salario__avg'] or 0
     salario_medio = round(salario_medio, 2)
@@ -81,7 +91,7 @@ def funcionario_edit(request, pk):
     else:
         form = FuncionarioForm(instance=funcionario)
 
-    return render(request, "funcionarios/funcionario_form.html", {
+    return render(request, "funcionarios/funcionario_edit.html", {
         "form": form
     })
 

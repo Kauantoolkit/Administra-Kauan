@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Novo Funcionário{% endblock %}
+{% block title %}Editar Funcionário{% endblock %}
 
 {% block content %}
 
@@ -38,7 +38,7 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin: 10px 0;
+    margin: 20px;
 }
 
 .form-label {
@@ -73,7 +73,7 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 </style>
 
 <div class="form-card">
-    <h1>Novo Funcionário</h1>
+    <h1>Editar Funcionário</h1>
 
     {% if form.errors %}
     <div style="
@@ -104,7 +104,7 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn-salvar">Salvar Funcionário</button>
+        <button type="submit" class="btn-salvar">Atualizar Funcionário</button>
     </form>
 </div>
 
