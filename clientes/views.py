@@ -7,11 +7,22 @@ from datetime import timedelta
 
 from .models import Cliente
 from .forms import ClienteForm
+import csv
+from django.http import HttpResponse
 
 
 def lista_clientes(request):
     clientes_qs = Cliente.objects.all().order_by('-data_cadastro')
 
+    status_filter = request.GET.get('status')
+    cidade_filter = request.GET.get('cidade')
+
+    if status_filter:
+        clientes_qs = clientes_qs.filter(status=status_filter)
+    
+    if cidade_filter:
+        clientes_qs = clientes_qs.filter(cidade__icontains=cidade_filter)
+    
     total_clientes = clientes_qs.count()
     clientes_ativos = clientes_qs.filter(status='ativo').count()
 
@@ -19,7 +30,6 @@ def lista_clientes(request):
     novos_hoje = clientes_qs.filter(data_cadastro__date=hoje).count()
 
     ticket_medio = 87.50
-
 
     now = timezone.now()
     mes_atual = now.month
@@ -41,26 +51,22 @@ def lista_clientes(request):
     diff_mes = clientes_mes_atual - clientes_mes_passado
     txt_total_mes = f"{diff_mes:+} este mês"
 
-
     ontem = hoje - timedelta(days=1)
     novos_ontem = clientes_qs.filter(data_cadastro__date=ontem).count()
 
     diff_hoje = novos_hoje - novos_ontem
     txt_novos_hoje = f"{diff_hoje:+} vs ontem"
 
-
     ticket_mes_passado = 82.50
     perc_variacao = ((ticket_medio - ticket_mes_passado) / ticket_mes_passado) * 100
     txt_ticket_mes = f"{perc_variacao:+.0f}% vs mês anterior"
 
-
     clientes_ativos_ontem = clientes_qs.filter(
-    status='ativo',
-    data_cadastro__date__lte=ontem
+        status='ativo',
+        data_cadastro__date__lte=ontem
     ).count()
 
     diff_ativos = clientes_ativos - clientes_ativos_ontem
-
 
     paginator = Paginator(clientes_qs, 5)
     page_number = request.GET.get('page')
@@ -136,3 +142,39 @@ def excluir_cliente(request, pk):
         return redirect("lista_clientes")
 
     return render(request, "clientes/excluir_cliente.html", {"cliente": cliente})
+
+def exportar_clientes_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
+
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    writer.writerow(['Nome', 'CPF', 'Email', 'Telefone', 'Cidade', 'Status', 'Data Cadastro'])
+
+    clientes = Cliente.objects.all()
+    
+    nome = request.GET.get('nome')
+    cpf = request.GET.get('cpf')
+    email = request.GET.get('email')
+
+    if nome:
+        clientes = clientes.filter(nome__icontains=nome)
+    if cpf:
+        clientes = clientes.filter(cpf__icontains=cpf)
+    if email:
+        clientes = clientes.filter(email__icontains=email)
+
+    for cliente in clientes:
+        writer.writerow([
+            cliente.nome,
+            cliente.cpf,
+            cliente.email,
+            cliente.telefone,
+            cliente.cidade,
+            cliente.get_status_display(),
+            cliente.data_cadastro.strftime('%d/%m/%Y')
+        ])
+
+    return response
