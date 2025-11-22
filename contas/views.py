@@ -9,13 +9,13 @@ from django.core.paginator import Paginator
 from .models import Produto, Categoria, MovimentoEstoque, CustomUser
 import datetime
 import locale
+from django.http import JsonResponse
 
 def cadastro_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Adiciona categorias padrão após o primeiro usuário ser criado, se não existirem
             _create_default_categories()
             return redirect('login')
     else:
@@ -226,3 +226,52 @@ def adicionar_estoque_view(request, pk):
         form = EntradaProdutoEspecificoForm()
         
     return render(request, 'entrada_produto_especifico.html', {'form': form, 'produto': produto})
+
+
+@login_required
+def excluir_produto_view(request, pk):
+    produto = get_object_or_404(Produto, pk=pk)
+    nome = produto.nome
+    produto.delete()
+    messages.success(request, f'O produto "{nome}" foi removido com sucesso.')
+    return redirect('estoque')
+
+def detalhes_produto_ajax(request, pk):
+    p = Produto.objects.get(pk=pk)
+    img = p.imagem.url if p.imagem else "/static/img/no-image.png"
+
+    return JsonResponse({
+        "nome": p.nome,
+        "marca": p.marca,
+        "sku": p.sku,
+        "categoria": p.categoria.nome if p.categoria else "",
+        "venda": f"{p.venda:.2f}",
+        "quantidade": p.quantidade_estoque,
+        "valor_total": f"{p.valor_total_estoque:.2f}",
+        "status": p.status,
+        "imagem": img,
+    })
+
+def editar_produto_view(request, pk):
+    produto = get_object_or_404(Produto, pk=pk)
+    categorias = Categoria.objects.all()
+
+    if request.method == "POST":
+        produto.nome = request.POST.get("nome")
+        produto.sku = request.POST.get("sku")
+        produto.marca = request.POST.get("marca")
+        produto.descricao = request.POST.get("descricao")
+        produto.categoria_id = request.POST.get("categoria")
+        produto.custo = request.POST.get("custo")
+        produto.venda = request.POST.get("venda")
+        produto.quantidade_minima_alerta = request.POST.get("quantidade_minima_alerta")
+        produto.unidade_medida = request.POST.get("unidade_medida")
+        produto.quantidade = request.POST.get("quantidade")
+
+        produto.save()
+        return redirect("estoque")
+
+    return render(request, "edicao_produto.html", {
+        "produto": produto,
+        "categorias": categorias,
+    })

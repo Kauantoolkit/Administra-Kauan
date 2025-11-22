@@ -49,6 +49,19 @@ class Categoria(models.Model):
         verbose_name = "Categoria"
         verbose_name_plural = "Categorias"
 
+    def save(self, *args, **kwargs):
+        if not self.imagem_categoria:
+            imagens = {
+                'Alimentos': 'categorias/alimentos.png',
+                'Limpeza': 'categorias/limpeza.png',
+                'Higiene': 'categorias/higiene.png',
+                'Bebidas': 'categorias/bebidas.png',
+                'Eletrônicos': 'categorias/eletronicos.png',
+                'Farmácia': 'categorias/farmacia.png',
+            }
+            self.imagem_categoria = imagens.get(self.nome, 'categorias/default.png')
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.nome
 
@@ -65,7 +78,7 @@ class Produto(models.Model):
     marca = models.CharField(max_length=100, blank=True, null=True, verbose_name="Marca")
     descricao = models.TextField(blank=True, null=True, verbose_name="Descrição Detalhada")
     quantidade_minima_alerta = models.IntegerField(default=5, verbose_name="Qtd. Mínima para Alerta")
-    unidade_medida = models.CharField(max_length=10, default='UN', verbose_name="Unidade de Medida")
+    unidade_medida = models.CharField(max_length=10, default='UN', verbose_name="Unidade de Medida", blank=True, null=True)
     imagem = models.ImageField(upload_to='produtos/', blank=True, null=True, verbose_name="Imagem do Produto")
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Categoria")
     custo = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Preço de Custo")
@@ -100,11 +113,11 @@ class Produto(models.Model):
         return '/static/img/default-product.png'
 
     def _atualizar_status(self):
-        limite = self.quantidade_minima_alerta if self.quantidade_minima_alerta is not None and self.quantidade_minima_alerta > 0 else 5
+        limite = self.quantidade_minima_alerta if self.quantidade_minima_alerta and int(self.quantidade_minima_alerta) > 0 else 999
         
         if self.quantidade_estoque <= 0:
             self.status = 'ZERADO'
-        elif self.quantidade_estoque <= limite:
+        elif int(self.quantidade_estoque) <= int(limite):
             self.status = 'BAIXO'
         else:
             self.status = 'ATIVO'
@@ -124,8 +137,6 @@ class MovimentoEstoque(models.Model):
     quantidade = models.IntegerField(verbose_name="Quantidade")
     data_movimento = models.DateTimeField(auto_now_add=True, verbose_name="Data/Hora")
     observacao = models.TextField(blank=True, null=True, verbose_name="Observação")
-    
-    # NOVOS CAMPOS ADICIONADOS PARA A ENTRADA MÚLTIPLA
     custo_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Custo Unitário")
     validade = models.DateField(null=True, blank=True, verbose_name="Data de Validade")
     usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Usuário")
@@ -147,17 +158,30 @@ class MovimentoEstoque(models.Model):
             if is_new:
                 produto = self.produto
                 if self.tipo_movimento == 'ENTRADA':
-                    # Usamos update() para garantir que a atualização da quantidade seja segura
                     Produto.objects.filter(pk=produto.pk).update(quantidade_estoque=F('quantidade_estoque') + self.quantidade)
                 elif self.tipo_movimento == 'SAIDA':
                     Produto.objects.filter(pk=produto.pk).update(quantidade_estoque=F('quantidade_estoque') - self.quantidade)
                     
-                # Após a atualização da quantidade (segura), re-buscamos o produto 
-                # e chamamos save() novamente para atualizar o status (ATIVO, BAIXO, ZERADO)
                 produto.refresh_from_db()
                 
-                # Se for ENTRADA e o custo unitário for fornecido, atualizamos o custo do produto
                 if self.tipo_movimento == 'ENTRADA' and self.custo_unitario is not None:
                     produto.custo = self.custo_unitario
                 
-                produto.save() # Isso forçará a atualização do status
+                produto.save()
+
+    def _atualizar_status(self):
+   
+        try:
+            # Garante que seja int
+            alerta_minimo = int(self.quantidade_minima_alerta) if self.quantidade_minima_alerta else 5
+        except (ValueError, TypeError):
+            alerta_minimo = 5  # valor padrão se vier inválido
+
+        quantidade_atual = int(self.quantidade) if self.quantidade is not None else 0
+
+        if quantidade_atual <= 0:
+            self.status = 'crítico'
+        elif quantidade_atual <= alerta_minimo:
+            self.status = 'alerta'
+        else:
+            self.status = 'normal'
