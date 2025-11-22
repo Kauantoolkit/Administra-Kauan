@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'contas.apps.ContasConfig',
-    'clientes.apps.ClientesConfig',
-    'funcionarios.apps.FuncionariosConfig',]
+    'clientes',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
