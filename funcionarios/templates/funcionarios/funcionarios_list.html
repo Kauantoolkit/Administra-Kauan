@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Funcionários{% endblock %}
+
+{% block content %}
+
+<style>/* TIPOGRAFIA BASE */
+body {
+    font-family: "Inter", sans-serif;
+    color: #1D2939;
+}
+
+/* ---------- HEADER ---------- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* ---------- BOTÕES ---------- */
+.btn-action {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #F0F2F5;
+    cursor: pointer;
+    text-decoration: none;
+    color: #1D2939;
+    transition: 0.2s;
+}
+
+.btn-action.primary {
+    background: #3B82F6;
+    color: white;
+}
+
+.btn-action:hover {
+    opacity: .85;
+}
+
+/* ---------- CARDS DE ESTATISTICA ---------- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-card-info h5 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+}
+
+.stat-card-info h2 {
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.stat-card-info p {
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.positive {
+    color: #2ECC71;
+}
+
+.warning {
+    color: #E8B200;
+}
+
+.stat-card-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-card-icon span {
+    font-size: 26px;
+}
+
+/* ---------- INPUTS E SELECTS ---------- */
+.form-input {
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #F9FAFB;
+    font-size: 14px;
+    width: 190px;
+}
+
+.form-input:focus {
+    border-color: #3B82F6;
+    background: white;
+}
+
+/* ---------- TABELA ---------- */
+.card {
+    background: white;
+    padding: 0;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+}
+
+.card-header {
+    padding: 16px;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 18px;
+}
+
+table th {
+    font-size: 13px;
+    text-align: left;
+    color: #6B7280;
+    padding-bottom: 10px;
+}
+
+table td {
+    padding: 12px 0;
+    font-size: 14px;
+}
+
+table img {
+    border-radius: 50%;
+}
+
+/* ---------- STATUS BADGES ---------- */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: #D1FAE5;
+    color: #065F46;
+    font-weight: 500;
+}
+
+/* ---------- AÇÕES ---------- */
+.material-icons-outlined {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.material-icons-outlined:hover {
+    opacity: .7;
+}
+</style>
+
+<div class="header">
+    <h1>Funcionários</h1>
+
+    <a href="{% url 'funcionario_create' %}" class="btn-action primary">
+        + Novo Funcionário
+    </a>
+</div>
+
+<!-- Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <h5>Total de Funcionários</h5>
+            <h2>{{ total_funcionarios }}</h2>
+            <p class="positive">+{{ aumento_mes }} este mês</p>
+        </div>
+        <div class="stat-card-icon positive">
+            <span class="material-icons-outlined">groups</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <h5>Ativos Hoje</h5>
+            <h2>{{ ativos_hoje }}</h2>
+        </div>
+        <div class="stat-card-icon">
+            <span class="material-icons-outlined">check_circle</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <h5>Em Férias</h5>
+            <h2>{{ ferias }}</h2>
+        </div>
+        <div class="stat-card-icon warning">
+            <span class="material-icons-outlined">beach_access</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <h5>Salário Médio</h5>
+            <h2>R$ {{ salario_medio }}</h2>
+            <p class="positive">+8% vs ano anterior</p>
+        </div>
+        <div class="stat-card-icon">
+            <span class="material-icons-outlined">payments</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div style="display:flex; gap:1rem; margin-bottom:1.5rem;">
+    <input type="text" placeholder="Nome do funcionário..." class="form-input">
+
+    <input type="text" placeholder="CPF..." class="form-input">
+
+    <select class="form-input">
+        <option>Todos os cargos</option>
+        {% for cargo in cargos %}
+        <option>{{ cargo }}</option>
+        {% endfor %}
+    </select>
+
+    <select class="form-input">
+        <option>Todos os status</option>
+        <option>Ativo</option>
+        <option>Férias</option>
+        <option>Demitido</option>
+    </select>
+
+    <input type="text" placeholder="Buscar..." class="form-input" />
+</div>
+
+<!-- Tabela -->
+<div class="card">
+    <div class="card-header">
+        <h4>Lista de Funcionários</h4>
+
+        <div style="display:flex; gap:1rem;">
+            <a href="#" class="btn-action">Exportar</a>
+            <a href="#" class="btn-action">Ponto</a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="border-bottom:1px solid #e9ecef;">
+                    <th>Funcionário</th>
+                    <th>CPF</th>
+                    <th>Cargo</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Admissão</th>
+                    <th>Salário</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for f in page_obj %}
+                <tr style="border-bottom:1px solid #f4f4f4;">
+                    <td>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <img src="{{ f.foto.url }}" style="width:40px; height:40px; border-radius:50%;">
+                            <div>
+                                <strong>{{ f.nome }}</strong><br>
+                                <small>ID: {{ f.codigo }}</small>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>{{ f.cpf }}</td>
+                    <td>
+                        <span class="status-badge" style="background:#e9e7ff; color:#6b4ce6;">
+                            {{ f.cargo }}
+                        </span>
+                    </td>
+                    <td>{{ f.email }}</td>
+                    <td>{{ f.telefone }}</td>
+                    <td>{{ f.data_admissao|date:"d/m/Y" }}</td>
+                    <td>R$ {{ f.salario }}</td>
+
+                    <td>
+                        {% if f.status == "Ativo" %}
+                        <span class="status-badge">Ativo</span>
+                        {% elif f.status == "Férias" %}
+                        <span class="status-badge" style="background:#fff8e1; color:#c79300;">Férias</span>
+                        {% else %}
+                        <span class="status-badge" style="background:#fde8e8; color:#dc3545;">Inativo</span>
+                        {% endif %}
+                    </td>
+
+                    <td style="display:flex; gap:8px;">
+                        <a href="{% url 'funcionario_detail' f.pk %}">
+                            <span class="material-icons-outlined">visibility</span>
+                        </a>
+                        <a href="{% url 'funcionario_edit' f.pk %}">
+                            <span class="material-icons-outlined">edit</span>
+                        </a>
+                        <a href="{% url 'funcionario_delete' f.pk %}" style="color:red;">
+                            <span class="material-icons-outlined">delete</span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:1rem; gap:0.5rem;">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn-action">Anterior</a>
+            {% endif %}
+
+            <span class="btn-action primary">{{ page_obj.number }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn-action">Próximo</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

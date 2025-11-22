@@ -1,0 +1,36 @@
+from django.db import models
+from contas.models import CustomUser
+
+
+class Funcionario(models.Model):
+    STATUS_CHOICES = [
+        ("ativo", "Ativo"),
+        ("ferias", "Férias"),
+        ("inativo", "Inativo"),
+    ]
+
+    user = models.OneToOneField(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    codigo = models.CharField(max_length=10, unique=True)
+
+    nome = models.CharField(max_length=255)
+    cpf = models.CharField(max_length=14, unique=True)
+    cargo = models.CharField(max_length=100)
+
+    telefone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+
+    salario = models.DecimalField(max_digits=10, decimal_places=2)
+    data_admissao = models.DateField()
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="ativo")
+
+    foto = models.ImageField(upload_to="funcionarios/", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.nome} ({self.cargo})"

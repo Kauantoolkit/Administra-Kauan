@@ -399,10 +399,11 @@
             </a>
           </li>
           <li>
-            <a href="#">
-              <span class="material-icons-outlined">badge</span> Funcionários
-            </a>
-          </li>
+    <a href="{% url 'funcionarios_list' %}"
+       class="{% if request.resolver_match.url_name == 'funcionarios_list' %}active{% endif %}">
+        <span class="material-icons-outlined">badge</span> Funcionários
+    </a>
+</li>
           <li>
             <a href="#">
               <span class="material-icons-outlined">local_shipping</span>

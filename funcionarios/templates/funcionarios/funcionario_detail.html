@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ funcionario.nome }}{% endblock %}
+
+{% block content %}
+
+<div class="header">
+    <h1>Dados do Funcionário</h1>
+
+    <div style="display:flex; gap:1rem;">
+        <a href="{% url 'funcionario_edit' funcionario.pk %}" class="btn-action">
+            <span class="material-icons-outlined">edit</span>
+            Editar
+        </a>
+
+        <a href="{% url 'funcionario_delete' funcionario.pk %}" class="btn-action" style="color:red;">
+            <span class="material-icons-outlined">delete</span>
+            Excluir
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body" style="display:flex; gap:2rem;">
+
+        <!-- FOTO -->
+        <div>
+            {% if funcionario.foto %}
+            <img src="{{ funcionario.foto.url }}" style="width:120px; height:120px; border-radius:100%;">
+            {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ funcionario.nome }}&size=120" style="border-radius:100%;">
+            {% endif %}
+        </div>
+
+        <!-- DADOS -->
+        <div style="font-size:1.1rem;">
+            <h2 style="margin:0;">{{ funcionario.nome }}</h2>
+            <p style="margin:0; color:#666;">ID: {{ funcionario.codigo }}</p>
+
+            <p><strong>Cargo:</strong> {{ funcionario.cargo }}</p>
+            <p><strong>CPF:</strong> {{ funcionario.cpf }}</p>
+            <p><strong>Email:</strong> {{ funcionario.email }}</p>
+            <p><strong>Telefone:</strong> {{ funcionario.telefone }}</p>
+            <p><strong>Data de admissão:</strong> {{ funcionario.data_admissao|date:"d/m/Y" }}</p>
+            <p><strong>Salário:</strong> R$ {{ funcionario.salario }}</p>
+
+            <p>
+                <strong>Status:</strong><br>
+                {% if funcionario.status == "ativo" %}
+                    <span class="status-badge">Ativo</span>
+                {% elif funcionario.status == "ferias" %}
+                    <span class="status-badge" style="background:#fff8e1; color:#c79300;">Férias</span>
+                {% else %}
+                    <span class="status-badge" style="background:#fde8e8; color:#dc3545;">Inativo</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
