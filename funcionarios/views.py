@@ -60,7 +60,7 @@ def funcionario_create(request):
     else:
         form = FuncionarioForm()
 
-    return render(request, "funcionarios/funcionario_form.html", {
+    return render(request, "funcionarios/funcionario_create.html", {
         "form": form
     })
 

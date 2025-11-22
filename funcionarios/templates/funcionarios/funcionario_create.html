@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Funcionário{% endblock %}
+
+{% block content %}
+
+<style>
+:root {
+    --bg:#F5F7FA;
+    --white:#FFFFFF;
+    --border:#E4E7EC;
+    --text:#1D2939;
+    --text-muted:#667085;
+    --blue:#1570EF;
+    --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
+}
+
+body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--text); }
+
+.form-card {
+    background: var(--white);
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 750px;
+    margin-top: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 20px;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.form-input, .form-select {
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+}
+
+.btn-salvar {
+    margin-top: 24px;
+    padding: 10px 20px;
+    background: var(--blue);
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-salvar:hover {
+    background: #1366d6;
+}
+</style>
+
+<div class="form-card">
+    <h1>Novo Funcionário</h1>
+
+    {% if form.errors %}
+    <div style="
+        background:#ffe1e1;
+        border:1px solid #ff9a9a;
+        padding:12px;
+        border-radius:8px;
+        margin-bottom:16px;
+        color:#b30000;
+    ">
+        <strong>Corrija os seguintes erros:</strong>
+        <ul>
+            {% for field, errors in form.errors.items %}
+                <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }} {# renderiza o input com a classe já definida no forms.py #}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-salvar">Salvar Funcionário</button>
+    </form>
+</div>
+
+{% endblock %}
