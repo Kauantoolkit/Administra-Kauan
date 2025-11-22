@@ -4,404 +4,228 @@
 
 {% block content %}
 
-<style>
-:root {
-    --bg:#F5F7FA;
-    --white:#FFFFFF;
-    --border:#E4E7EC;
-    --border-light:#EDF0F2;
-    --text:#1D2939;
-    --text-muted:#667085;
-    --blue:#1570EF;
-    --blue-light:#EFF8FF;
-    --green:#12B76A;
-    --green-light:#ECFDF3;
-    --yellow:#FEC84B;
-    --yellow-light:#FFFAEB;
-    --purple:#7F56D9;
-    --purple-light:#F4EBFF;
-    --red:#DC3545;
-    --red-light:#FEE4E2;
-    --orange:#FD7E14;
-    --orange-light:#FFF4E6;
-    --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
-}
+<div style="background-color: #F5F7FA; font-family: 'Inter', sans-serif; color: #101828; padding: 32px; width: 100%; box-sizing: border-box; min-height: 100vh;">
 
-body {
-    background: var(--bg);
-    font-family: "Inter", sans-serif;
-    color: var(--text);
-}
-
-.page-header-content {
-    margin-bottom: 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.page-header-content h1 {
-    font-size: 26px;
-    font-weight: 600;
-}
-
-.page-header-content p {
-    color: var(--text-muted);
-}
-
-.btn-novo-produto {
-    background: var(--blue);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    box-shadow: 0 1px 2px rgba(16,24,40,0.05);
-    text-decoration: none !important;
-}
-
-.btn-novo-produto:hover {
-    background: #1366d6;
-    text-decoration: none !important;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 22px;
-}
-
-.stat-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 18px 22px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.stat-card h5 {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-
-.stat-card h2 {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.stat-card .footer-stat {
-    font-size: 14px;
-    color: var(--green);
-    margin-top: 4px;
-}
-
-.stat-card-icon {
-    padding: 14px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.success-bg { background: var(--green-light); color: var(--green); }
-.purple-bg { background: var(--purple-light); color: var(--purple); }
-.warning-bg { background: var(--yellow-light); color: var(--yellow); }
-.red-bg { background: var(--red-light); color: var(--red); }
-.orange-bg { background: var(--orange-light); color: var(--orange); }
-
-.card {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-}
-
-.card-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.action-buttons button {
-    background: var(--white);
-    border: 1px solid var(--border);
-    padding: 8px 14px;
-    border-radius: 8px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    font-size: 14px;
-    color: var(--text-muted);
-    cursor: pointer;
-}
-
-.search-filter-area {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.search-form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.input-text {
-    width: 240px;
-    height: 40px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font-size: 14px;
-    background: var(--white);
-}
-
-.btn-buscar {
-    height: 40px;
-    padding: 0 20px;
-    background: var(--blue);
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table thead th {
-    font-size: 13px;
-    color: var(--text-muted);
-    padding: 14px;
-    text-align: left;
-    background: #F9FAFB;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.data-table tbody tr {
-    border-bottom: 1px solid var(--border-light);
-}
-
-.data-table tbody td {
-    padding: 18px 14px;
-    font-size: 14px;
-}
-
-.product-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.product-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #D0D5DD;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: var(--white);
-}
-
-.product-name strong {
-    font-size: 14px;
-}
-
-.product-name span {
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.badge-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-baixo { background: var(--yellow-light); color: var(--yellow); }
-.badge-zerado { background: var(--red-light); color: var(--red); }
-.badge-ok { background: var(--green-light); color: var(--green); }
-
-.icon-ver { color: var(--blue); }
-.icon-editar { color: var(--purple); }
-.icon-excluir { color: #F04438; }
-
-.table-footer {
-    padding: 20px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.pagination-link {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--white);
-    box-shadow: var(--shadow);
-    color: var(--text-muted);
-    text-decoration: none;
-}
-
-.pagination-link.active {
-    background: var(--blue);
-    color: white;
-}
-</style>
-
-
-<div class="page-header-content">
-    <div>
-        <h1>Estoque</h1>
-        <p style="color: var(--text-muted);">Gerencie os produtos em estoque.</p>
-    </div>
-    <a href="{% url 'novo_produto' %}" class="btn-novo-produto">
-        <span class="material-icons-outlined">inventory_2</span> Novo Produto
-    </a>
-</div>
-
-<!-- STATS -->
-<div class="stats-grid">
-    <div class="stat-card">
+    <!-- Cabeçalho -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
         <div>
-            <h5>Produtos Cadastrados</h5>
-            <h2>{{ total_produtos_cadastrados|default:"0" }}</h2>
-            <p class="footer-stat">{{ txt_variacao_mes }}</p>
+            <h1 style="font-size: 24px; font-weight: 600; margin: 0 0 4px 0; color: #101828;">Controle de Estoque</h1>
+            <p style="color: #667085; font-size: 14px; margin: 0;">Gerencie produtos, preços e quantidades</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined">inventory</span></div>
-    </div>
-
-    <div class="stat-card">
-        <div>
-            <h5>Valor Total (Custo)</h5>
-            <h2>R$ {{ valor_total_estoque|floatformat:2|default:"0,00" }}</h2>
-            <p class="footer-stat">{{ total_itens_estoque|default:"0" }} itens</p>
-        </div>
-        <div class="stat-card-icon success-bg"><span class="material-icons-outlined">paid</span></div>
-    </div>
-
-    <div class="stat-card">
-        <div>
-            <h5>Estoque Baixo</h5>
-            <h2>{{ estoque_baixo_count|default:"0" }}</h2>
-            <p class="footer-stat">Produtos críticos</p>
-        </div>
-        <div class="stat-card-icon orange-bg"><span class="material-icons-outlined">warning</span></div>
-    </div>
-
-    <div class="stat-card">
-        <div>
-            <h5>Sem Estoque</h5>
-            <h2>{{ produtos_zerados_count|default:"0" }}</h2>
-            <p class="footer-stat">Produtos zerados</p>
-        </div>
-        <div class="stat-card-icon red-bg"><span class="material-icons-outlined">block</span></div>
-    </div>
-</div>
-
-<!-- LISTA -->
-<div class="card" style="margin-top: 1.5rem;">
-    <div class="card-header">
-        <h4>Lista de Produtos</h4>
-        <div class="action-buttons">
-            <button class="btn-export-filter"><span class="material-icons-outlined">upload_file</span> Exportar</button>
-            <button class="btn-export-filter"><span class="material-icons-outlined">filter_alt</span> Filtros</button>
+        <div style="display: flex; gap: 12px;">
+            <!-- Entrada de Estoque -->
+            <a href="{% url 'entrada_estoque' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #12B76A; color: white;">
+                <span class="material-icons-outlined" style="font-size:18px;">add_shopping_cart</span> Entrada Estoque
+            </a>
+            <!-- Novo Produto -->
+            <a href="{% url 'novo_produto' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #1570EF; color: white;">
+                <span class="material-icons-outlined" style="font-size:18px;">inventory_2</span> Novo Produto
+            </a>
         </div>
     </div>
 
-    <div class="search-filter-area">
-        <form method="get" class="search-form">
-            <input type="text" name="nome" class="input-text" placeholder="Nome..." value="{{ request.GET.nome }}">
-            <input type="text" name="sku" class="input-text" placeholder="SKU..." value="{{ request.GET.sku }}">
-            <input type="text" name="categoria" class="input-text" placeholder="Categoria..." value="{{ request.GET.categoria }}">
-            <button type="submit" class="btn-buscar">
-                <span class="material-icons-outlined">search</span> Buscar
-            </button>
-        </form>
+    <!-- Estatísticas -->
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 32px; width: 100%;">
+        <!-- Total Produtos -->
+        <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="font-size: 13px; color: #667085; font-weight: 500; margin: 0 0 8px 0;">Total Produtos</h5>
+                <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: #101828;">{{ total_produtos|default:"2.456" }}</h2>
+                <span style="font-size: 12px; margin-top: 4px; display: block; color: #12B76A;">+45 este mês</span>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #EFF8FF; color: #1570EF;">
+                <span class="material-icons-outlined">inventory_2</span>
+            </div>
+        </div>
+        <!-- Valor Total -->
+        <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="font-size: 13px; color: #667085; font-weight: 500; margin: 0 0 8px 0;">Valor Total</h5>
+                <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: #101828;">R$ {{ valor_total|default:"124.850" }}</h2>
+                <span style="font-size: 12px; margin-top: 4px; display: block; color: #667085;">valor do estoque</span>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #ECFDF3; color: #12B76A;">
+                <span class="material-icons-outlined">attach_money</span>
+            </div>
+        </div>
+        <!-- Estoque Baixo -->
+        <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="font-size: 13px; color: #667085; font-weight: 500; margin: 0 0 8px 0;">Estoque Baixo</h5>
+                <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: #101828;">{{ estoque_baixo|default:"23" }}</h2>
+                <span style="font-size: 12px; margin-top: 4px; display: block; color: #B42318;">produtos críticos</span>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #FEF3F2; color: #F04438;">
+                <span class="material-icons-outlined">warning_amber</span>
+            </div>
+        </div>
+        <!-- Sem Estoque -->
+        <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="font-size: 13px; color: #667085; font-weight: 500; margin: 0 0 8px 0;">Sem Estoque</h5>
+                <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: #101828;">{{ sem_estoque|default:"8" }}</h2>
+                <span style="font-size: 12px; margin-top: 4px; display: block; color: #B42318;">produtos zerados</span>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #FFFAEB; color: #F79009;">
+                <span class="material-icons-outlined">block</span>
+            </div>
+        </div>
+        <!-- Categorias -->
+        <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; padding: 20px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h5 style="font-size: 13px; color: #667085; font-weight: 500; margin: 0 0 8px 0;">Categorias</h5>
+                <h2 style="font-size: 24px; font-weight: 700; margin: 0; color: #101828;">{{ total_categorias|default:"12" }}</h2>
+                <span style="font-size: 12px; margin-top: 4px; display: block; color: #667085;">diferentes</span>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #F4EBFF; color: #7F56D9;">
+                <span class="material-icons-outlined">category</span>
+            </div>
+        </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Produto</th><th>SKU</th><th>Categoria</th>
-                    <th>Preço Venda</th><th>Qtd</th><th>Valor Custo</th><th>Status</th><th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for p in produtos %}
-                <tr>
-                    <td class="product-info-cell">
-                        <div class="product-avatar"><span class="material-icons-outlined">inventory</span></div>
-                        <div class="product-name"><strong>{{ p.nome }}</strong><span>{{ p.marca|default:"" }}</span></div>
-                    </td>
-                    <td>{{ p.sku }}</td>
-                    <td>{{ p.categoria.nome|default:"N/A" }}</td>
-                    <td>R$ {{ p.venda|floatformat:2 }}</td>
-                    <td>{{ p.quantidade_estoque }}</td>
-                    <td>R$ {{ p.valor_total_estoque|floatformat:2 }}</td>
-                    <td>
-                        {% if p.status == 'BAIXO' %}<span class="badge-status badge-baixo">Estoque Baixo</span>
-                        {% elif p.status == 'ZERADO' %}<span class="badge-status badge-zerado">Sem Estoque</span>
-                        {% else %}<span class="badge-status badge-ok">Em Estoque</span>{% endif %}
-                    </td>
-                    <td class="action-icons">
-                        <a href="{% url 'detalhes_produto' p.pk %}" class="icon-ver"><span class="material-icons-outlined">visibility</span></a>
-                        <a href="{% url 'editar_produto' p.pk %}" class="icon-editar"><span class="material-icons-outlined">edit</span></a>
-                        <a href="{% url 'excluir_produto' p.pk %}" class="icon-excluir"><span class="material-icons-outlined">delete</span></a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Nenhum produto encontrado.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="table-footer">
-        {% if page_obj %}
-        <span>Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }}</span>
-        <nav class="pagination-nav">
-            {% if page_obj.has_previous %}
-                <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-            {% else %}<span class="pagination-link" style="opacity:0.4;">Anterior</span>{% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if num == page_obj.number %}<span class="pagination-link active">{{ num }}</span>
-                {% elif num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
-                    <a class="pagination-link" href="?page={{ num }}">{{ num }}</a>
-                {% endif %}
+    <!-- Filtros de pesquisa -->
+    <form method="GET" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 1.5fr auto; gap: 12px; margin-bottom: 24px; width: 100%;">
+        <input type="text" name="nome" placeholder="Nome do produto..." value="{{ request.GET.nome }}" 
+            style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828; box-sizing: border-box; outline: none;">
+        
+        <input type="text" name="sku" placeholder="Código/SKU..." value="{{ request.GET.sku }}" 
+            style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828; box-sizing: border-box; outline: none;">
+        
+        <select name="categoria" style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828; box-sizing: border-box; outline: none; cursor: pointer;">
+            <option value="">Todas Categorias</option>
+            {% for cat in categorias %}
+                <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.nome }}</option>
             {% endfor %}
+        </select>
 
-            {% if page_obj.has_next %}
-                <a class="pagination-link" href="?page={{ page_obj.next_page_number }}">Próximo</a>
-            {% else %}<span class="pagination-link" style="opacity:0.4;">Próximo</span>{% endif %}
-        </nav>
-        {% endif %}
+        <select name="status" style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828; box-sizing: border-box; outline: none; cursor: pointer;">
+            <option value="">Todos Status</option>
+            <option value="ok" {% if request.GET.status == 'ok' %}selected{% endif %}>Em Estoque</option>
+            <option value="baixo" {% if request.GET.status == 'baixo' %}selected{% endif %}>Baixo</option>
+            <option value="zerado" {% if request.GET.status == 'zerado' %}selected{% endif %}>Zerado</option>
+        </select>
+
+        <button type="submit" style="background: #F2F4F7; border: 1px solid #E4E7EC; color: #667085; font-weight: 500; padding: 0 20px; border-radius: 8px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <span class="material-icons-outlined" style="font-size: 18px;">search</span> Buscar
+        </button>
+    </form>
+
+    <!-- Tabela de produtos -->
+    <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05); overflow: hidden; width: 100%;">
+        <div style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 16px; font-weight: 600; margin: 0; color: #101828;">Lista de Produtos</h3>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" style="background: #F9FAFB; border: 1px solid #E4E7EC; color: #667085; padding: 8px 12px; font-size: 13px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <span class="material-icons-outlined" style="font-size: 16px;">file_download</span> Exportar
+                </button>
+                <button type="button" style="background: #F9FAFB; border: 1px solid #E4E7EC; color: #667085; padding: 8px 12px; font-size: 13px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <span class="material-icons-outlined" style="font-size: 16px;">qr_code</span> Imprimir Códigos
+                </button>
+            </div>
+        </div>
+
+        <div style="width: 100%; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Produto</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">SKU</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Categoria</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Preço</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Quantidade</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Valor Total</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Status</th>
+                        <th style="background: #F9FAFB; padding: 12px 24px; font-size: 12px; font-weight: 500; color: #667085; border-bottom: 1px solid #E4E7EC;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+    {% for p in produtos %}
+    <tr>
+        <!-- Produto -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; vertical-align: middle;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: #F2F4F7; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #98A2B3;">
+                    <span class="material-icons-outlined" style="font-size: 20px;">smartphone</span>
+                </div>
+                <div>
+                    <strong style="display: block; color: #101828; font-size: 14px; font-weight: 500;">{{ p.nome }}</strong>
+                    <span style="font-size: 12px; color: #667085;">{{ p.marca|default:"Genérico" }}</span>
+                </div>
+            </div>
+        </td>
+
+        <!-- SKU -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; font-size: 14px; color: #667085;">{{ p.sku }}</td>
+
+        <!-- Categoria -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; font-size: 14px; color: #667085;">{{ p.categoria.nome|default:"N/A" }}</td>
+
+        <!-- Preço de Venda -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; font-size: 14px; color: #667085;">R$ {{ p.venda|floatformat:2 }}</td>
+
+        <!-- Quantidade em Estoque -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; font-size: 14px; color: #667085;">{{ p.quantidade_estoque|default:"0" }}</td>
+
+        <!-- Valor Total Estoque -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; font-size: 14px; color: #667085;">R$ {{ p.valor_total_estoque|floatformat:2 }}</td>
+
+        <!-- Status -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC;">
+            {% if p.quantidade_estoque == 0 %}
+                <span style="padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 500; display: inline-block; background: #FEF3F2; color: #B42318;">Sem Estoque</span>
+            {% elif p.quantidade_estoque <= p.quantidade_minima_alerta %}
+                <span style="padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 500; display: inline-block; background: #FFFAEB; color: #B54708;">Estoque Baixo</span>
+            {% else %}
+                <span style="padding: 4px 10px; border-radius: 16px; font-size: 12px; font-weight: 500; display: inline-block; background: #ECFDF3; color: #027A48;">Em Estoque</span>
+            {% endif %}
+        </td>
+
+        <!-- Ações -->
+        <td style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC;">
+            <div style="display: flex; gap: 10px;">
+                <a href="{% url 'detalhe_produto' p.pk %}" style="text-decoration: none; display: flex; align-items: center; color: #1570EF;">
+                    <span class="material-icons-outlined" style="font-size:18px;">visibility</span>
+                </a>
+                <a href="{% url 'editar_produto' p.pk %}" style="text-decoration: none; display: flex; align-items: center; color: #12B76A;">
+                    <span class="material-icons-outlined" style="font-size:18px;">edit_square</span>
+                </a>
+                <a href="{% url 'entrada_produto' p.pk %}" style="text-decoration: none; display: flex; align-items: center; color: #7F56D9;">
+                    <span class="material-icons-outlined" style="font-size:18px;">add</span>
+                </a>
+            </div>
+        </td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="8" style="text-align:center; padding: 40px; color: #667085;">Nenhum produto encontrado.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        <div style="padding: 16px 24px; border-top: 1px solid #E4E7EC; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; color: #667085;">Mostrando {{ produtos.start_index }} a {{ produtos.end_index }} de {{ produtos.paginator.count }} produtos</span>
+            <div style="display: flex; gap: 4px;">
+                {% if produtos.has_previous %}
+                <a href="?page={{ produtos.previous_page_number }}" style="padding: 6px 12px; border: 1px solid #E4E7EC; border-radius: 6px; background: #FFFFFF; color: #667085; font-size: 13px; text-decoration: none;">Anterior</a>
+                {% endif %}
+                {% for num in produtos.paginator.page_range %}
+    {% if produtos.number == num %}
+        <a href="?page={{ num }}" style="padding: 6px 12px; border: 1px solid #1570EF; border-radius: 6px; background: #1570EF; color: white; font-size: 13px; text-decoration: none;">{{ num }}</a>
+    {% else %}
+        <a href="?page={{ num }}" style="padding: 6px 12px; border: 1px solid #E4E7EC; border-radius: 6px; background: #FFFFFF; color: #667085; font-size: 13px; text-decoration: none;">{{ num }}</a>
+    {% endif %}
+{% endfor %}
+                {% if produtos.has_next %}
+                <a href="?page={{ produtos.next_page_number }}" style="padding: 6px 12px; border: 1px solid #E4E7EC; border-radius: 6px; background: #FFFFFF; color: #667085; font-size: 13px; text-decoration: none;">Próximo</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
+
 </div>
 
 {% endblock content %}
