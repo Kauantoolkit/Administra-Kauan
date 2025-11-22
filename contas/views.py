@@ -68,6 +68,8 @@ def dashboard_view(request):
     total_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
     
     produtos_vendidos = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+
+    vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
     
     try:
         clientes_ativos = Cliente.objects.filter(status='ativo').count()
@@ -85,6 +87,7 @@ def dashboard_view(request):
         'produtos_vendidos': produtos_vendidos,
         'clientes_ativos': clientes_ativos,
         'produtos_falta': produtos_falta,
+        'vendas_recentes': vendas_recentes,
     }
     
     return render(request, 'dashboard.html', context)
