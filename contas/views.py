@@ -165,22 +165,6 @@ def novo_produto_view(request):
         
     return render(request, 'novo_produto.html', {'form': form})
 
-@login_required
-def editar_produto_view(request, pk):
-    produto = get_object_or_404(Produto, pk=pk)
-    if request.method == 'POST':
-        # CORREÇÃO: Passar request.FILES para o formulário ao editar a imagem
-        form = ProdutoForm(request.POST, request.FILES, instance=produto)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Produto "{produto.nome}" atualizado com sucesso!')
-            return redirect('detalhe_produto', pk=produto.pk)
-        else:
-             messages.error(request, 'Erro ao atualizar o produto. Verifique os dados inseridos.')
-    else:
-        form = ProdutoForm(instance=produto)
-        
-    return render(request, 'editar_produto.html', {'form': form, 'produto': produto})
 
 @login_required
 def detalhe_produto_view(request, pk):
@@ -261,14 +245,37 @@ def editar_produto_view(request, pk):
         produto.sku = request.POST.get("sku")
         produto.marca = request.POST.get("marca")
         produto.descricao = request.POST.get("descricao")
-        produto.categoria_id = request.POST.get("categoria")
-        produto.custo = request.POST.get("custo")
-        produto.venda = request.POST.get("venda")
-        produto.quantidade_minima_alerta = request.POST.get("quantidade_minima_alerta")
+        
+        cat_id = request.POST.get("categoria")
+        if cat_id:
+            produto.categoria_id = int(cat_id)
+        else:
+            produto.categoria = None
+        
+        try:
+            produto.custo = float(request.POST.get("custo", 0))
+        except ValueError:
+            produto.custo = 0
+
+        try:
+            produto.venda = float(request.POST.get("venda", 0))
+        except ValueError:
+            produto.venda = 0
+
+        try:
+            produto.quantidade_minima_alerta = int(request.POST.get("quantidade_minima_alerta", 0))
+        except ValueError:
+            produto.quantidade_minima_alerta = 0
+
         produto.unidade_medida = request.POST.get("unidade_medida")
-        produto.quantidade = request.POST.get("quantidade")
+        
+        try:
+            produto.quantidade_estoque = int(request.POST.get("quantidade", 0))
+        except ValueError:
+            produto.quantidade_estoque = 0
 
         produto.save()
+        messages.success(request, f'Produto "{produto.nome}" atualizado com sucesso!')
         return redirect("estoque")
 
     return render(request, "edicao_produto.html", {
