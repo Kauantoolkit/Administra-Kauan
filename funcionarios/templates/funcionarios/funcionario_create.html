@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Novo Funcionário{% endblock %}
 
@@ -28,6 +29,8 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     margin-top: 20px;
 }
 
+.form-card h1 { margin-bottom: 20px; }
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -38,16 +41,12 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin: 10px 0;
+    margin: 20px;
 }
 
-.form-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-}
+.form-label { font-size: 14px; font-weight: 500; color: var(--text-muted); }
 
-.form-input, .form-select {
+.form-input, .form-select, .form-file {
     width: 100%;
     height: 40px;
     padding: 8px 12px;
@@ -55,6 +54,17 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     border: 1px solid var(--border);
     border-radius: 8px;
     background: white;
+}
+
+.form-file { padding: 6px 10px; }
+
+.img-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
 }
 
 .btn-salvar {
@@ -65,10 +75,13 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
+    border: none;
 }
 
-.btn-salvar:hover {
-    background: #1366d6;
+.btn-salvar:hover { background: #1366d6; }
+
+@media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -76,14 +89,7 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     <h1>Novo Funcionário</h1>
 
     {% if form.errors %}
-    <div style="
-        background:#ffe1e1;
-        border:1px solid #ff9a9a;
-        padding:12px;
-        border-radius:8px;
-        margin-bottom:16px;
-        color:#b30000;
-    ">
+    <div style="background:#ffe1e1; border:1px solid #ff9a9a; padding:12px; border-radius:8px; margin-bottom:16px; color:#b30000;">
         <strong>Corrija os seguintes erros:</strong>
         <ul>
             {% for field, errors in form.errors.items %}
@@ -95,12 +101,26 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        
+        <!-- Campo de imagem com preview -->
+        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+            {% for field in form %}
+                {% if field.name == "foto" %}
+                    <img id="preview" class="img-preview" src="{% if field.value %}{{ field.value.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" alt="Pré-visualização">
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Demais campos -->
         <div class="form-grid">
             {% for field in form %}
+                {% if field.name != "foto" %}
                 <div class="form-group">
                     <label class="form-label">{{ field.label }}</label>
                     {{ field }}
                 </div>
+                {% endif %}
             {% endfor %}
         </div>
 
@@ -108,4 +128,52 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     </form>
 </div>
 
-{% endblock %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+
+    // Preview da imagem e obrigatoriedade
+    const imgField = $('input[type="file"][name="foto"]');
+    imgField.prop('required', true);
+    imgField.on('change', function(){
+        const file = this.files[0];
+        if(file){
+            const reader = new FileReader();
+            reader.onload = function(e){
+                $('#preview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Máscara CPF
+    const cpfField = $('input[name="cpf"]');
+    cpfField.attr('maxlength', 14);
+    cpfField.on('input', function(){
+        let v = $(this).val().replace(/\D/g,'');
+        v = v.replace(/^(\d{3})(\d)/,'$1.$2');
+        v = v.replace(/^(\d{3})\.(\d{3})(\d)/,'$1.$2.$3');
+        v = v.replace(/\.(\d{3})(\d)/,'.$1-$2');
+        $(this).val(v);
+    });
+    cpfField.on('keypress', function(e){ if(e.which < 48 || e.which > 57) e.preventDefault(); });
+
+    // Máscara Telefone (fixo ou celular)
+    const telField = $('input[name="telefone"]');
+    telField.on('input', function(){
+        let v = $(this).val().replace(/\D/g,'').substring(0,11);
+        if(v.length <= 10){
+            v = v.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
+            v = v.replace(/(\d{4})(\d{0,4})$/, '$1-$2');
+        } else {
+            v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            v = v.replace(/(\d{5})(\d{0,4})$/, '$1-$2');
+        }
+        $(this).val(v);
+    });
+    telField.on('keypress', function(e){ if(e.which < 48 || e.which > 57) e.preventDefault(); });
+
+});
+</script>
+
+{% endblock content %}
