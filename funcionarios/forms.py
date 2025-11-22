@@ -12,4 +12,5 @@ class FuncionarioForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-input'}),
             'telefone': forms.TextInput(attrs={'class': 'form-input'}),
             'salario': forms.NumberInput(attrs={'class': 'form-input'}),
+            'data_admissao': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
         }

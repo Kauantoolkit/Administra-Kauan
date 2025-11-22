@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Funcionários{% endblock %}
 
 {% block content %}
@@ -284,14 +285,18 @@ table img {
                 {% for f in page_obj %}
                 <tr style="border-bottom:1px solid #f4f4f4;">
                     <td>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="{{ f.foto.url }}" style="width:40px; height:40px; border-radius:50%;">
-                            <div>
-                                <strong>{{ f.nome }}</strong><br>
-                                <small>ID: {{ f.codigo }}</small>
-                            </div>
-                        </div>
-                    </td>
+    <div style="display:flex; align-items:center; gap:10px;">
+        {% if f.foto %}
+            <img src="{{ f.foto.url }}" style="width:40px; height:40px; border-radius:50%;">
+        {% else %}
+            <img src="{% static 'img/default-user.png' %}" style="width:40px; height:40px; border-radius:50%;">
+        {% endif %}
+        <div>
+            <strong>{{ f.nome }}</strong><br>
+            <small>ID: {{ f.codigo }}</small>
+        </div>
+    </div>
+</td>
 
                     <td>{{ f.cpf }}</td>
                     <td>
