@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Ver Cliente{% endblock %}
+
+{% block content %}
+<h1>{{ cliente.nome }}</h1>
+
+<p><strong>Email:</strong> {{ cliente.email }}</p>
+<p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+<p><strong>Telefone:</strong> {{ cliente.telefone }}</p>
+<p><strong>Cidade:</strong> {{ cliente.cidade }}</p>
+<p><strong>Status:</strong> {{ cliente.status }}</p>
+<p><strong>Última compra:</strong> {{ cliente.ultima_compra }}</p>
+
+<a href="{% url 'lista_clientes' %}">Voltar</a>
+{% endblock %}
