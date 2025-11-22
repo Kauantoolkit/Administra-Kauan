@@ -7,6 +7,16 @@ from django.contrib.auth.decorators import login_required
 import datetime
 import locale
 
+
+def obter_data_formatada():
+    try:
+        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+    
+    today = datetime.date.today()
+    return today.strftime('%d de %B de %Y')
+
 def cadastro_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -50,19 +60,8 @@ def login_view(request):
 
 @login_required
 def dashboard_view(request):
-    try:
-        locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
-    except locale.Error:
-        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
-
-    today = datetime.date.today()
-    data_formatada = today.strftime('%d de %B de %Y')
-    
     context = {
-        'data_hoje': data_formatada
-        # TODO adicionar valores para que v'ao vir das proximas telas
-        # 'vendas_hoje': 2847,
-        # 'produtos_vendidos': 147,
+        'data_hoje': obter_data_formatada()
     }
     
     return render(request, 'dashboard.html', context)
@@ -70,6 +69,108 @@ def dashboard_view(request):
 @login_required
 def clientes_view(request):
     return render(request, 'listar_clientes.html')
+
+@login_required
+def fornecedores_view(request):
+    from .models import Fornecedor
+    from django.core.paginator import Paginator
+    from django.db.models import Q
+    
+    search_query = request.GET.get('search', '')
+    fornecedores = Fornecedor.objects.all()
+    
+    if search_query:
+        fornecedores = fornecedores.filter(
+            Q(nome_fantasia__icontains=search_query) |
+            Q(cnpj__icontains=search_query) |
+            Q(contato_principal__icontains=search_query)
+        )
+    
+    paginator = Paginator(fornecedores, 10)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'total_fornecedores': paginator.count,
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'fornecedores.html', context)
+
+
+@login_required
+def fornecedor_criar(request):
+    from .forms import FornecedorForm
+    
+    if request.method == 'POST':
+        form = FornecedorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fornecedor cadastrado com sucesso!')
+            return redirect('fornecedores')
+    else:
+        form = FornecedorForm()
+    
+    context = {
+        'form': form,
+        'titulo': 'Novo Fornecedor',
+        'action': 'criar',
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'fornecedor_form.html', context)
+
+
+@login_required
+def fornecedor_editar(request, pk):
+    from .models import Fornecedor
+    from .forms import FornecedorForm
+    from django.shortcuts import get_object_or_404
+    
+    fornecedor = get_object_or_404(Fornecedor, pk=pk)
+    
+    if request.method == 'POST':
+        form = FornecedorForm(request.POST, instance=fornecedor)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fornecedor atualizado com sucesso!')
+            return redirect('fornecedores')
+    else:
+        form = FornecedorForm(instance=fornecedor)
+    
+    context = {
+        'form': form,
+        'titulo': 'Editar Fornecedor',
+        'action': 'editar',
+        'fornecedor': fornecedor,
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'fornecedor_form.html', context)
+
+
+@login_required
+def fornecedor_deletar(request, pk):
+    from .models import Fornecedor
+    from django.shortcuts import get_object_or_404
+    
+    fornecedor = get_object_or_404(Fornecedor, pk=pk)
+    
+    if request.method == 'POST':
+        nome = fornecedor.nome_fantasia
+        fornecedor.delete()
+        messages.success(request, f'Fornecedor "{nome}" deletado com sucesso!')
+        return redirect('fornecedores')
+    
+    context = {
+        'fornecedor': fornecedor,
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'fornecedor_confirmar_delete.html', context)
+
 
 def logout_view(request):
     logout(request)
