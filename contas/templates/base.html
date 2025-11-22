@@ -399,6 +399,14 @@
             </a>
           </li>
           <li>
+            <a
+              href="{% url 'estoque' %}"
+              class="{% if request.resolver_match.url_name == 'estoque' %}active{% endif %}"
+            >
+              <span class="material-icons-outlined">inventory_2</span> Estoque
+            </a>
+          </li>
+          <li>
             <a href="#">
               <span class="material-icons-outlined">badge</span> Funcionários
             </a>
