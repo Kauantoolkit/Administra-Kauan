@@ -69,7 +69,7 @@ def dashboard_view(request):
 
 @login_required
 def clientes_view(request):
-    return render(request, 'clientes.html')
+    return render(request, 'listar_clientes.html')
 
 def logout_view(request):
     logout(request)
