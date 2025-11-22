@@ -194,14 +194,14 @@ def detalhes_produto_ajax(request, pk):
     img = p.imagem.url if p.imagem else "/static/img/no-image.png"
     return JsonResponse({
         "nome": p.nome,
-        "marca": p.marca,
         "sku": p.sku,
         "categoria": p.categoria.nome if p.categoria else "",
+        "descricao": p.descricao or "",
+        "custo": f"{p.custo:.2f}",
         "venda": f"{p.venda:.2f}",
         "quantidade": p.quantidade_estoque,
-        "valor_total": f"{p.valor_total_estoque:.2f}",
+        "quantidade_minima": p.quantidade_minima_alerta,
         "status": p.status,
-        "imagem": img,
     })
 
 def editar_produto_view(request, pk):

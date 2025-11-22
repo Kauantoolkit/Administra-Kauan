@@ -153,3 +153,4 @@ class MovimentoEstoque(models.Model):
             self.status = 'alerta'
         else:
             self.status = 'normal'
+
