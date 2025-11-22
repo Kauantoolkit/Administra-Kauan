@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Administra{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <div>
+    <h1>{{ titulo }}</h1>
+  </div>
+  <div class="header-info">
+    <a href="{% url 'fornecedores' %}" style="text-decoration: none; color: #6c757d; display: flex; align-items: center; gap: 0.5rem; margin-right: 1.5rem;">
+      <span class="material-icons-outlined">arrow_back</span> Voltar
+    </a>
+    <span>{{ data_hoje }}</span>
+  </div>
+</div>
+
+<div class="card" style="max-width: 900px;">
+  <div class="card-header">
+    <h4>
+      {% if action == 'criar' %}
+        <span class="material-icons-outlined" style="vertical-align: middle;">add_business</span> Cadastrar Novo Fornecedor
+      {% else %}
+        <span class="material-icons-outlined" style="vertical-align: middle;">edit</span> Editar Fornecedor
+      {% endif %}
+    </h4>
+  </div>
+  
+  <div class="card-body" style="padding: 2rem;">
+    {% if form.errors %}
+      <div class="alert alert-danger" style="margin-bottom: 1.5rem; padding: 12px; border-radius: 8px; background-color: #f8d7da; color: #721c24;">
+        <strong>Erro ao salvar:</strong>
+        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="POST" style="display: grid; gap: 1.8rem;">
+      {% csrf_token %}
+      
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.8rem;">
+        <div>
+          <label for="{{ form.nome_fantasia.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            Nome Fantasia <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.nome_fantasia }}
+          {% if form.nome_fantasia.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.nome_fantasia.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.status.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            Status <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.status }}
+          {% if form.status.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.status.errors.0 }}</small>
+          {% endif %}
+        </div>
+      </div>
+
+      <div>
+        <label for="{{ form.categoria.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+          Categoria <span style="color: #dc3545;">*</span>
+        </label>
+        {{ form.categoria }}
+        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Ex: Eletrônicos e Componentes, Material de Escritório, etc.</small>
+        {% if form.categoria.errors %}
+          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.categoria.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.8rem;">
+        <div>
+          <label for="{{ form.cnpj.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            CNPJ <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.cnpj }}
+          <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Formato: 00.000.000/0000-00</small>
+          {% if form.cnpj.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.cnpj.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.contato_principal.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            Contato Principal <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.contato_principal }}
+          <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Nome da pessoa de contato</small>
+          {% if form.contato_principal.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.contato_principal.errors.0 }}</small>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.8rem;">
+        <div>
+          <label for="{{ form.email.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            Email <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.email.errors.0 }}</small>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.telefone.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+            Telefone <span style="color: #dc3545;">*</span>
+          </label>
+          {{ form.telefone }}
+          <small style="color: #6c757d; display: block; margin-top: 0.25rem;">(00) 00000-0000</small>
+          {% if form.telefone.errors %}
+            <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.telefone.errors.0 }}</small>
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef;">
+        <a href="{% url 'fornecedores' %}" style="padding: 0.75rem 1.5rem; border: 1px solid #e9ecef; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 500;">
+          Cancelar
+        </a>
+        <button type="submit" id="submitBtn" style="padding: 0.75rem 2rem; background-color: #0d6efd; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-icons-outlined" style="font-size: 1.2rem;">save</span>
+          {% if action == 'criar' %}Cadastrar{% else %}Salvar Alterações{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: #adb5bd;
+  }
+
+  button[type="submit"]:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cnpjInput = document.getElementById('{{ form.cnpj.id_for_label }}');
+    if (cnpjInput) {
+      cnpjInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.substring(0, 14);
+        
+        if (value.length > 0) {
+          value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+          value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+          value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+          value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        }
+        
+        e.target.value = value;
+      });
+    }
+
+    const telefoneInput = document.getElementById('{{ form.telefone.id_for_label }}');
+    if (telefoneInput) {
+      telefoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.substring(0, 11);
+        
+        if (value.length > 0) {
+          if (value.length <= 10) {
+            value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+          } else {
+            value = value.replace(/^(\d{2})(\d)/, '($1) $2');
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+          }
+        }
+        
+        e.target.value = value;
+      });
+    }
+
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form && submitBtn) {
+      form.addEventListener('submit', function(e) {
+        submitBtn.disabled = true;
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.style.opacity = '0.65';
+        
+        const icon = submitBtn.querySelector('.material-icons-outlined');
+        const text = submitBtn.childNodes[submitBtn.childNodes.length - 1];
+        text.textContent = ' Processando...';
+        
+        setTimeout(function() {
+          if (!form.checkValidity()) {
+            submitBtn.disabled = false;
+            submitBtn.style.cursor = 'pointer';
+            submitBtn.style.opacity = '1';
+            text.textContent = ' {% if action == "criar" %}Cadastrar{% else %}Salvar Alterações{% endif %}';
+          }
+        }, 100);
+      });
+    }
+  });
+</script>
+
+{% endblock %}
