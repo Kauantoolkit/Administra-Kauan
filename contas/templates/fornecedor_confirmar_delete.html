@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Deletar Fornecedor - Administra{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <div>
+    <h1>Deletar Fornecedor</h1>
+  </div>
+  <div class="header-info">
+    <a href="{% url 'fornecedores' %}" style="text-decoration: none; color: #6c757d; display: flex; align-items: center; gap: 0.5rem; margin-right: 1.5rem;">
+      <span class="material-icons-outlined">arrow_back</span> Voltar
+    </a>
+    <span>{{ data_hoje }}</span>
+  </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+  <div class="card-body" style="text-align: center; padding: 2rem;">
+    <div style="background-color: #fde8e8; color: #dc3545; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <span class="material-icons-outlined" style="font-size: 3rem;">warning</span>
+    </div>
+
+    <h2 style="margin-bottom: 1rem; color: #333;">Confirmar Exclusão</h2>
+    
+    <p style="color: #6c757d; font-size: 1.1rem; margin-bottom: 1.5rem;">
+      Tem certeza que deseja deletar o fornecedor:
+    </p>
+
+    <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; text-align: left;">
+      <p style="margin: 0.5rem 0;"><strong>Nome:</strong> {{ fornecedor.nome_fantasia }}</p>
+      <p style="margin: 0.5rem 0;"><strong>CNPJ:</strong> {{ fornecedor.cnpj }}</p>
+      <p style="margin: 0.5rem 0;"><strong>Categoria:</strong> {{ fornecedor.categoria }}</p>
+      <p style="margin: 0.5rem 0;"><strong>Contato:</strong> {{ fornecedor.contato_principal }}</p>
+    </div>
+
+    <div class="alert alert-danger" style="padding: 12px; border-radius: 8px; background-color: #fff3cd; color: #856404; margin-bottom: 1.5rem; text-align: left;">
+      <strong>⚠️ Atenção:</strong> Esta ação não pode ser desfeita. Todos os dados relacionados a este fornecedor serão permanentemente removidos.
+    </div>
+
+    <form method="POST" style="display: flex; gap: 1rem; justify-content: center;">
+      {% csrf_token %}
+      
+      <a href="{% url 'fornecedores' %}" style="padding: 0.75rem 2rem; border: 1px solid #e9ecef; background-color: #fff; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 600;">
+        Cancelar
+      </a>
+      
+      <button type="submit" style="padding: 0.75rem 2rem; background-color: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+        <span class="material-icons-outlined" style="font-size: 1.2rem;">delete_forever</span>
+        Sim, Deletar
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
