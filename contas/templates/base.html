@@ -400,7 +400,7 @@
           </li>
           <li>
             <a
-              href="{% url 'estoque' %}"
+              href="#"
               class="{% if request.resolver_match.url_name == 'estoque' %}active{% endif %}"
             >
               <span class="material-icons-outlined">inventory_2</span> Estoque
@@ -413,7 +413,7 @@
           </li>
           <li>
             <a
-              href="{% url 'fornecedores' %}"
+              href="#"
               class="{% if request.resolver_match.url_name == 'fornecedores' or 'fornecedor' in request.resolver_match.url_name %}active{% endif %}"
             >
               <span class="material-icons-outlined">local_shipping</span>
