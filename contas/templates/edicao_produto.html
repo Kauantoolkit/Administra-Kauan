@@ -63,12 +63,12 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Preço de Custo (R$) *</label>
-                    <input type="number" step="0.01" name="custo" value="{{ produto.custo }}" class="form-control" required>
+                    <input type="number" step="0.01" name="custo" value="{{ produto.custo|stringformat:'.2f' }}" class="form-control" required>
                 </div>
 
                 <div class="form-group">
                     <label>Preço de Venda (R$) *</label>
-                    <input type="number" step="0.01" name="venda" value="{{ produto.venda }}" class="form-control" required>
+                    <input type="number" step="0.01" name="venda" value="{{ produto.venda|stringformat:'.2f' }}" class="form-control" required>
                 </div>
             </div>
 
@@ -84,6 +84,11 @@
                     <label>Quantidade Mínima</label>
                     <input type="number" name="quantidade_minima_alerta" value="{{ produto.quantidade_minima_alerta }}" class="form-control">
                 </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Unidade de Medida</label>
+                <input type="text" name="unidade_medida" value="{{ produto.unidade_medida|default:'UN' }}" class="form-control">
             </div>
 
             <div class="form-actions">
@@ -126,6 +131,8 @@
 .form-group label {
     font-weight: 600;
     color: #495057;
+    display: block;
+    margin-bottom: 0.25rem;
 }
 
 .form-control {
@@ -135,6 +142,11 @@
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s;
+    box-sizing: border-box; 
+}
+
+textarea.form-control {
+    resize: none;
 }
 
 .form-control:focus {
@@ -145,8 +157,11 @@
 
 .form-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 1rem;
     margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
 }
 
 .btn-cancel {
@@ -156,6 +171,7 @@
     text-decoration: none;
     color: #495057;
     font-weight: 500;
+    box-sizing: border-box;
 }
 
 .btn-submit {
@@ -169,6 +185,13 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
 }
 </style>
 

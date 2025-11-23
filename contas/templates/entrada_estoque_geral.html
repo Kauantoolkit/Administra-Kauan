@@ -5,6 +5,55 @@
 
 {% block content %}
 
+<style>
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box; 
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #198754;
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: #adb5bd;
+  }
+
+  textarea.form-control {
+    resize: none;
+    height: 100px; 
+  }
+  
+  .form-label {
+    display: block; 
+    margin-bottom: 0.5rem; 
+    font-weight: 600; 
+    color: #495057;
+  }
+  
+  .form-text {
+    color: #6c757d; 
+    display: block; 
+    margin-top: 0.25rem; 
+    font-size: 0.875rem;
+  }
+  
+  .error-msg {
+    color: #dc3545; 
+    display: block; 
+    margin-top: 0.25rem; 
+    font-size: 0.875rem;
+  }
+</style>
+
 <div class="header">
   <div>
     <h1>{{ titulo }}</h1>
@@ -44,43 +93,40 @@
       {% csrf_token %}
       <input type="hidden" name="tipo_movimento" value="ENTRADA">
 
-      <!-- Produto -->
       <div>
-        <label for="{{ form.produto.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+        <label for="{{ form.produto.id_for_label }}" class="form-label">
           Produto <span style="color: #dc3545;">*</span>
         </label>
         {{ form.produto }}
-        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Selecione o item que você está adicionando ao estoque.</small>
+        <small class="form-text">Selecione o item que você está adicionando ao estoque.</small>
         {% if form.produto.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.produto.errors.0 }}</small>
+          <small class="error-msg">{{ form.produto.errors.0 }}</small>
         {% endif %}
       </div>
 
-      <!-- Quantidade -->
       <div>
-        <label for="{{ form.quantidade.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+        <label for="{{ form.quantidade.id_for_label }}" class="form-label">
           Quantidade a Adicionar <span style="color: #dc3545;">*</span>
         </label>
         {{ form.quantidade }}
         {% if form.quantidade.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.quantidade.errors.0 }}</small>
+          <small class="error-msg">{{ form.quantidade.errors.0 }}</small>
         {% endif %}
       </div>
 
-      <!-- Observação -->
       <div>
-        <label for="{{ form.observacao.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+        <label for="{{ form.observacao.id_for_label }}" class="form-label">
           Observação (Opcional)
         </label>
         {{ form.observacao }}
-        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Ex: Nota fiscal, fornecedor, lote, etc.</small>
+        <small class="form-text">Ex: Nota fiscal, fornecedor, lote, etc.</small>
         {% if form.observacao.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.observacao.errors.0 }}</small>
+          <small class="error-msg">{{ form.observacao.errors.0 }}</small>
         {% endif %}
       </div>
 
       <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef;">
-        <a href="{% url 'estoque' %}" style="padding: 0.75rem 1.5rem; border: 1px solid #e9ecef; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 500;">
+        <a href="{% url 'estoque' %}" style="padding: 0.75rem 1.5rem; border: 1px solid #e9ecef; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 500; display: flex; align-items: center;">
           Cancelar
         </a>
         <button type="submit" style="padding: 0.75rem 2rem; background-color: #198754; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
@@ -90,27 +136,5 @@
     </form>
   </div>
 </div>
-
-<style>
-  .form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: border-color 0.2s;
-  }
-
-  .form-control:focus {
-    outline: none;
-    border-color: #198754;
-    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
-  }
-
-  .form-control::placeholder {
-    color: #adb5bd;
-  }
-</style>
 
 {% endblock %}

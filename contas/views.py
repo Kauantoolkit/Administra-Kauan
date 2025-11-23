@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Q
 from django.core.paginator import Paginator
 import datetime
 import locale
@@ -10,6 +10,14 @@ from django.http import JsonResponse
 from .models import Categoria, Produto, MovimentoEstoque
 from .messages.estoque_storage import EstoqueStorage
 from django.contrib.messages.constants import INFO, SUCCESS, ERROR
+from django.db.models import Sum
+from django.utils import timezone
+from vendas.models import Venda, ItemVenda
+from clientes.models import Cliente
+from vendas.models import Produto
+from django.contrib import messages
+import csv
+from django.http import HttpResponse
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
@@ -36,6 +44,7 @@ def cadastro_view(request):
         form = CustomUserCreationForm()
     context = {'form': form}
     return render(request, 'cadastro.html', context)
+
 @login_required
 def estoque_view(request): 
     search_query = request.GET.get('search', '')
@@ -57,6 +66,7 @@ def estoque_view(request):
     }
 
     return render(request, 'estoque.html', context)
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -92,15 +102,55 @@ def entrada_estoque_geral_view(request):
         form = MovimentoEstoqueForm()
     
     return render(request, 'contas/entrada_estoque_geral.html', {'form': form})
+
+def calcular_crescimento(atual, anterior):
+    if not anterior or anterior == 0:
+        return 100.0 if atual > 0 else 0.0
+    return ((atual - anterior) / anterior) * 100
+
 @login_required
 def dashboard_view(request):
     try:
         locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
     except locale.Error:
         locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+
     today = datetime.date.today()
     data_formatada = today.strftime('%d de %B de %Y')
-    context = {'data_hoje': data_formatada}
+
+    hoje = timezone.now().date()
+    ontem_data = hoje - datetime.timedelta(days=1)
+
+    vendas_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
+    vendas_ontem = Venda.objects.filter(data_venda__date=ontem_data).aggregate(Sum('total'))['total__sum'] or 0
+    perc_vendas = calcular_crescimento(float(vendas_hoje), float(vendas_ontem))
+
+    prod_hoje = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    prod_ontem = ItemVenda.objects.filter(venda__data_venda__date=ontem_data).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    perc_produtos = calcular_crescimento(prod_hoje, prod_ontem)
+
+    clientes_ativos = Cliente.objects.filter(status='ativo').count()
+    novos_clientes_hoje = Cliente.objects.filter(data_cadastro__date=hoje).count()
+    novos_clientes_ontem = Cliente.objects.filter(data_cadastro__date=ontem_data).count()
+    perc_clientes = calcular_crescimento(novos_clientes_hoje, novos_clientes_ontem)
+
+    produtos_falta = Produto.objects.filter(
+        quantidade_estoque__lte=F('quantidade_minima_alerta')
+    ).count()
+
+    vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
+
+    context = {
+        'data_hoje': data_formatada,
+        'vendas_hoje': vendas_hoje,
+        'perc_vendas': perc_vendas,
+        'produtos_vendidos': prod_hoje,
+        'perc_produtos': perc_produtos,
+        'clientes_ativos': clientes_ativos,
+        'perc_clientes': perc_clientes, 
+        'produtos_falta': produtos_falta,
+        'vendas_recentes': vendas_recentes,
+    }
     return render(request, 'dashboard.html', context)
 @login_required
 def novo_produto_view(request):
@@ -434,3 +484,86 @@ def novo_produto_view(request):
 @login_required
 def relatorios(request):
     return render(request, 'relatorios.html')
+
+@login_required
+def exportar_estoque_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="estoque.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['Produto', 'SKU', 'Categoria', 'Marca', 'Custo', 'Venda', 'Estoque', 'Status'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+            p.categoria.nome if p.categoria else 'N/A',
+            p.marca or '',
+            f"{p.custo:.2f}".replace('.', ','),
+            f"{p.venda:.2f}".replace('.', ','),
+            p.quantidade_estoque,
+            p.get_status_display()
+        ])
+
+    return response
+
+@login_required
+def imprimir_codigos_estoque(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="lista_skus.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+    writer.writerow(['Produto', 'SKU'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+        ])
+
+    return response
