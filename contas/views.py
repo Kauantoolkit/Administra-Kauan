@@ -10,6 +10,11 @@ from django.http import JsonResponse
 from .models import Categoria, Produto, MovimentoEstoque
 from .messages.estoque_storage import EstoqueStorage
 from django.contrib.messages.constants import INFO, SUCCESS, ERROR
+from django.db.models import Sum
+from django.utils import timezone
+from vendas.models import Venda, ItemVenda
+from clientes.models import Cliente
+from vendas.models import Produto
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
@@ -58,15 +63,54 @@ def login_view(request):
         form = EmailAuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+def calcular_crescimento(atual, anterior):
+    if not anterior or anterior == 0:
+        return 100.0 if atual > 0 else 0.0
+    return ((atual - anterior) / anterior) * 100
+
 @login_required
 def dashboard_view(request):
     try:
         locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
     except locale.Error:
         locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+
     today = datetime.date.today()
     data_formatada = today.strftime('%d de %B de %Y')
-    context = {'data_hoje': data_formatada}
+
+    hoje = timezone.now().date()
+    ontem_data = hoje - datetime.timedelta(days=1)
+
+    vendas_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
+    vendas_ontem = Venda.objects.filter(data_venda__date=ontem_data).aggregate(Sum('total'))['total__sum'] or 0
+    perc_vendas = calcular_crescimento(float(vendas_hoje), float(vendas_ontem))
+
+    prod_hoje = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    prod_ontem = ItemVenda.objects.filter(venda__data_venda__date=ontem_data).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    perc_produtos = calcular_crescimento(prod_hoje, prod_ontem)
+
+    clientes_ativos = Cliente.objects.filter(status='ativo').count()
+    novos_clientes_hoje = Cliente.objects.filter(data_cadastro__date=hoje).count()
+    novos_clientes_ontem = Cliente.objects.filter(data_cadastro__date=ontem_data).count()
+    perc_clientes = calcular_crescimento(novos_clientes_hoje, novos_clientes_ontem)
+
+    produtos_falta = Produto.objects.filter(
+        quantidade_estoque__lte=F('quantidade_minima_alerta')
+    ).count()
+
+    vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
+
+    context = {
+        'data_hoje': data_formatada,
+        'vendas_hoje': vendas_hoje,
+        'perc_vendas': perc_vendas,
+        'produtos_vendidos': prod_hoje,
+        'perc_produtos': perc_produtos,
+        'clientes_ativos': clientes_ativos,
+        'perc_clientes': perc_clientes, 
+        'produtos_falta': produtos_falta,
+        'vendas_recentes': vendas_recentes,
+    }
     return render(request, 'dashboard.html', context)
 
 @login_required
