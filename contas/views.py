@@ -16,6 +16,8 @@ from vendas.models import Venda, ItemVenda
 from clientes.models import Cliente
 from vendas.models import Produto
 from django.contrib import messages
+import csv
+from django.http import HttpResponse
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
@@ -431,3 +433,47 @@ def novo_produto_view(request):
 @login_required
 def relatorios(request):
     return render(request, 'relatorios.html')
+
+@login_required
+def exportar_estoque_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="estoque.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['Produto', 'SKU', 'Categoria', 'Marca', 'Custo', 'Venda', 'Estoque', 'Status'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+            p.categoria.nome if p.categoria else 'N/A',
+            p.marca or '',
+            f"{p.custo:.2f}".replace('.', ','),
+            f"{p.venda:.2f}".replace('.', ','),
+            p.quantidade_estoque,
+            p.get_status_display()
+        ])
+
+    return response

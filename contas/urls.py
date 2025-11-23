@@ -20,5 +20,5 @@ urlpatterns = [
     path('produtos/<int:pk>/adicionar-estoque/', views.adicionar_estoque_view, name='entrada_produto'),
     path('produtos/<int:pk>/excluir/', views.excluir_produto_view, name='excluir_produto'),
     path("estoque/detalhes/<int:pk>/", views.detalhes_produto_ajax, name="detalhes_produto_ajax"),
-
+    path('estoque/exportar/', views.exportar_estoque_csv, name='exportar_estoque'),
 ]
