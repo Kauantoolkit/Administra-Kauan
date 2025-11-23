@@ -37,7 +37,6 @@ def cadastro_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            _create_default_categories()
             return redirect('login')
     else:
         form = CustomUserCreationForm()
@@ -223,7 +222,6 @@ def fornecedor_deletar(request, pk):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
 def _create_default_categories():
     default_categories = [
         'Eletrônicos', 
@@ -430,3 +428,6 @@ def novo_produto_view(request):
         form = ProdutoForm()
         add_estoque_message(request, 'Lembre-se: o estoque inicial é 0. Use a função de Entrada para adicionar unidades.', level=INFO)
     return render(request, 'novo_produto.html', {'form': form})
+@login_required
+def relatorios(request):
+    return render(request, 'relatorios.html')
