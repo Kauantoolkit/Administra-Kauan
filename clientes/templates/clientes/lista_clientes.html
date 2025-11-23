@@ -417,7 +417,7 @@ body {
 
     <div class="table-footer">
         {% if page_obj %}
-        <span>Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }}</span>
+        <span>Mostrando{{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ page_obj.paginator.count }}</span>
         <nav class="pagination-nav">
             {% if page_obj.has_previous %}
                 <a class="pagination-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
