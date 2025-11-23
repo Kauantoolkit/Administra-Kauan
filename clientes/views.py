@@ -11,32 +11,33 @@ import csv
 from django.http import HttpResponse
 
 
+@login_required
 def lista_clientes(request):
+
     clientes_qs = Cliente.objects.all().order_by('-data_cadastro')
 
-    status_filter = request.GET.get('status')
-    cidade_filter = request.GET.get('cidade')
 
-    if status_filter:
-        clientes_qs = clientes_qs.filter(status=status_filter)
-    
-    if cidade_filter:
-        clientes_qs = clientes_qs.filter(cidade__icontains=cidade_filter)
-    
     total_clientes = clientes_qs.count()
     clientes_ativos = clientes_qs.filter(status='ativo').count()
 
     hoje = timezone.localdate()
-    novos_hoje = clientes_qs.filter(data_cadastro__date=hoje).count()
-
-    ticket_medio = 87.50
-
+    ontem = hoje - timedelta(days=1)
     now = timezone.now()
+
+    novos_hoje = clientes_qs.filter(data_cadastro__date=hoje).count()
+    novos_ontem = clientes_qs.filter(data_cadastro__date=ontem).count()
+    diff_hoje = novos_hoje - novos_ontem
+    txt_novos_hoje = f"{diff_hoje:+} vs ontem"
+
     mes_atual = now.month
     ano_atual = now.year
-
-    mes_passado = mes_atual - 1 if mes_atual > 1 else 12
-    ano_passado = ano_atual if mes_atual > 1 else ano_atual - 1
+    
+    if mes_atual == 1:
+        mes_passado = 12
+        ano_passado = ano_atual - 1
+    else:
+        mes_passado = mes_atual - 1
+        ano_passado = ano_atual
 
     clientes_mes_atual = clientes_qs.filter(
         data_cadastro__month=mes_atual,
@@ -51,12 +52,7 @@ def lista_clientes(request):
     diff_mes = clientes_mes_atual - clientes_mes_passado
     txt_total_mes = f"{diff_mes:+} este mês"
 
-    ontem = hoje - timedelta(days=1)
-    novos_ontem = clientes_qs.filter(data_cadastro__date=ontem).count()
-
-    diff_hoje = novos_hoje - novos_ontem
-    txt_novos_hoje = f"{diff_hoje:+} vs ontem"
-
+    ticket_medio = 87.50
     ticket_mes_passado = 82.50
     perc_variacao = ((ticket_medio - ticket_mes_passado) / ticket_mes_passado) * 100
     txt_ticket_mes = f"{perc_variacao:+.0f}% vs mês anterior"
@@ -65,15 +61,33 @@ def lista_clientes(request):
         status='ativo',
         data_cadastro__date__lte=ontem
     ).count()
-
+    
     diff_ativos = clientes_ativos - clientes_ativos_ontem
 
-    paginator = Paginator(clientes_qs, 5)
+    clientes_tabela = Cliente.objects.all().order_by('-id')
+
+    busca_nome = (request.GET.get('nome') or '').strip()
+    busca_cpf = (request.GET.get('cpf') or '').strip()
+    busca_email = (request.GET.get('email') or '').strip()
+
+    if busca_nome:
+        clientes_tabela = clientes_tabela.filter(nome__icontains=busca_nome)
+    
+    if busca_cpf:
+        cpf_limpo = busca_cpf.replace('.', '').replace('-', '')
+        clientes_tabela = clientes_tabela.filter(cpf__icontains=cpf_limpo)
+
+    if busca_email:
+        clientes_tabela = clientes_tabela.filter(email__icontains=busca_email)
+    paginator = Paginator(clientes_tabela, 5) 
+    
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'page_obj': page_obj,
+        'request': request,
+
         'total_clientes': total_clientes,
         'clientes_ativos': clientes_ativos,
         'novos_hoje': novos_hoje,
