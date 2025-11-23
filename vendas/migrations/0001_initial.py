@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('nome', models.CharField(max_length=100)),
                 ('preco', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Preço')),
-                ('estoque_atual', models.IntegerField(default=0)),
+                ('quantidade_estoque', models.IntegerField(default=0)),
             ],
         ),
         migrations.CreateModel(
