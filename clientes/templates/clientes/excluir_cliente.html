@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Excluir Cliente{% endblock %}
+
+{% block content %}
+
+<style>
+.delete-card {
+    background: var(--white);
+    padding: 32px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    max-width: 480px;
+    margin: 40px auto;
+}
+
+.delete-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.delete-text {
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.btns {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancelar {
+    padding: 10px 18px;
+    background: var(--border-light);
+    border-radius: 8px;
+}
+
+.btn-excluir {
+    padding: 10px 18px;
+    background: #F04438;
+    color: white;
+    border-radius: 8px;
+}
+
+.btn-excluir:hover {
+    background: #C62F2A;
+}
+</style>
+
+<div class="delete-card">
+    <h2 class="delete-title">Excluir Cliente</h2>
+
+    <p class="delete-text">
+        Tem certeza que deseja excluir <strong>{{ cliente.nome }}</strong>?<br>
+        Esta ação não poderá ser desfeita.
+    </p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="btns">
+            <a href="{% url 'lista_clientes' %}" class="btn-cancelar">Cancelar</a>
+            <button type="submit" class="btn-excluir">Excluir</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

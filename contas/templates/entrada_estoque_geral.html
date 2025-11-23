@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ titulo }} - Administra{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <div>
+    <h1>{{ titulo }}</h1>
+  </div>
+  <div class="header-info">
+    <a href="{% url 'estoque' %}" style="text-decoration: none; color: #6c757d; display: flex; align-items: center; gap: 0.5rem; margin-right: 1.5rem;">
+      <span class="material-icons-outlined">arrow_back</span> Voltar
+    </a>
+    <span>{{ data_hoje }}</span>
+  </div>
+</div>
+
+<div class="card" style="max-width: 900px;">
+  <div class="card-header">
+    <h4>
+      <span class="material-icons-outlined" style="vertical-align: middle;">
+        add_circle
+      </span> Registrar Entrada de Estoque
+    </h4>
+  </div>
+  
+  <div class="card-body">
+    {% if form.errors %}
+      <div class="alert alert-danger" style="margin-bottom: 1.5rem; padding: 12px; border-radius: 8px; background-color: #f8d7da; color: #721c24;">
+        <strong>Erro ao salvar:</strong>
+        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="POST" style="display: grid; gap: 1.5rem;">
+      {% csrf_token %}
+      <input type="hidden" name="tipo_movimento" value="ENTRADA">
+
+      <!-- Produto -->
+      <div>
+        <label for="{{ form.produto.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+          Produto <span style="color: #dc3545;">*</span>
+        </label>
+        {{ form.produto }}
+        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Selecione o item que você está adicionando ao estoque.</small>
+        {% if form.produto.errors %}
+          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.produto.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <!-- Quantidade -->
+      <div>
+        <label for="{{ form.quantidade.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+          Quantidade a Adicionar <span style="color: #dc3545;">*</span>
+        </label>
+        {{ form.quantidade }}
+        {% if form.quantidade.errors %}
+          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.quantidade.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <!-- Observação -->
+      <div>
+        <label for="{{ form.observacao.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
+          Observação (Opcional)
+        </label>
+        {{ form.observacao }}
+        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Ex: Nota fiscal, fornecedor, lote, etc.</small>
+        {% if form.observacao.errors %}
+          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.observacao.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef;">
+        <a href="{% url 'estoque' %}" style="padding: 0.75rem 1.5rem; border: 1px solid #e9ecef; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 500;">
+          Cancelar
+        </a>
+        <button type="submit" style="padding: 0.75rem 2rem; background-color: #198754; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-icons-outlined" style="font-size: 1.2rem;">arrow_downward</span> Registrar Entrada
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #198754;
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: #adb5bd;
+  }
+</style>
+
+{% endblock %}

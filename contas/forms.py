@@ -1,7 +1,9 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
-from .models import CustomUser
+from .models import Categoria, CustomUser, MovimentoEstoque, Produto
+from .models import CustomUser, Fornecedor
 from django import forms
 from django.utils.translation import gettext_lazy as _
+import re
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
@@ -20,8 +22,184 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ('email', 'nome', 'cpf', 'is_active', 'is_staff')
 
+
 class EmailAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(
         label=_("Email"),
         widget=forms.EmailInput(attrs={'autofocus': True, 'placeholder': 'seu@email.com'})
     )
+
+class ProdutoForm(forms.ModelForm):
+    class Meta:
+        model = Produto
+        fields = ['sku', 'nome', 'marca', 'descricao', 'categoria', 'custo', 'venda', 'quantidade_minima_alerta', 'unidade_medida', 'imagem']
+        labels = {
+            'sku': 'SKU (Código Único)',
+            'nome': 'Nome do Produto',
+            'marca': 'Marca do Produto',
+            'descricao': 'Descrição Detalhada',
+            'categoria': 'Categoria',
+            'custo': 'Preço de Custo (R$)',
+            'venda': 'Preço de Venda (R$)',
+            'quantidade_minima_alerta': 'Qtd. Mínima para Alerta (Estoque Baixo)',
+            'unidade_medida': 'Unidade de Medida (Ex: UN, KG)',
+            'imagem': 'Imagem do Produto',
+        }
+        widgets = {
+            'sku': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Único do Produto'}),
+            'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome Completo do Produto'}),
+            'marca': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome da marca'}),
+            'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Detalhes, cores, dimensões, etc.'}),
+            'categoria': forms.Select(attrs={'class': 'form-select'}),
+            'custo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'quantidade_minima_alerta': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'unidade_medida': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: UN, KG, L'}),
+            'imagem': forms.FileInput(attrs={'class': 'form-control-file'}),
+        }
+
+class BuscaEstoqueForm(forms.Form):
+    busca_nome = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Nome do produto...'})
+    )
+    
+    busca_sku = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Código / SKU...'})
+    )
+
+    categoria = forms.ModelChoiceField(
+        queryset=Categoria.objects.all(),
+        required=False,
+        empty_label='Todas Categorias',
+    )
+    
+    status = forms.ChoiceField(
+        choices=[('', 'Todos Status')] + list(Produto.STATUS_CHOICES),
+        required=False,
+    )
+
+class MovimentoEstoqueForm(forms.ModelForm):
+    """
+    Formulário para registrar Movimentos de Estoque em geral (Entrada/Saída).
+    Usado na view simples (Movimento de Estoque Simples).
+    """
+    class Meta:
+        model = MovimentoEstoque
+        fields = ['produto', 'tipo_movimento', 'quantidade', 'observacao']
+        widgets = {
+            'tipo_movimento': forms.Select(attrs={'class': 'form-control'}),
+            'quantidade': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['produto'].queryset = Produto.objects.filter(status__in=['ATIVO', 'BAIXO', 'ZERADO'])
+        self.fields['produto'].widget.attrs.update({'class': 'form-control'})
+
+class EntradaProdutoEspecificoForm(forms.ModelForm):
+    """
+    Formulário para adicionar estoque a um produto específico (usado na tela de detalhe do produto).
+    """
+    class Meta:
+        model = MovimentoEstoque
+        fields = ['quantidade', 'observacao']
+        widgets = {
+            'quantidade': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+class EntradaEstoqueMultiplaForm(forms.Form):
+    """
+    Formulário base para o FormSet de Entrada de Estoque Múltipla. 
+    Contém campos de custo e validade que agora existem no Model MovimentoEstoque.
+    """
+    produto = forms.ModelChoiceField(
+        queryset=Produto.objects.all().order_by('nome'),
+        label="Produto",
+        empty_label="Selecione um produto...",
+        widget=forms.Select(attrs={'class': 'form-control select-produto'}),
+        required=True
+    )
+    quantidade = forms.IntegerField(
+        label="Quantidade",
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Qtd. a adicionar', 'min': '1', 'required': 'required'}),
+        required=True
+    )
+    custo_unitario = forms.DecimalField(
+        label="Custo Unitário (R$)",
+        min_value=0.01,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': '0.01', 'required': 'required'}),
+        required=True
+    )
+    validade = forms.DateField(
+        label="Validade (Opcional)",
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'})
+    )
+
+
+class FornecedorForm(forms.ModelForm):
+    class Meta:
+        model = Fornecedor
+        fields = ['nome_fantasia', 'categoria', 'cnpj', 'contato_principal', 'email', 'telefone', 'status']
+        widgets = {
+            'nome_fantasia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: Tech Distribuidora'
+            }),
+            'categoria': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ex: Eletrônicos e Componentes'
+            }),
+            'cnpj': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '00.000.000/0000-00',
+                'maxlength': '18'
+            }),
+            'contato_principal': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome do contato'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'email@exemplo.com'
+            }),
+            'telefone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '(00) 00000-0000',
+                'maxlength': '20'
+            }),
+            'status': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
+    
+    def clean_cnpj(self):
+        cnpj = self.cleaned_data.get('cnpj')
+        cnpj_numeros = re.sub(r'\D', '', cnpj)
+        
+        if len(cnpj_numeros) != 14:
+            raise forms.ValidationError('CNPJ deve conter 14 dígitos.')
+        
+        cnpj_formatado = f"{cnpj_numeros[:2]}.{cnpj_numeros[2:5]}.{cnpj_numeros[5:8]}/{cnpj_numeros[8:12]}-{cnpj_numeros[12:]}"
+        return cnpj_formatado
+    
+    def clean_telefone(self):
+        telefone = self.cleaned_data.get('telefone')
+        telefone_numeros = re.sub(r'\D', '', telefone)
+        
+        if len(telefone_numeros) not in [10, 11]:
+            raise forms.ValidationError('Telefone deve conter 10 ou 11 dígitos.')
+        
+        if len(telefone_numeros) == 11:
+            telefone_formatado = f"({telefone_numeros[:2]}) {telefone_numeros[2:7]}-{telefone_numeros[7:]}"
+        else:
+            telefone_formatado = f"({telefone_numeros[:2]}) {telefone_numeros[2:6]}-{telefone_numeros[6:]}"
+        
+        return telefone_formatado
