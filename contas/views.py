@@ -108,7 +108,7 @@ def dashboard_view(request):
     perc_clientes = calcular_crescimento(novos_clientes_hoje, novos_clientes_ontem)
 
 
-    produtos_falta = Produto.objects.filter(quantidade_estoque__lt=10).count()
+    produtos_falta = Produto.objects.filter(estoque_atual__lt=10).count()
     vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
 
     context = {
