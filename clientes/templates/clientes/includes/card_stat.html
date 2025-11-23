@@ -1,0 +1,15 @@
+<div class="stat-card">
+    <div class="stat-card-info">
+        <h5>{{ title }}</h5>
+        
+        <h2>{{ value_prefix }}{{ value }}</h2>
+        
+        <p class="{% if icon_type == 'positive' %}positive{% elif icon_type == 'negative' %}negative{% endif %}">
+            {{ footer }}
+        </p>
+    </div>
+    
+    <div class="stat-card-icon {% if icon_type == 'positive' %}positive{% elif icon_type == 'negative' %}negative{% elif icon_type == 'warning' %}warning{% endif %}">
+        <i class="{{ icon_class }}"></i> 
+    </div>
+</div>
