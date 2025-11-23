@@ -36,7 +36,27 @@ def cadastro_view(request):
         form = CustomUserCreationForm()
     context = {'form': form}
     return render(request, 'cadastro.html', context)
+@login_required
+def estoque_view(request): 
+    search_query = request.GET.get('search', '')
+    produtos = Produto.objects.all()
 
+    if search_query:
+        produtos = produtos.filter(
+            Q(nome__icontains=search_query) | 
+            Q(sku__icontains=search_query)
+        )
+
+    paginator = Paginator(produtos, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+
+    return render(request, 'estoque.html', context)
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -56,7 +76,22 @@ def login_view(request):
     else:
         form = EmailAuthenticationForm()
     return render(request, 'login.html', {'form': form})
-
+@login_required
+def entrada_estoque_geral_view(request):
+    from .forms import MovimentoEstoqueForm 
+    
+    if request.method == 'POST':
+        form = MovimentoEstoqueForm(request.POST)
+        if form.is_valid():
+            movimento = form.save(commit=False)
+            movimento.tipo_movimento = 'ENTRADA'
+            movimento.save()
+            
+            return redirect('estoque')
+    else:
+        form = MovimentoEstoqueForm()
+    
+    return render(request, 'contas/entrada_estoque_geral.html', {'form': form})
 @login_required
 def dashboard_view(request):
     try:
@@ -67,7 +102,20 @@ def dashboard_view(request):
     data_formatada = today.strftime('%d de %B de %Y')
     context = {'data_hoje': data_formatada}
     return render(request, 'dashboard.html', context)
+@login_required
+def novo_produto_view(request):
+    from .forms import ProdutoForm 
 
+    if request.method == 'POST':
+        form = ProdutoForm(request.POST, request.FILES)
+        if form.is_valid():
+            produto = form.save()
+
+            return redirect('estoque')
+    else:
+        form = ProdutoForm()
+    
+    return render(request, 'contas/novo_produto.html', {'form': form})
 @login_required
 def clientes_view(request):
     return render(request, 'listar_clientes.html')
