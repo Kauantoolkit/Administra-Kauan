@@ -5,112 +5,216 @@
 
 {% block content %}
 
-<div class="header">
-  <div>
+<div class="page-container">
+
+  <div class="header">
     <h1>{{ titulo }}</h1>
-  </div>
-  <div class="header-info">
-    <a href="{% url 'estoque' %}" style="text-decoration: none; color: #6c757d; display: flex; align-items: center; gap: 0.5rem; margin-right: 1.5rem;">
+    <a href="{% url 'estoque' %}" class="back-btn">
       <span class="material-icons-outlined">arrow_back</span> Voltar
     </a>
-    <span>{{ data_hoje }}</span>
   </div>
-</div>
 
-<div class="card" style="max-width: 900px;">
-  <div class="card-header">
-    <h4>
-      <span class="material-icons-outlined" style="vertical-align: middle;">
-        add_circle
-      </span> Registrar Entrada de Estoque
-    </h4>
-  </div>
-  
-  <div class="card-body">
-    {% if form.errors %}
-      <div class="alert alert-danger" style="margin-bottom: 1.5rem; padding: 12px; border-radius: 8px; background-color: #f8d7da; color: #721c24;">
+  <div class="form-card">
+
+    <div class="form-card-header">
+      <span class="material-icons-outlined">add_circle</span>
+      Registrar Entrada de Estoque
+    </div>
+
+    <div class="form-card-body">
+
+      {% if form.errors %}
+      <div class="alert-error">
         <strong>Erro ao salvar:</strong>
-        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0;">
+        <ul>
           {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
+          {% for error in errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
           {% endfor %}
         </ul>
       </div>
-    {% endif %}
+      {% endif %}
 
-    <form method="POST" style="display: grid; gap: 1.5rem;">
-      {% csrf_token %}
-      <input type="hidden" name="tipo_movimento" value="ENTRADA">
+      <form method="POST" class="form-grid">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_movimento" value="ENTRADA">
 
-      <!-- Produto -->
-      <div>
-        <label for="{{ form.produto.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
-          Produto <span style="color: #dc3545;">*</span>
-        </label>
-        {{ form.produto }}
-        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Selecione o item que você está adicionando ao estoque.</small>
-        {% if form.produto.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.produto.errors.0 }}</small>
-        {% endif %}
-      </div>
+        <div class="form-group">
+          <label>Produto <span class="req">*</span></label>
+          {{ form.produto }}
+        </div>
 
-      <!-- Quantidade -->
-      <div>
-        <label for="{{ form.quantidade.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
-          Quantidade a Adicionar <span style="color: #dc3545;">*</span>
-        </label>
-        {{ form.quantidade }}
-        {% if form.quantidade.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.quantidade.errors.0 }}</small>
-        {% endif %}
-      </div>
+        <div class="form-group">
+          <label>Quantidade a Adicionar <span class="req">*</span></label>
+          {{ form.quantidade }}
+        </div>
 
-      <!-- Observação -->
-      <div>
-        <label for="{{ form.observacao.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #495057;">
-          Observação (Opcional)
-        </label>
-        {{ form.observacao }}
-        <small style="color: #6c757d; display: block; margin-top: 0.25rem;">Ex: Nota fiscal, fornecedor, lote, etc.</small>
-        {% if form.observacao.errors %}
-          <small style="color: #dc3545; display: block; margin-top: 0.25rem;">{{ form.observacao.errors.0 }}</small>
-        {% endif %}
-      </div>
+        <div class="form-group">
+          <label>Observação (Opcional)</label>
+          {{ form.observacao }}
+        </div>
 
-      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef;">
-        <a href="{% url 'estoque' %}" style="padding: 0.75rem 1.5rem; border: 1px solid #e9ecef; border-radius: 8px; text-decoration: none; color: #495057; font-weight: 500;">
-          Cancelar
-        </a>
-        <button type="submit" style="padding: 0.75rem 2rem; background-color: #198754; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
-          <span class="material-icons-outlined" style="font-size: 1.2rem;">arrow_downward</span> Registrar Entrada
-        </button>
-      </div>
-    </form>
+        <div class="form-actions">
+          <a href="{% url 'estoque' %}" class="btn-cancel">Cancelar</a>
+          <button type="submit" class="btn-submit">
+            <span class="material-icons-outlined">arrow_downward</span>
+            Registrar Entrada
+          </button>
+        </div>
+      </form>
+
+    </div>
   </div>
+
 </div>
 
 <style>
-  .form-control {
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.back-btn {
+  text-decoration: none;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+}
+
+.form-card-header {
+  padding: 1.2rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fa;
+}
+
+.form-card-body {
+  padding: 1.8rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.3rem;
+}
+
+.form-group {
+  width: 100%;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  display: inline-block;
+}
+
+.req {
+  color: #dc3545;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+textarea {
+  min-height: 110px;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-error ul {
+  margin: 0.5rem 0 0 1.3rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.btn-cancel {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #495057;
+  background: #fff;
+  font-weight: 500;
+}
+
+.btn-submit {
+  padding: 0.75rem 1.8rem;
+  border: none;
+  border-radius: 8px;
+  background: #198754;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background: #157347;
+}
+
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-cancel,
+  .btn-submit {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: border-color 0.2s;
+    justify-content: center;
   }
-
-  .form-control:focus {
-    outline: none;
-    border-color: #198754;
-    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
-  }
-
-  .form-control::placeholder {
-    color: #adb5bd;
-  }
+}
 </style>
 
 {% endblock %}

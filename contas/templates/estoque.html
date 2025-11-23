@@ -79,8 +79,8 @@
     </div>
 
     <form method="GET" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 1.5fr auto; gap: 12px; margin-bottom: 32px; width: 100%;">
-        <input type="text" name="nome" placeholder="Nome do produto..." value="{{ request.GET.nome }}" style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828;">
-        <input type="text" name="sku" placeholder="Código/SKU..." value="{{ request.GET.sku }}" style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828;">
+        <input type="text" name="nome" placeholder="Nome do produto..." value="{{ request.GET.nome }}" style="width: 90%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828;">
+        <input type="text" name="sku" placeholder="Código/SKU..." value="{{ request.GET.sku }}" style="width: 90%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828;">
         <select name="categoria" style="width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 8px; padding: 10px 14px; font-size: 14px; color: #101828; cursor: pointer;">
             <option value="">Todas Categorias</option>
             {% for cat in categorias %}
