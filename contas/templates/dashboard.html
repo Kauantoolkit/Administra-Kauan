@@ -15,40 +15,56 @@
 </div>
 
 <div class="stats-grid">
+  
   <div class="stat-card">
     <div class="stat-card-info">
       <h5>Vendas Hoje</h5>
-      <h2>R$ 2.847</h2>
-      <p class="positive">+12.5%</p>
+      <h2>R$ {{ vendas_hoje|floatformat:2 }}</h2>
+      
+      <p class="{% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_vendas > 0 %}+{% endif %}{{ perc_vendas|floatformat:1 }}%
+        <small style="color: #999; font-weight: normal;">vs ontem</small>
+      </p>
     </div>
-    <div class="stat-card-icon positive">
+    <div class="stat-card-icon {% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
       <span class="material-icons-outlined">leaderboard</span>
     </div>
   </div>
+
   <div class="stat-card">
     <div class="stat-card-info">
       <h5>Produtos Vendidos</h5>
-      <h2>147</h2>
-      <p class="positive">+8.2%</p>
+      <h2>{{ produtos_vendidos }}</h2>
+      
+      <p class="{% if perc_produtos >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_produtos > 0 %}+{% endif %}{{ perc_produtos|floatformat:1 }}%
+        <small style="color: #999; font-weight: normal;">vs ontem</small>
+      </p>
     </div>
     <div class="stat-card-icon">
       <span class="material-icons-outlined">shopping_cart</span>
     </div>
   </div>
+
   <div class="stat-card">
     <div class="stat-card-info">
       <h5>Clientes Ativos</h5>
-      <h2>1.234</h2>
-      <p class="positive">+5.1%</p>
+      <h2>{{ clientes_ativos }}</h2>
+      
+      <p class="{% if perc_clientes >= 0 %}positive{% else %}negative{% endif %}">
+        {% if perc_clientes > 0 %}+{% endif %}{{ perc_clientes|floatformat:1 }}%
+        <small style="color: #999; font-weight: normal;">novos vs ontem</small>
+      </p>
     </div>
     <div class="stat-card-icon">
       <span class="material-icons-outlined">groups</span>
     </div>
   </div>
+
   <div class="stat-card">
     <div class="stat-card-info">
       <h5>Produtos em Falta</h5>
-      <h2>23</h2>
+      <h2>{{ produtos_falta }}</h2>
       <p class="negative"><strong>Atenção</strong></p>
     </div>
     <div class="stat-card-icon negative">
@@ -62,55 +78,48 @@
   <div class="card">
     <div class="card-header">
       <h4>Vendas Recentes</h4>
-      <a href="#">Ver Todas</a>
+      <a href="{% url 'lista_vendas' %}">Ver Todas</a>
     </div>
     <div class="card-body">
       <ul class="recent-sales-list">
+        
+        {% for venda in vendas_recentes %}
         <li>
-          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
-          <div class="sale-details">
-            <p class="customer">Maria Santos</p>
-            <p class="meta">#001247 | CPF: 123.456.789-00</p>
+          <div class="sale-icon">
+            <span class="material-icons-outlined">receipt_long</span>
           </div>
-          <strong class="sale-amount">R$ 247,50</strong>
-          <span class="sale-time">14:25</span>
-        </li>
-        <li>
-          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
           <div class="sale-details">
-            <p class="customer">Carlos Oliveira</p>
-            <p class="meta">#001246 | CPF: 987.654.321-00</p>
+            <p class="customer">{{ venda.cliente.nome }}</p>
+            <p class="meta">#{{ venda.id }} | CPF: {{ venda.cliente.cpf }}</p>
           </div>
-          <strong class="sale-amount">R$ 89,90</strong>
-          <span class="sale-time">14:10</span>
+          <strong class="sale-amount">R$ {{ venda.total|floatformat:2 }}</strong>
+          <span class="sale-time">{{ venda.data_venda|date:"H:i" }}</span>
         </li>
-        <li>
-          <div class="sale-icon"><span class="material-icons-outlined">receipt_long</span></div>
-          <div class="sale-details">
-            <p class="customer">Ana Costa</p>
-            <p class="meta">#001245 | CPF: 456.789.123-00</p>
-          </div>
-          <strong class="sale-amount">R$ 156,30</strong>
-          <span class="sale-time">13:45</span>
+        {% empty %}
+        <li style="justify-content: center; color: #999; padding: 2rem;">
+            Nenhuma venda registrada hoje.
         </li>
+        {% endfor %}
+
       </ul>
     </div>
   </div>
 
   <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    
     <div class="card">
       <div class="card-header">
         <h4>Ações Rápidas</h4>
       </div>
       <div class="card-body">
         <div class="quick-actions-list">
-          <a href="#" class="btn-action primary">
+          <a href="{% url 'criar_venda' %}" class="btn-action primary">
             <span class="material-icons-outlined">add_shopping_cart</span> Nova Venda
           </a>
-          <a href="#" class="btn-action">
+          <a href="{% url 'novo_cliente' %}" class="btn-action">
             <span class="material-icons-outlined">person_add</span> Novo Cliente
           </a>
-          <a href="#" class="btn-action">
+          <a href="{% url 'novo_produto' %}" class="btn-action">
             <span class="material-icons-outlined">add_box</span> Novo Produto
           </a>
           <a href="#" class="btn-action">
@@ -126,13 +135,25 @@
       </div>
       <div class="card-body">
         <ul class="alerts-list">
+          
+          {% if produtos_falta > 0 %}
           <li class="alert alert-danger">
             <span class="material-icons-outlined">error</span>
             <div>
               <strong>Estoque Baixo</strong>
-              <p style="margin:0; font-size: 0.9rem;">23 produtos precisam de reposição.</p>
+              <p style="margin:0; font-size: 0.9rem;">{{ produtos_falta }} produtos precisam de reposição.</p>
             </div>
           </li>
+          {% else %}
+          <li class="alert" style="background-color: #d1e7dd; color: #0f5132;">
+            <span class="material-icons-outlined">check_circle</span>
+            <div>
+                <strong>Estoque OK</strong>
+                <p style="margin:0; font-size: 0.9rem;">Nenhum produto em nível crítico.</p>
+            </div>
+          </li>
+          {% endif %}
+
           <li class="alert alert-warning">
             <span class="material-icons-outlined">backup</span>
             <div>
