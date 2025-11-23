@@ -78,20 +78,19 @@ def clientes_view(request):
         clientes_list = clientes_list.filter(nome__icontains=param_nome)
     
     if param_cpf:
-        # Remove pontos e traços caso o usuário digite formatado
+        
         cpf_limpo = param_cpf.replace('.', '').replace('-', '')
         clientes_list = clientes_list.filter(cpf__icontains=cpf_limpo)
 
     if param_email:
         clientes_list = clientes_list.filter(email__icontains=param_email)
 
-    # 4. Paginação (Opcional, mas seu HTML tem código para isso)
-    paginator = Paginator(clientes_list, 10) # Mostra 10 clientes por página
+    paginator = Paginator(clientes_list, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'page_obj': page_obj, # Seu HTML usa 'page_obj', não 'clientes'
+        'page_obj': page_obj, 
     }
     
     return render(request, 'clientes/lista_clientes.html', context)

@@ -83,6 +83,27 @@
             Já tem conta? <a href="{% url 'login' %}">Entre aqui</a>
         </p>
     </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const campoCpf = document.getElementById('id_cpf');
 
+        if (campoCpf) {
+            campoCpf.addEventListener('input', function(e) {
+                let valor = e.target.value;
+
+                valor = valor.replace(/\D/g, "");
+
+                valor = valor.substring(0, 11);
+
+                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+                e.target.value = valor;
+            });
+        }
+    });
+</script>
+</script>
 </body>
 </html>
