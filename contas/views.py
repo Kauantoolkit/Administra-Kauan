@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Q
 from django.core.paginator import Paginator
 import datetime
 import locale
@@ -44,6 +44,7 @@ def cadastro_view(request):
         form = CustomUserCreationForm()
     context = {'form': form}
     return render(request, 'cadastro.html', context)
+
 @login_required
 def estoque_view(request): 
     search_query = request.GET.get('search', '')
@@ -65,6 +66,7 @@ def estoque_view(request):
     }
 
     return render(request, 'estoque.html', context)
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
