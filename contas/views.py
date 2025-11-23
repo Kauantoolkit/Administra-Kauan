@@ -15,6 +15,7 @@ from django.utils import timezone
 from vendas.models import Venda, ItemVenda
 from clientes.models import Cliente
 from vendas.models import Produto
+from django.contrib import messages
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
