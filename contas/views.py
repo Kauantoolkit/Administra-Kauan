@@ -71,8 +71,31 @@ def dashboard_view(request):
 
 @login_required
 def clientes_view(request):
-    return render(request, 'listar_clientes.html')
+    clientes_list = Cliente.objects.all().order_by('-id')
+    param_nome = request.GET.get('nome')   
+    param_cpf = request.GET.get('cpf')    
+    param_email = request.GET.get('email') 
+    if param_nome:
+        clientes_list = clientes_list.filter(nome__icontains=param_nome)
+    
+    if param_cpf:
+        # Remove pontos e traços caso o usuário digite formatado
+        cpf_limpo = param_cpf.replace('.', '').replace('-', '')
+        clientes_list = clientes_list.filter(cpf__icontains=cpf_limpo)
 
+    if param_email:
+        clientes_list = clientes_list.filter(email__icontains=param_email)
+
+    # 4. Paginação (Opcional, mas seu HTML tem código para isso)
+    paginator = Paginator(clientes_list, 10) # Mostra 10 clientes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj, # Seu HTML usa 'page_obj', não 'clientes'
+    }
+    
+    return render(request, 'clientes/lista_clientes.html', context)
 @login_required
 def fornecedores_view(request):
     from .models import Fornecedor

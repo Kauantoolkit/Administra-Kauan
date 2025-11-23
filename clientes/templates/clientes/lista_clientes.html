@@ -341,16 +341,23 @@ body {
         </div>
     </div>
 
-    <div class="search-filter-area">
-        <form method="get" class="search-form">
-            <input type="text" name="nome" class="input-text" placeholder="Nome..." value="{{ request.GET.nome }}">
-            <input type="text" name="cpf" class="input-text" placeholder="CPF..." value="{{ request.GET.cpf }}">
-            <input type="text" name="email" class="input-text" placeholder="Email..." value="{{ request.GET.email }}">
-            <button type="submit" class="btn-buscar">
-                <span class="material-icons-outlined">search</span> Buscar
-            </button>
-        </form>
-    </div>
+   <div class="search-filter-area">
+    <form method="GET" action="" class="search-form">
+        
+        <input type="text" name="nome" class="input-text" placeholder="Nome..." value="{{ request.GET.nome }}">
+        
+        <input type="text" name="cpf" class="input-text" placeholder="CPF..." value="{{ request.GET.cpf }}">
+        
+        <input type="text" name="email" class="input-text" placeholder="Email..." value="{{ request.GET.email }}">
+        
+        <button type="submit" class="btn-buscar">
+            <span class="material-icons-outlined">search</span> Buscar
+        </button>
+
+        <a href="{% url 'lista_clientes' %}" style="margin-left: 10px; color: #666; text-decoration: none; font-size: 14px;">Limpar</a>
+        
+    </form>
+</div>
 
     <div class="table-responsive">
         <table class="data-table">
@@ -380,7 +387,7 @@ body {
                     <td>{{ cliente.ultima_compra|date:"d/m/Y" }}</td>
 
                     <td>
-                        {% if cliente.status == "Ativo" %}
+                        {% if cliente.status == "ativo" %}
                         <span class="badge-status badge-ativo">Ativo</span>
                         {% else %}
                         <span class="badge-status badge-inativo">Inativo</span>
@@ -392,6 +399,13 @@ body {
                         <a href="{% url 'editar_cliente' cliente.pk %}" class="icon-editar"><span class="material-icons-outlined">edit</span></a>
                         <a href="{% url 'excluir_cliente' cliente.pk %}" class="icon-excluir"><span class="material-icons-outlined">delete</span></a>
                     </td>
+                    <td>
+                    {% if cliente.status == 'ativo' %}
+                        <span class="badge-status badge-ativo">Ativo</span>
+                    {% else %}
+                        <span class="badge-status badge-inativo">Inativo</span>
+                    {% endif %}
+                </td>
                 </tr>
 
                 {% empty %}

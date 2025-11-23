@@ -20,7 +20,6 @@ def lista_clientes(request):
 
     ticket_medio = 87.50
 
-
     now = timezone.now()
     mes_atual = now.month
     ano_atual = now.year
@@ -41,33 +40,45 @@ def lista_clientes(request):
     diff_mes = clientes_mes_atual - clientes_mes_passado
     txt_total_mes = f"{diff_mes:+} este mês"
 
-
     ontem = hoje - timedelta(days=1)
     novos_ontem = clientes_qs.filter(data_cadastro__date=ontem).count()
 
     diff_hoje = novos_hoje - novos_ontem
     txt_novos_hoje = f"{diff_hoje:+} vs ontem"
 
-
     ticket_mes_passado = 82.50
     perc_variacao = ((ticket_medio - ticket_mes_passado) / ticket_mes_passado) * 100
     txt_ticket_mes = f"{perc_variacao:+.0f}% vs mês anterior"
 
-
     clientes_ativos_ontem = clientes_qs.filter(
-    status='ativo',
-    data_cadastro__date__lte=ontem
+        status='ativo',
+        data_cadastro__date__lte=ontem
     ).count()
 
     diff_ativos = clientes_ativos - clientes_ativos_ontem
 
+    clientes_para_tabela = clientes_qs
 
-    paginator = Paginator(clientes_qs, 5)
+    termo_nome = request.GET.get('nome')
+    termo_cpf = request.GET.get('cpf')
+    termo_email = request.GET.get('email')
+
+    if termo_nome:
+        clientes_para_tabela = clientes_para_tabela.filter(nome__icontains=termo_nome)
+    
+    if termo_cpf:
+        clientes_para_tabela = clientes_para_tabela.filter(cpf__icontains=termo_cpf)
+
+    if termo_email:
+        clientes_para_tabela = clientes_para_tabela.filter(email__icontains=termo_email)
+
+    paginator = Paginator(clientes_para_tabela, 5) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'page_obj': page_obj,
+        'request': request, 
         'total_clientes': total_clientes,
         'clientes_ativos': clientes_ativos,
         'novos_hoje': novos_hoje,
