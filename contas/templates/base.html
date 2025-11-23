@@ -412,14 +412,11 @@
             </a>
           </li>
           <li>
-            <a
-              href="#"
-              class="{% if request.resolver_match.url_name == 'fornecedores' or 'fornecedor' in request.resolver_match.url_name %}active{% endif %}"
-            >
-              <span class="material-icons-outlined">local_shipping</span>
-              Fornecedores
+            <a href="{% url 'fornecedores' %}" class="{% if 'fornecedores' in request.path %}active{% endif %}">
+                <span class="material-icons-outlined">local_shipping</span>
+                Fornecedores
             </a>
-          </li>
+        </li>
           <li>
             <a href="#">
               <span class="material-icons-outlined">inventory_2</span> Produtos
