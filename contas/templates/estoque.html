@@ -15,7 +15,7 @@
             <a href="{% url 'entrada_estoque' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #12B76A; color: white;">
                 <span class="material-icons-outlined" style="font-size:18px;">add_shopping_cart</span> Entrada Estoque
             </a>
-            <a href="{% url 'novo_produto' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #1570EF; color: white;">
+            <a href="#" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #1570EF; color: white;">
                 <span class="material-icons-outlined" style="font-size:18px;">inventory_2</span> Novo Produto
             </a>
         </div>
@@ -196,7 +196,6 @@ function abrirDetalhes(id) {
     const conteudo = document.getElementById("detalhes-conteudo");
     conteudo.innerHTML = "Carregando...";
 
-    const url = "{% url 'detalhes_produto_ajax' 0 %}".replace('0', id);
 
     fetch(url)
         .then(response => response.json())
