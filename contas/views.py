@@ -477,3 +477,42 @@ def exportar_estoque_csv(request):
         ])
 
     return response
+
+@login_required
+def imprimir_codigos_estoque(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="lista_skus.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+    writer.writerow(['Produto', 'SKU'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+        ])
+
+    return response

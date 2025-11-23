@@ -175,6 +175,10 @@
                     <span class="material-icons-outlined" style="font-size: 16px;">file_download</span> Exportar
                 </a>
 
+                <a href="{% url 'imprimir_codigos_estoque' %}?{{ request.GET.urlencode }}" style="background: #F9FAFB; border: 1px solid #E4E7EC; color: #667085; padding: 8px 12px; font-size: 13px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s;">
+                    <span class="material-icons-outlined" style="font-size: 16px;">qr_code</span> Imprimir Códigos
+                </a>
+
             </div>
         </div>
 
