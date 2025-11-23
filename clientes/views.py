@@ -90,19 +90,11 @@ def lista_clientes(request):
 def novo_cliente(request):
     if request.method == 'POST':
 
-        print("=== RAW POST DATA ===")
-        print(request.POST)
-
         form = ClienteForm(request.POST)
 
-        print("\n=== FORM.cleaned_data (antes de validar) ===")
         if form.is_valid():
-            print(form.cleaned_data)
             form.save()
             return redirect('lista_clientes')
-
-        print("\n=== FORM ERRORS ===")
-        print(form.errors)
 
     else:
         form = ClienteForm()
