@@ -1,164 +1,391 @@
 {% extends 'base.html' %}
 
-{% block title %}Fornecedores - Administra{% endblock %}
+{% block title %}
+  Fornecedores - Administra
+{% endblock%}
 
 {% block content %}
 
 <div class="header">
   <div>
     <h1>Fornecedores</h1>
-    <p style="color: #6c757d; margin: 0; margin-top: -5px;">Gerencie seus fornecedores e parceiros</p>
+    <p style="color: #6c757d; margin: 0; margin-top: -5px">
+      Gerencie seus fornecedores e parceiros
+    </p>
   </div>
   <div class="header-info">
     <span>{{ data_hoje }}</span>
   </div>
 </div>
 
-<div class="card" style="margin-bottom: 2rem;">
+<div class="card" style="margin-bottom: 2rem">
   <div class="card-header">
     <h4>Lista de Fornecedores</h4>
-    <a href="{% url 'fornecedor_criar' %}" class="btn-action primary" style="text-decoration: none; padding: 0.6rem 1.2rem;">
+    <a
+      href="{% url 'fornecedor_criar' %}"
+      class="btn-action primary"
+      style="text-decoration: none; padding: 0.6rem 1.2rem"
+    >
       <span class="material-icons-outlined">add</span> Novo Fornecedor
     </a>
   </div>
-  
+
   <div class="card-body">
-    <form method="GET" style="margin-bottom: 1.5rem;">
-      <div style="position: relative;">
-        <span class="material-icons-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6c757d;">search</span>
-        <input 
-          type="text" 
-          name="search" 
-          value="{{ search_query }}"
-          placeholder="Buscar por nome, CNPJ ou contato..." 
-          style="width: 100%; padding: 12px 12px 12px 45px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 0.95rem;"
+    <form
+      method="GET"
+      style="
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      "
+    >
+      <div style="position: relative; flex: 1">
+        <span
+          class="material-icons-outlined"
+          style="
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+          "
+          >search</span
         >
+        <input
+          type="text"
+          name="search"
+          value="{{ search_query }}"
+          placeholder="Buscar por nome, CNPJ ou contato..."
+          style="
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            height: 42px;
+          "
+        />
       </div>
+
+      <button
+        type="submit"
+        class="btn-action"
+        style="
+          height: 42px;
+          border: 1px solid #e9ecef;
+          background-color: #f8f9fa;
+          cursor: pointer;
+          font-weight: 500;
+          padding: 0 20px;
+          border-radius: 8px;
+        "
+      >
+        Buscar
+      </button>
+
+      {% if search_query %}
+      <a
+        href="{% url 'fornecedores' %}"
+        class="btn-action"
+        title="Limpar busca"
+        style="
+          height: 42px;
+          width: 42px; /* Largura fixa para virar um quadrado */
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          justify-content: center; /* Centraliza o X */
+          border: 1px solid #e9ecef;
+          background-color: #fff;
+          color: #dc3545;
+          border-radius: 8px;
+          box-sizing: border-box;
+        "
+      >
+        <span class="material-icons-outlined">close</span>
+      </a>
+      {% endif %}
     </form>
 
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'success' %}
-          <div class="alert alert-success" style="margin-bottom: 1rem; padding: 12px; border-radius: 8px; background-color: #d4edda; color: #155724;">
-            {{ message }}
-          </div>
-        {% elif message.tags == 'error' %}
-          <div class="alert alert-error" style="margin-bottom: 1rem; padding: 12px; border-radius: 8px; background-color: #f8d7da; color: #721c24;">
-            {{ message }}
-          </div>
-        {% else %}
-          <div class="alert alert-info" style="margin-bottom: 1rem; padding: 12px; border-radius: 8px; background-color: #d1ecf1; color: #0c5460;">
-            {{ message }}
-          </div>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-
-    {% if page_obj.object_list %}
-      <table style="width: 100%; border-collapse: collapse;">
+    {% if messages %} {% for message in messages %}
+    <div
+      class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% else %}alert-info{% endif %}"
+      style="margin-bottom: 1rem; padding: 12px; border-radius: 8px"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% if page_obj.object_list %}
+    <div style="overflow-x: auto">
+      <table style="width: 100%; border-collapse: collapse">
         <thead>
-          <tr style="border-bottom: 2px solid #e9ecef; text-align: left;">
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">Nome Fantasia</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">CNPJ</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">Contato Principal</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">Email</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">Telefone</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem;">Status</th>
-            <th style="padding: 12px 8px; color: #6c757d; font-weight: 600; font-size: 0.85rem; text-align: center;">Ações</th>
+          <tr
+            style="
+              border-bottom: 2px solid #e9ecef;
+              text-align: left;
+              background-color: #f8f9fa;
+            "
+          >
+            <th
+              style="
+                padding: 12px 16px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              Nome Fantasia
+            </th>
+            <th
+              style="
+                padding: 12px 8px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              CNPJ
+            </th>
+            <th
+              style="
+                padding: 12px 8px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              Contato
+            </th>
+            <th
+              style="
+                padding: 12px 8px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              Email
+            </th>
+            <th
+              style="
+                padding: 12px 8px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              Telefone
+            </th>
+            <th
+              style="
+                padding: 12px 8px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+              "
+            >
+              Status
+            </th>
+            <th
+              style="
+                padding: 12px 16px;
+                color: #6c757d;
+                font-weight: 600;
+                font-size: 0.85rem;
+                text-align: center;
+              "
+            >
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody>
           {% for fornecedor in page_obj.object_list %}
-            <tr style="border-bottom: 1px solid #f4f4f4;">
-              <td style="padding: 16px 8px;">
-                <div>
-                  <strong>{{ fornecedor.nome_fantasia }}</strong>
-                  <div style="font-size: 0.85rem; color: #6c757d; margin-top: 2px;">
-                    {{ fornecedor.categoria }}
-                  </div>
+          <tr style="border-bottom: 1px solid #f4f4f4">
+            <td style="padding: 16px 16px">
+              <div>
+                <strong>{{ fornecedor.nome_fantasia }}</strong>
+                <div
+                  style="font-size: 0.85rem; color: #6c757d; margin-top: 2px"
+                >
+                  {{ fornecedor.categoria }}
                 </div>
-              </td>
-              <td style="padding: 16px 8px; font-family: monospace; font-size: 0.9rem;">
-                {{ fornecedor.cnpj }}
-              </td>
-              <td style="padding: 16px 8px;">
-                {{ fornecedor.contato_principal }}
-              </td>
-              <td style="padding: 16px 8px; color: #0d6efd;">
-                {{ fornecedor.email }}
-              </td>
-              <td style="padding: 16px 8px; font-family: monospace; font-size: 0.9rem;">
-                {{ fornecedor.telefone }}
-              </td>
-              <td style="padding: 16px 8px;">
-                {% if fornecedor.status == 'ativo' %}
-                  <span style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background-color: #d4edda; color: #155724;">
-                    {{ fornecedor.get_status_display }}
-                  </span>
-                {% else %}
-                  <span style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background-color: #f8d7da; color: #721c24;">
-                    {{ fornecedor.get_status_display }}
-                  </span>
-                {% endif %}
-              </td>
-              <td style="padding: 16px 8px; text-align: center;">
-                <a href="{% url 'fornecedor_editar' fornecedor.pk %}" style="color: #6c757d; margin-right: 12px;" title="Editar">
-                  <span class="material-icons-outlined" style="font-size: 20px; vertical-align: middle;">edit</span>
-                </a>
-                <a href="{% url 'fornecedor_deletar' fornecedor.pk %}" style="color: #dc3545;" title="Deletar" onclick="return confirm('Tem certeza que deseja deletar este fornecedor?');">
-                  <span class="material-icons-outlined" style="font-size: 20px; vertical-align: middle;">delete</span>
-                </a>
-              </td>
-            </tr>
+              </div>
+            </td>
+            <td
+              style="
+                padding: 16px 8px;
+                font-family: monospace;
+                font-size: 0.9rem;
+              "
+            >
+              {{ fornecedor.cnpj }}
+            </td>
+            <td style="padding: 16px 8px">
+              {{ fornecedor.contato_principal }}
+            </td>
+            <td style="padding: 16px 8px; color: #0d6efd">
+              {{ fornecedor.email }}
+            </td>
+            <td
+              style="
+                padding: 16px 8px;
+                font-family: monospace;
+                font-size: 0.9rem;
+              "
+            >
+              {{ fornecedor.telefone }}
+            </td>
+            <td style="padding: 16px 8px">
+              {% if fornecedor.status == 'ativo' %}
+              <span
+                style="
+                  padding: 4px 12px;
+                  border-radius: 20px;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                  background-color: #d4edda;
+                  color: #155724;
+                "
+              >
+                Ativo
+              </span>
+              {% else %}
+              <span
+                style="
+                  padding: 4px 12px;
+                  border-radius: 20px;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                  background-color: #f8d7da;
+                  color: #721c24;
+                "
+              >
+                Inativo
+              </span>
+              {% endif %}
+            </td>
+            <td style="padding: 16px 16px; text-align: center">
+              <a
+                href="{% url 'fornecedor_editar' fornecedor.pk %}"
+                style="color: #6c757d; margin-right: 12px"
+                title="Editar"
+              >
+                <span
+                  class="material-icons-outlined"
+                  style="font-size: 20px; vertical-align: middle"
+                  >edit</span
+                >
+              </a>
+              <a
+                href="{% url 'fornecedor_deletar' fornecedor.pk %}"
+                style="color: #dc3545"
+                title="Deletar"
+                onclick="return confirm('Tem certeza que deseja deletar este fornecedor?');"
+              >
+                <span
+                  class="material-icons-outlined"
+                  style="font-size: 20px; vertical-align: middle"
+                  >delete</span
+                >
+              </a>
+            </td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e9ecef;">
-        <p style="margin: 0; color: #6c757d; font-size: 0.9rem;">
-          Mostrando {{ page_obj.start_index }} a {{ page_obj.end_index }} de {{ total_fornecedores }} fornecedores
-        </p>
-        
-        {% if page_obj.has_other_pages %}
-          <div style="display: flex; gap: 0.5rem;">
-            {% if page_obj.has_previous %}
-              <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" 
-                 style="padding: 0.5rem 1rem; border: 1px solid #e9ecef; border-radius: 6px; text-decoration: none; color: #495057; font-size: 0.9rem;">
-                Anterior
-              </a>
-            {% endif %}
-            
-            <span style="padding: 0.5rem 1rem; background-color: #0d6efd; color: white; border-radius: 6px; font-size: 0.9rem; font-weight: 600;">
-              {{ page_obj.number }}
-            </span>
-            
-            {% if page_obj.has_next %}
-              <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" 
-                 style="padding: 0.5rem 1rem; border: 1px solid #e9ecef; border-radius: 6px; text-decoration: none; color: #495057; font-size: 0.9rem;">
-                Próximo
-              </a>
-            {% endif %}
-          </div>
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+      "
+    >
+      <p style="margin: 0; color: #6c757d; font-size: 0.9rem">
+        Mostrando página {{ page_obj.number }} de {{
+        page_obj.paginator.num_pages }}
+      </p>
+
+      {% if page_obj.has_other_pages %}
+      <div style="display: flex; gap: 0.5rem">
+        {% if page_obj.has_previous %}
+        <a
+          href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+          style="
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            font-size: 0.9rem;
+          "
+        >
+          Anterior
+        </a>
+        {% endif %} {% if page_obj.has_next %}
+        <a
+          href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+          style="
+            padding: 0.5rem 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #495057;
+            font-size: 0.9rem;
+          "
+        >
+          Próximo
+        </a>
         {% endif %}
       </div>
+      {% endif %}
+    </div>
+
     {% else %}
-      <div style="text-align: center; padding: 3rem 0; color: #6c757d;">
-        <span class="material-icons-outlined" style="font-size: 4rem; opacity: 0.3;">inventory_2</span>
-        <p style="margin-top: 1rem; font-size: 1.1rem;">
-          {% if search_query %}
-            Nenhum fornecedor encontrado para "{{ search_query }}"
-          {% else %}
-            Nenhum fornecedor cadastrado ainda
-          {% endif %}
-        </p>
-        {% if not search_query %}
-          <a href="{% url 'fornecedor_criar' %}" class="btn-action primary" style="display: inline-flex; margin-top: 1rem;">
-            <span class="material-icons-outlined">add</span> Cadastrar Primeiro Fornecedor
-          </a>
-        {% endif %}
-      </div>
+    <div style="text-align: center; padding: 3rem 0; color: #6c757d">
+      <span
+        class="material-icons-outlined"
+        style="font-size: 4rem; opacity: 0.3"
+        >local_shipping</span
+      >
+      <p style="margin-top: 1rem; font-size: 1.1rem">
+        {% if search_query %} Nenhum fornecedor encontrado para "{{ search_query
+        }}" {% else %} Nenhum fornecedor cadastrado ainda. {% endif %}
+      </p>
+      {% if not search_query %}
+      <a
+        href="{% url 'fornecedor_criar' %}"
+        class="btn-action primary"
+        style="display: inline-flex; margin-top: 1rem"
+      >
+        <span class="material-icons-outlined">add</span> Cadastrar Primeiro
+        Fornecedor
+      </a>
+      {% endif %}
+    </div>
     {% endif %}
   </div>
 </div>
+
+<style>
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+</style>
 
 {% endblock %}
