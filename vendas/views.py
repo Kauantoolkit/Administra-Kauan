@@ -4,12 +4,20 @@ from django.db import transaction
 from django.utils import timezone
 from .models import Venda, ItemVenda
 from .forms import VendaForm, ItemVendaFormSet
-from contas.models import MovimentoEstoque 
+from contas.models import MovimentoEstoque
+from django.core.paginator import Paginator
 
 @login_required
 def lista_vendas(request):
-    vendas = Venda.objects.all().order_by('-data_venda')
-    return render(request, 'vendas/lista_vendas.html', {'vendas': vendas})
+    vendas_list = Venda.objects.all().order_by('-data_venda')
+    
+    paginator = Paginator(vendas_list, 10) 
+    
+    page_number = request.GET.get('page')
+    
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'vendas/lista_vendas.html', {'vendas': page_obj})
 
 @login_required
 def criar_venda(request):
