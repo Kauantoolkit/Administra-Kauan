@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F, Q
+from django.db.models import Sum, F, Q, Count
 from django.core.paginator import Paginator
 import datetime
 import locale
@@ -18,6 +18,8 @@ from vendas.models import Produto
 from django.contrib import messages
 import csv
 from django.http import HttpResponse
+from django.db.models.functions import TruncDay
+import json
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
@@ -567,3 +569,67 @@ def imprimir_codigos_estoque(request):
         ])
 
     return response
+
+@login_required
+def relatorios(request):
+    hoje = timezone.now()
+    inicio_mes = hoje - datetime.timedelta(days=30)
+    
+    vendas_periodo = Venda.objects.filter(data_venda__range=[inicio_mes, hoje], status='fechada')
+    itens_periodo = ItemVenda.objects.filter(venda__in=vendas_periodo)
+    
+    kpi_total_vendas = vendas_periodo.aggregate(Sum('total'))['total__sum'] or 0
+    
+    qtd_vendas = vendas_periodo.count()
+    kpi_ticket_medio = kpi_total_vendas / qtd_vendas if qtd_vendas > 0 else 0
+    
+    kpi_novos_clientes = Cliente.objects.filter(data_cadastro__range=[inicio_mes, hoje]).count()
+    
+    kpi_lucro = 0
+    for item in itens_periodo:
+        custo = item.produto.custo or 0
+        receita = item.preco_unitario
+        qtd = item.quantidade
+        kpi_lucro += (receita - custo) * qtd
+
+    vendas_por_dia = vendas_periodo.annotate(day=TruncDay('data_venda')) \
+        .values('day') \
+        .annotate(total=Sum('total')) \
+        .order_by('day')
+    
+    chart_dates = [v['day'].strftime('%d/%m') for v in vendas_por_dia]
+    chart_values = [float(v['total']) for v in vendas_por_dia]
+
+    vendas_por_cat = itens_periodo.values('produto__categoria__nome') \
+        .annotate(total=Sum(F('quantidade') * F('preco_unitario'))) \
+        .order_by('-total')
+    
+    cat_labels = [item['produto__categoria__nome'] if item['produto__categoria__nome'] else 'Sem Categoria' for item in vendas_por_cat]
+    cat_values = [float(item['total']) for item in vendas_por_cat]
+
+    top_produtos = itens_periodo.values('produto__nome', 'produto__id') \
+        .annotate(qtd=Sum('quantidade'), val=Sum(F('quantidade') * F('preco_unitario'))) \
+        .order_by('-val')[:5]
+
+    top_clientes = vendas_periodo.values('cliente__nome') \
+        .annotate(total_comprado=Sum('total'), qtd_compras=Count('id')) \
+        .order_by('-total_comprado')[:5]
+
+    context = {
+        'kpi_total_vendas': kpi_total_vendas,
+        'kpi_lucro': kpi_lucro,
+        'kpi_novos_clientes': kpi_novos_clientes,
+        'kpi_ticket_medio': kpi_ticket_medio,
+        
+        'chart_dates': json.dumps(chart_dates),
+        'chart_values': json.dumps(chart_values),
+        'cat_labels': json.dumps(cat_labels),
+        'cat_values': json.dumps(cat_values),
+        
+        'top_produtos': top_produtos,
+        'top_clientes': top_clientes,
+        
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'relatorios.html', context)
