@@ -60,9 +60,6 @@ def dashboard_view(request):
     
     context = {
         'data_hoje': data_formatada
-        # TODO adicionar valores para que v'ao vir das proximas telas
-        # 'vendas_hoje': 2847,
-        # 'produtos_vendidos': 147,
     }
     
     return render(request, 'dashboard.html', context)

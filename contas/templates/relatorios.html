@@ -5,14 +5,14 @@
 {% block content %}
 
 <style>
-    /* --- 1. Topo Geral (Título + Data/Sino) --- */
+
     .page-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 2rem;
         padding-bottom: 1rem;
-        border-bottom: 1px solid #f0f0f0; /* Linha sutil divisória opcional */
+        border-bottom: 1px solid #f0f0f0; 
     }
 
     .header-left h1 {
@@ -44,7 +44,6 @@
     .notification-icon:hover { color: #0d6efd; }
 
 
-    /* --- 2. Barra de Ferramentas (Análise + Botões) --- */
     .performance-toolbar {
         display: flex;
         justify-content: space-between;
@@ -93,11 +92,9 @@
     }
     .btn-tool.primary:hover { background-color: #0b5ed7; }
 
-    /* Ícones dentro dos botões */
     .btn-tool .material-icons-outlined { font-size: 18px; margin-right: 8px; }
 
 
-    /* --- 3. Estilos dos Cards e Gráficos (Mantidos) --- */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
     .stat-card { background: #fff; padding: 1.5rem; border-radius: 12px; border: 1px solid #e9ecef; display: flex; justify-content: space-between; }
     .stat-card-info .kpi-label { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
@@ -281,7 +278,6 @@
 </div>
 
 <script>
-    // Gráfico de Linha
     const ctxLine = document.getElementById('salesChart').getContext('2d');
     let gradient = ctxLine.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(13, 110, 253, 0.2)'); 
@@ -298,7 +294,7 @@
                 backgroundColor: gradient,
                 borderWidth: 2,
                 fill: true,
-                tension: 0, // Linha reta conforme imagem
+                tension: 0, 
                 pointRadius: 0,
                 pointHoverRadius: 5
             }]
