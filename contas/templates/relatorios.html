@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatórios{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0f0f0; 
+    }
+
+    .header-left h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .header-left p {
+        margin: 5px 0 0 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: #6c757d;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .notification-icon {
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .notification-icon:hover { color: #0d6efd; }
+
+
+    .performance-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .toolbar-title h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .toolbar-title p {
+        margin: 3px 0 0 0;
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .toolbar-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-tool {
+        background-color: #fff;
+        border: 1px solid #e9ecef;
+        color: #6c757d;
+        padding: 0.6rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+
+    .btn-tool:hover { background-color: #f8f9fa; border-color: #dde0e3; }
+
+    .btn-tool.primary {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+    .btn-tool.primary:hover { background-color: #0b5ed7; }
+
+    .btn-tool .material-icons-outlined { font-size: 18px; margin-right: 8px; }
+
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+    .stat-card { background: #fff; padding: 1.5rem; border-radius: 12px; border: 1px solid #e9ecef; display: flex; justify-content: space-between; }
+    .stat-card-info .kpi-label { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    .stat-card-info .kpi-value { font-size: 1.8rem; font-weight: 700; margin: 0.5rem 0; color: #212529; }
+    .trend-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; }
+    .trend-up { background-color: #d1e7dd; color: #198754; }
+    .trend-down { background-color: #f8d7da; color: #dc3545; }
+    
+    .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .card-box { background: #fff; border: 1px solid #e9ecef; border-radius: 12px; padding: 1.5rem; }
+    .card-header-flex { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+    .card-header-flex h4 { margin: 0; font-size: 1rem; color: #333; font-weight: 600; }
+
+    .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .custom-table { width: 100%; border-collapse: collapse; }
+    .custom-table td { padding: 12px 0; border-bottom: 1px solid #f8f9fa; font-size: 0.9rem; }
+    
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 992px) { .charts-row, .tables-row { grid-template-columns: 1fr; } .header-right { display: none; } }
+</style>
+
+<div class="page-header">
+    <div class="header-left">
+        <h1>Relatórios</h1>
+        <p>Visualize os dados de performance da sua loja</p>
+    </div>
+    <div class="header-right">
+        <span>Hoje: {% now "d/m/Y H:i" %}</span>
+        <span class="material-icons-outlined notification-icon">notifications</span>
+    </div>
+</div>
+
+<div class="performance-toolbar">
+    <div class="toolbar-title">
+        <h2>Análise de Performance</h2>
+        <p>Dados consolidados do último mês</p>
+    </div>
+    <div class="toolbar-actions">
+        <button class="btn-tool">
+            <span class="material-icons-outlined">calendar_today</span> 
+            01/09/2025 - 30/09/2025
+        </button>
+        <button class="btn-tool">
+            <span class="material-icons-outlined">filter_list</span> 
+            Filtrar
+        </button>
+        <button class="btn-tool primary">
+            <span class="material-icons-outlined">download</span> 
+            Exportar Relatório
+        </button>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <div class="kpi-label">Total de Vendas</div>
+            <div class="kpi-value">R$ 128.750,00</div>
+            <span class="trend-badge trend-up">↑ 12.5%</span>
+        </div>
+        <div style="background-color: #e7f0ff; color: #0d6efd; width: 50px; height: 50px; border-radius: 10px; display: grid; place-items: center;">
+            <span class="material-icons-outlined">attach_money</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <div class="kpi-label">Lucro Bruto</div>
+            <div class="kpi-value">R$ 45.320,00</div>
+            <span class="trend-badge trend-up">↑ 8.2%</span>
+        </div>
+        <div style="background-color: #d1e7dd; color: #198754; width: 50px; height: 50px; border-radius: 10px; display: grid; place-items: center;">
+            <span class="material-icons-outlined">account_balance_wallet</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <div class="kpi-label">Novos Clientes</div>
+            <div class="kpi-value">342</div>
+            <span class="trend-badge trend-up">↑ 25</span>
+        </div>
+        <div style="background-color: #e0cffc; color: #6f42c1; width: 50px; height: 50px; border-radius: 10px; display: grid; place-items: center;">
+            <span class="material-icons-outlined">person_add</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-info">
+            <div class="kpi-label">Ticket Médio</div>
+            <div class="kpi-value">R$ 152,40</div>
+            <span class="trend-badge trend-down">↓ 1.8%</span>
+        </div>
+        <div style="background-color: #fff3cd; color: #ffc107; width: 50px; height: 50px; border-radius: 10px; display: grid; place-items: center;">
+            <span class="material-icons-outlined">receipt_long</span>
+        </div>
+    </div>
+</div>
+
+<div class="charts-row">
+    <div class="card-box">
+        <div class="card-header-flex">
+            <h4>Evolução das Vendas</h4>
+            <span class="material-icons-outlined" style="color:#ccc; cursor:pointer;">menu</span>
+        </div>
+        <div style="height: 300px; width: 100%;">
+            <canvas id="salesChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card-box">
+        <div class="card-header-flex">
+            <h4>Vendas por Categoria</h4>
+            <span class="material-icons-outlined" style="color:#ccc; cursor:pointer;">menu</span>
+        </div>
+        <div style="height: 250px; display:flex; justify-content:center;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="tables-row">
+    <div class="card-box">
+        <h4 style="margin-bottom: 1rem;">Produtos Mais Vendidos</h4>
+        <table class="custom-table">
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Camiseta Básica Branca</strong><br>
+                        <span style="font-size:0.8rem; color:#999;">ID: 1001</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <strong>215</strong> unid.<br>
+                        <span style="color: #198754; font-size:0.8rem;">R$ 10.750</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Calça Jeans Slim</strong><br>
+                        <span style="font-size:0.8rem; color:#999;">ID: 2003</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <strong>188</strong> unid.<br>
+                        <span style="color: #198754; font-size:0.8rem;">R$ 28.200</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-box">
+        <h4 style="margin-bottom: 1rem;">Desempenho dos Vendedores</h4>
+        <table class="custom-table">
+            <thead>
+                <tr style="color:#999; font-size:0.85rem; text-align:left;">
+                    <th style="padding-bottom:10px;">Vendedor</th>
+                    <th style="text-align: right; padding-bottom:10px;">Vendas (R$)</th>
+                    <th style="text-align: right; padding-bottom:10px;">Nº Vendas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <img src="https://ui-avatars.com/api/?name=Maria+Oliveira&background=0D8ABC&color=fff" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:10px;">
+                        Maria Oliveira
+                    </td>
+                    <td style="text-align: right;">R$ 32.450,00</td>
+                    <td style="text-align: right;">210</td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="https://ui-avatars.com/api/?name=Pedro+Henrique&background=random" style="width:30px; height:30px; border-radius:50%; vertical-align:middle; margin-right:10px;">
+                        Pedro Henrique
+                    </td>
+                    <td style="text-align: right;">R$ 28.980,00</td>
+                    <td style="text-align: right;">195</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const ctxLine = document.getElementById('salesChart').getContext('2d');
+    let gradient = ctxLine.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(13, 110, 253, 0.2)'); 
+    gradient.addColorStop(1, 'rgba(13, 110, 253, 0)');
+
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+            datasets: [{
+                label: 'Vendas',
+                data: [28000, 35000, 32000, 42000],
+                borderColor: '#0d6efd',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0, 
+                pointRadius: 0,
+                pointHoverRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#f0f0f0' }, ticks: {font:{size:10}, color:'#999'} },
+                x: { grid: { display: false }, ticks: {font:{size:10}, color:'#999'} }
+            }
+        }
+    });
+
+    const ctxPie = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Roupas', 'Calçados', 'Acessórios', 'Outros'],
+            datasets: [{
+                data: [35, 45, 15, 5],
+                backgroundColor: ['#0d6efd', '#6610f2', '#198754', '#ffc107'],
+                borderWidth: 0,
+                hoverOffset: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font:{size:10} } }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
