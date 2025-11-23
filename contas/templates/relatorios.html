@@ -35,6 +35,64 @@
     
     @media (max-width: 1100px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 992px) { .charts-row, .tables-row { grid-template-columns: 1fr; } .header-right { display: none; } }
+    @media print {
+        .sidebar, 
+        .header-right, 
+        .toolbar-actions,
+        .btn-novo-cliente,
+        .btn-tool,
+        .material-icons-outlined { 
+            display: none !important; 
+        }
+
+        body, html {
+            background-color: white;
+            font-size: 12pt;
+            height: auto;
+            overflow: visible;
+        }
+
+        .layout-container {
+            display: block !important;
+        }
+
+        .main-content {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .charts-row {
+            grid-template-columns: 1fr !important; 
+            page-break-inside: avoid;
+        }
+
+        .tables-row {
+            grid-template-columns: 1fr !important;
+            page-break-inside: avoid;
+        }
+
+        .stat-card, .card-box {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+            break-inside: avoid;
+        }
+
+        canvas {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+        
+        .page-header h1 { font-size: 1.5rem; }
+        .toolbar-title h2 { font-size: 1.2rem; }
+    }
 </style>
 
 <div class="page-header">
@@ -58,10 +116,10 @@
             <span class="material-icons-outlined">calendar_today</span> 
             Últimos 30 Dias
         </button>
-        <button class="btn-tool primary">
-            <span class="material-icons-outlined">download</span> 
-            Exportar PDF
-        </button>
+        <button class="btn-tool primary" onclick="window.print()">
+          <span class="material-icons-outlined">picture_as_pdf</span> 
+          Exportar Relatório
+      </button>
     </div>
 </div>
 
