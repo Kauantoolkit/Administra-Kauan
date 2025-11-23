@@ -31,7 +31,6 @@ def cadastro_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            _create_default_categories()
             return redirect('login')
     else:
         form = CustomUserCreationForm()
