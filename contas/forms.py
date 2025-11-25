@@ -81,28 +81,16 @@ class BuscaEstoqueForm(forms.Form):
     )
 
 class MovimentoEstoqueForm(forms.ModelForm):
-    """
-    Formulário para registrar Movimentos de Estoque em geral (Entrada/Saída).
-    Usado na view simples (Movimento de Estoque Simples).
-    """
     class Meta:
         model = MovimentoEstoque
-        fields = ['produto', 'tipo_movimento', 'quantidade', 'observacao']
-        widgets = {
-            'tipo_movimento': forms.Select(attrs={'class': 'form-control'}),
-            'quantidade': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
-            'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        }
-        
+        fields = ['produto', 'quantidade', 'observacao']
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['produto'].queryset = Produto.objects.filter(status__in=['ATIVO', 'BAIXO', 'ZERADO'])
-        self.fields['produto'].widget.attrs.update({'class': 'form-control'})
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
 class EntradaProdutoEspecificoForm(forms.ModelForm):
-    """
-    Formulário para adicionar estoque a um produto específico (usado na tela de detalhe do produto).
-    """
     class Meta:
         model = MovimentoEstoque
         fields = ['quantidade', 'observacao']
@@ -112,10 +100,6 @@ class EntradaProdutoEspecificoForm(forms.ModelForm):
         }
 
 class EntradaEstoqueMultiplaForm(forms.Form):
-    """
-    Formulário base para o FormSet de Entrada de Estoque Múltipla. 
-    Contém campos de custo e validade que agora existem no Model MovimentoEstoque.
-    """
     produto = forms.ModelChoiceField(
         queryset=Produto.objects.all().order_by('nome'),
         label="Produto",

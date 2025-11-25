@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:pk>/', views.ver_cliente, name='ver_cliente'),
     path('<int:pk>/editar/', views.editar_cliente, name='editar_cliente'),
     path('<int:pk>/excluir/', views.excluir_cliente, name='excluir_cliente'),
+    path('exportar/', views.exportar_clientes_csv, name='exportar_clientes'),
 ]

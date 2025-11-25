@@ -23,263 +23,139 @@
     --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
 }
 
+body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--text); }
 
-body {
-    background: var(--bg);
-    font-family: "Inter", sans-serif;
-    color: var(--text);
-}
-
-.page-header-content {
-    margin-bottom: 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.page-header-content h1 {
-    font-size: 26px;
-    font-weight: 600;
-}
-
-.page-header-content p {
-    color: var(--text-muted);
-}
-
-
-.btn-novo-cliente {
-    background: var(--blue);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    box-shadow: 0 1px 2px rgba(16,24,40,0.05);
-    transition: 0.15s;
-    text-decoration: none !important;
-}
-
-.btn-novo-cliente:hover {
-    background: #1366d6;
-    text-decoration: none !important;
-}
-
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 22px;
-}
-
-.stat-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 18px 22px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-}
-
-.stat-card h5 {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-
-.stat-card h2 {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.stat-card .footer-stat {
-    font-size: 14px;
-    color: var(--green);
-    margin-top: 4px;
-}
-
-.stat-card-icon {
-    margin-left: auto;
-    background: var(--blue-light);
-    padding: 14px;
-    border-radius: 10px;
-}
-
+.page-header-content { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; }
+.page-header-content h1 { font-size: 26px; font-weight: 600; }
+.page-header-content p { color: var(--text-muted); }
+.btn-novo-cliente { background: var(--blue); color: white; padding: 8px 14px; border-radius: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px; font-size: 14px; box-shadow: 0 1px 2px rgba(16,24,40,0.05); transition: 0.15s; text-decoration: none !important; }
+.btn-novo-cliente:hover { background: #1366d6; text-decoration: none !important; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 22px; }
+.stat-card { background: var(--white); border-radius: 12px; padding: 18px 22px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.stat-card h5 { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; }
+.stat-card h2 { font-size: 28px; font-weight: 700; }
+.stat-card .footer-stat { font-size: 14px; color: var(--green); margin-top: 4px; }
+.stat-card-icon { margin-left: auto; background: var(--blue-light); padding: 14px; border-radius: 10px; }
 .success-bg { background: var(--green-light) !important; }
 .purple-bg { background: var(--purple-light) !important; }
 .warning-bg { background: var(--yellow-light) !important; }
+.card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.card-header { padding: 18px 24px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
 
+.table-responsive { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead th { font-size: 13px; color: var(--text-muted); padding: 14px; text-align: left; background: #F9FAFB; border-bottom: 1px solid var(--border-light); }
+.data-table tbody tr { border-bottom: 1px solid var(--border-light); }
+.data-table tbody td { padding: 18px 14px; font-size: 14px; }
+.client-info-cell { display: flex; align-items: center; gap: 12px; }
+.client-avatar { width: 38px; height: 38px; border-radius: 50%; background: #D0D5DD; display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--white); }
+.client-name strong { font-size: 14px; }
+.client-name span { color: var(--text-muted); font-size: 13px; }
+.badge-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-ativo { background: var(--green-light); color: var(--green); }
+.badge-inativo { background: var(--yellow-light); color: var(--yellow); }
+.icon-ver { color: var(--blue); } .icon-editar { color: var(--purple); } .icon-excluir { color: #F04438; }
+.table-footer { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+.pagination-link { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--white); box-shadow: var(--shadow); color: var(--text-muted); text-decoration: none; }
+.pagination-link.active { background: var(--blue); color: white; }
 
-.card {
-    background: var(--white);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-}
-
-.card-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--border-light);
+.header-actions {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    gap: 12px;
     align-items: center;
 }
 
-.action-buttons button {
+.btn-secondary-action {
     background: var(--white);
     border: 1px solid var(--border);
-    padding: 8px 14px;
+    padding: 0 16px;
     border-radius: 8px;
     display: flex;
-    gap: 6px;
     align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-size: 14px;
+    font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    height: 40px;
+    box-sizing: border-box;
 }
 
+.btn-secondary-action:hover {
+    background-color: #f9fafb;
+    border-color: var(--text);
+    color: var(--text);
+}
 
 .search-filter-area {
     padding: 18px 24px;
     border-bottom: 1px solid var(--border-light);
 }
+.search-form { display: flex; align-items: center; gap: 12px; }
+.input-text { width: 240px; height: 40px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; background: var(--white); }
+.btn-buscar { height: 40px; padding: 0 20px; background: var(--blue); color: white; border-radius: 8px; display: flex; align-items: center; gap: 6px; font-weight: 500; border: none; cursor: pointer; }
 
-.search-form {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.input-text {
-    width: 240px;
-    height: 40px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font-size: 14px;
-    background: var(--white);
-}
-
-.btn-buscar {
-    height: 40px;
-    padding: 0 20px;
-    background: var(--blue);
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-}
-
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.data-table thead th {
-    font-size: 13px;
-    color: var(--text-muted);
-    padding: 14px;
-    text-align: left;
-    background: #F9FAFB;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.data-table tbody tr {
-    border-bottom: 1px solid var(--border-light);
-}
-
-.data-table tbody td {
-    padding: 18px 14px;
-    font-size: 14px;
-}
-
-
-.client-info-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.client-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: #D0D5DD;
-    display: flex;
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: none;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    color: var(--white);
 }
 
-.client-name strong {
-    font-size: 14px;
+.modal-overlay.show {
+    display: flex;
 }
 
-.client-name span {
-    color: var(--text-muted);
-    font-size: 13px;
+.modal-content {
+    background: white;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 0;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
 }
 
-
-.badge-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.badge-ativo {
-    background: var(--green-light);
-    color: var(--green);
-}
-
-.badge-inativo {
-    background: var(--yellow-light);
-    color: var(--yellow);
-}
-
-
-.icon-ver { color: var(--blue); }
-.icon-editar { color: var(--purple); }
-.icon-excluir { color: #F04438; }
-
-
-.table-footer {
-    padding: 20px 24px;
+.modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 600; }
+.btn-close-modal { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; }
 
-.pagination-link {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--white);
-    box-shadow: var(--shadow);
-    color: var(--text-muted);
-    text-decoration: none;
+.modal-body { padding: 24px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--text-muted); }
+.form-select, .form-input {
+    width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box;
 }
 
-.pagination-link.active {
-    background: var(--blue);
-    color: white;
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #f9fafb;
 }
+
+.btn-cancel { padding: 8px 16px; border: 1px solid var(--border); background: white; border-radius: 8px; cursor: pointer; color: var(--text); }
+.btn-apply { padding: 8px 16px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
 </style>
-
-
 
 <div class="page-header-content">
     <div>
@@ -291,53 +167,38 @@ body {
     </a>
 </div>
 
-<!-- STATS -->
 <div class="stats-grid">
     <div class="stat-card">
-        <div>
-            <h5>Total de Clientes</h5>
-            <h2>{{ total_clientes }}</h2>
-            <p class="footer-stat">{{ txt_total_mes }}</p>
-        </div>
+        <div><h5>Total de Clientes</h5><h2>{{ total_clientes }}</h2><p class="footer-stat">{{ txt_total_mes }}</p></div>
         <div class="stat-card-icon"><span class="material-icons-outlined">groups</span></div>
     </div>
-
     <div class="stat-card">
-        <div>
-            <h5>Clientes Ativos</h5>
-            <h2>{{ clientes_ativos }}</h2>
-            <p class="footer-stat">{{ txt_ativos_30dias }}</p>
-        </div>
+        <div><h5>Clientes Ativos</h5><h2>{{ clientes_ativos }}</h2><p class="footer-stat">{{ txt_ativos_30dias }}</p></div>
         <div class="stat-card-icon success-bg"><span class="material-icons-outlined">person_check</span></div>
     </div>
-
     <div class="stat-card">
-        <div>
-            <h5>Novos Hoje</h5>
-            <h2>{{ novos_hoje }}</h2>
-            <p class="footer-stat">{{ txt_novos_hoje }}</p>
-        </div>
+        <div><h5>Novos Hoje</h5><h2>{{ novos_hoje }}</h2><p class="footer-stat">{{ txt_novos_hoje }}</p></div>
         <div class="stat-card-icon purple-bg"><span class="material-icons-outlined">person_add</span></div>
     </div>
-
     <div class="stat-card">
-        <div>
-            <h5>Ticket Médio</h5>
-            <h2>R$ {{ ticket_medio }}</h2>
-            <p class="footer-stat">{{ txt_ticket_mes }}</p>
-        </div>
+        <div><h5>Ticket Médio</h5><h2>R$ {{ ticket_medio }}</h2><p class="footer-stat">{{ txt_ticket_mes }}</p></div>
         <div class="stat-card-icon warning-bg"><span class="material-icons-outlined">paid</span></div>
     </div>
 </div>
 
 
-<!-- LISTA -->
 <div class="card" style="margin-top: 1.5rem;">
     <div class="card-header">
         <h4>Lista de Clientes</h4>
-        <div class="action-buttons">
-            <button class="btn-export-filter"><span class="material-icons-outlined">upload_file</span> Exportar</button>
-            <button class="btn-export-filter"><span class="material-icons-outlined">filter_alt</span> Filtros</button>
+        
+        <div class="header-actions">
+            <a href="{% url 'exportar_clientes' %}?{{ request.GET.urlencode }}" class="btn-secondary-action">
+                <span class="material-icons-outlined">upload_file</span> Exportar
+            </a>
+            
+            <button type="button" id="btn-open-modal" class="btn-secondary-action">
+                <span class="material-icons-outlined">filter_alt</span> Filtros
+            </button>
         </div>
     </div>
 
@@ -372,28 +233,24 @@ body {
                             <span>{{ cliente.sobrenome }}</span>
                         </div>
                     </td>
-
                     <td>{{ cliente.cpf }}</td>
                     <td>{{ cliente.email }}</td>
                     <td>{{ cliente.telefone }}</td>
                     <td>{{ cliente.cidade }}</td>
                     <td>{{ cliente.ultima_compra|date:"d/m/Y" }}</td>
-
                     <td>
-                        {% if cliente.status == "Ativo" %}
+                        {% if cliente.status == "ativo" %}
                         <span class="badge-status badge-ativo">Ativo</span>
                         {% else %}
                         <span class="badge-status badge-inativo">Inativo</span>
                         {% endif %}
                     </td>
-
                     <td class="action-icons">
                         <a href="{% url 'ver_cliente' cliente.pk %}" class="icon-ver"><span class="material-icons-outlined">visibility</span></a>
                         <a href="{% url 'editar_cliente' cliente.pk %}" class="icon-editar"><span class="material-icons-outlined">edit</span></a>
                         <a href="{% url 'excluir_cliente' cliente.pk %}" class="icon-excluir"><span class="material-icons-outlined">delete</span></a>
                     </td>
                 </tr>
-
                 {% empty %}
                 <tr><td colspan="8" style="text-align:center;color:var(--gray-500);">Nenhum cliente encontrado.</td></tr>
                 {% endfor %}
@@ -428,5 +285,63 @@ body {
         {% endif %}
     </div>
 </div>
+
+<div id="filterModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Filtros Avançados</h3>
+            <button type="button" class="btn-close-modal">&times;</button>
+        </div>
+        
+        <form method="get">
+            <div class="modal-body">
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="ativo" {% if request.GET.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                        <option value="inativo" {% if request.GET.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                        <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" name="cidade" id="cidade" class="form-input" placeholder="Ex: Toledo" value="{{ request.GET.cidade }}">
+                </div>
+
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-close-modal btn-cancel">Cancelar</button>
+                <button type="submit" class="btn-apply">Aplicar Filtros</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnOpen = document.getElementById('btn-open-modal');
+        const modal = document.getElementById('filterModal');
+        const btnsClose = document.querySelectorAll('.btn-close-modal');
+
+        btnOpen.addEventListener('click', function() {
+            modal.classList.add('show');
+        });
+
+        btnsClose.forEach(btn => {
+            btn.addEventListener('click', function() {
+                modal.classList.remove('show');
+            });
+        });
+
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+    });
+</script>
 
 {% endblock content %}

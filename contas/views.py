@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Q, Count
 from django.core.paginator import Paginator
 import datetime
 import locale
@@ -10,6 +10,16 @@ from django.http import JsonResponse
 from .models import Categoria, Produto, MovimentoEstoque
 from .messages.estoque_storage import EstoqueStorage
 from django.contrib.messages.constants import INFO, SUCCESS, ERROR
+from django.db.models import Sum
+from django.utils import timezone
+from vendas.models import Venda, ItemVenda
+from clientes.models import Cliente
+from vendas.models import Produto
+from django.contrib import messages
+import csv
+from django.http import HttpResponse
+from django.db.models.functions import TruncDay
+import json
 
 def add_estoque_message(request, message, level=INFO):
     storage = EstoqueStorage(request)
@@ -31,12 +41,33 @@ def cadastro_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            _create_default_categories()
             return redirect('login')
     else:
         form = CustomUserCreationForm()
     context = {'form': form}
     return render(request, 'cadastro.html', context)
+
+@login_required
+def estoque_view(request): 
+    search_query = request.GET.get('search', '')
+    produtos = Produto.objects.all()
+
+    if search_query:
+        produtos = produtos.filter(
+            Q(nome__icontains=search_query) | 
+            Q(sku__icontains=search_query)
+        )
+
+    paginator = Paginator(produtos, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'search_query': search_query,
+    }
+
+    return render(request, 'estoque.html', context)
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -57,6 +88,27 @@ def login_view(request):
     else:
         form = EmailAuthenticationForm()
     return render(request, 'login.html', {'form': form})
+@login_required
+def entrada_estoque_geral_view(request):
+    from .forms import MovimentoEstoqueForm 
+    
+    if request.method == 'POST':
+        form = MovimentoEstoqueForm(request.POST)
+        if form.is_valid():
+            movimento = form.save(commit=False)
+            movimento.tipo_movimento = 'ENTRADA'
+            movimento.save()
+            
+            return redirect('estoque')
+    else:
+        form = MovimentoEstoqueForm()
+    
+    return render(request, 'contas/entrada_estoque_geral.html', {'form': form})
+
+def calcular_crescimento(atual, anterior):
+    if not anterior or anterior == 0:
+        return 100.0 if atual > 0 else 0.0
+    return ((atual - anterior) / anterior) * 100
 
 @login_required
 def dashboard_view(request):
@@ -64,11 +116,58 @@ def dashboard_view(request):
         locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
     except locale.Error:
         locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil.1252')
+
     today = datetime.date.today()
     data_formatada = today.strftime('%d de %B de %Y')
-    context = {'data_hoje': data_formatada}
-    return render(request, 'dashboard.html', context)
 
+    hoje = timezone.now().date()
+    ontem_data = hoje - datetime.timedelta(days=1)
+
+    vendas_hoje = Venda.objects.filter(data_venda__date=hoje).aggregate(Sum('total'))['total__sum'] or 0
+    vendas_ontem = Venda.objects.filter(data_venda__date=ontem_data).aggregate(Sum('total'))['total__sum'] or 0
+    perc_vendas = calcular_crescimento(float(vendas_hoje), float(vendas_ontem))
+
+    prod_hoje = ItemVenda.objects.filter(venda__data_venda__date=hoje).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    prod_ontem = ItemVenda.objects.filter(venda__data_venda__date=ontem_data).aggregate(Sum('quantidade'))['quantidade__sum'] or 0
+    perc_produtos = calcular_crescimento(prod_hoje, prod_ontem)
+
+    clientes_ativos = Cliente.objects.filter(status='ativo').count()
+    novos_clientes_hoje = Cliente.objects.filter(data_cadastro__date=hoje).count()
+    novos_clientes_ontem = Cliente.objects.filter(data_cadastro__date=ontem_data).count()
+    perc_clientes = calcular_crescimento(novos_clientes_hoje, novos_clientes_ontem)
+
+    produtos_falta = Produto.objects.filter(
+        quantidade_estoque__lte=F('quantidade_minima_alerta')
+    ).count()
+
+    vendas_recentes = Venda.objects.select_related('cliente').order_by('-data_venda')[:5]
+
+    context = {
+        'data_hoje': data_formatada,
+        'vendas_hoje': vendas_hoje,
+        'perc_vendas': perc_vendas,
+        'produtos_vendidos': prod_hoje,
+        'perc_produtos': perc_produtos,
+        'clientes_ativos': clientes_ativos,
+        'perc_clientes': perc_clientes, 
+        'produtos_falta': produtos_falta,
+        'vendas_recentes': vendas_recentes,
+    }
+    return render(request, 'dashboard.html', context)
+@login_required
+def novo_produto_view(request):
+    from .forms import ProdutoForm 
+
+    if request.method == 'POST':
+        form = ProdutoForm(request.POST, request.FILES)
+        if form.is_valid():
+            produto = form.save()
+
+            return redirect('estoque')
+    else:
+        form = ProdutoForm()
+    
+    return render(request, 'contas/novo_produto.html', {'form': form})
 @login_required
 def clientes_view(request):
     return render(request, 'listar_clientes.html')
@@ -178,7 +277,6 @@ def fornecedor_deletar(request, pk):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
 def _create_default_categories():
     default_categories = [
         'Eletrônicos', 
@@ -385,3 +483,153 @@ def novo_produto_view(request):
         form = ProdutoForm()
         add_estoque_message(request, 'Lembre-se: o estoque inicial é 0. Use a função de Entrada para adicionar unidades.', level=INFO)
     return render(request, 'novo_produto.html', {'form': form})
+@login_required
+def relatorios(request):
+    return render(request, 'relatorios.html')
+
+@login_required
+def exportar_estoque_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="estoque.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(['Produto', 'SKU', 'Categoria', 'Marca', 'Custo', 'Venda', 'Estoque', 'Status'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+            p.categoria.nome if p.categoria else 'N/A',
+            p.marca or '',
+            f"{p.custo:.2f}".replace('.', ','),
+            f"{p.venda:.2f}".replace('.', ','),
+            p.quantidade_estoque,
+            p.get_status_display()
+        ])
+
+    return response
+
+@login_required
+def imprimir_codigos_estoque(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="lista_skus.csv"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    
+    writer.writerow(['Produto', 'SKU'])
+
+    produtos = Produto.objects.all().order_by('nome')
+    
+    nome = request.GET.get("nome")
+    sku = request.GET.get("sku")
+    categoria = request.GET.get("categoria")
+    status = request.GET.get("status")
+
+    if nome:
+        produtos = produtos.filter(nome__icontains=nome)
+    if sku:
+        produtos = produtos.filter(sku__icontains=sku)
+    if categoria:
+        produtos = produtos.filter(categoria_id=categoria)
+    if status:
+        if status == "ok":
+            produtos = produtos.filter(quantidade_estoque__gt=F("quantidade_minima_alerta"))
+        elif status == "baixo":
+            produtos = produtos.filter(quantidade_estoque__gt=0, quantidade_estoque__lte=F("quantidade_minima_alerta"))
+        elif status == "zerado":
+            produtos = produtos.filter(quantidade_estoque=0)
+
+    for p in produtos:
+        writer.writerow([
+            p.nome,
+            p.sku,
+        ])
+
+    return response
+
+@login_required
+def relatorios(request):
+    hoje = timezone.now()
+    inicio_mes = hoje - datetime.timedelta(days=30)
+    
+    vendas_periodo = Venda.objects.filter(data_venda__range=[inicio_mes, hoje], status='fechada')
+    itens_periodo = ItemVenda.objects.filter(venda__in=vendas_periodo)
+    
+    kpi_total_vendas = vendas_periodo.aggregate(Sum('total'))['total__sum'] or 0
+    
+    qtd_vendas = vendas_periodo.count()
+    kpi_ticket_medio = kpi_total_vendas / qtd_vendas if qtd_vendas > 0 else 0
+    
+    kpi_novos_clientes = Cliente.objects.filter(data_cadastro__range=[inicio_mes, hoje]).count()
+    
+    kpi_lucro = 0
+    for item in itens_periodo:
+        custo = item.produto.custo or 0
+        receita = item.preco_unitario
+        qtd = item.quantidade
+        kpi_lucro += (receita - custo) * qtd
+
+    vendas_por_dia = vendas_periodo.annotate(day=TruncDay('data_venda')) \
+        .values('day') \
+        .annotate(total=Sum('total')) \
+        .order_by('day')
+    
+    chart_dates = [v['day'].strftime('%d/%m') for v in vendas_por_dia]
+    chart_values = [float(v['total']) for v in vendas_por_dia]
+
+    vendas_por_cat = itens_periodo.values('produto__categoria__nome') \
+        .annotate(total=Sum(F('quantidade') * F('preco_unitario'))) \
+        .order_by('-total')
+    
+    cat_labels = [item['produto__categoria__nome'] if item['produto__categoria__nome'] else 'Sem Categoria' for item in vendas_por_cat]
+    cat_values = [float(item['total']) for item in vendas_por_cat]
+
+    top_produtos = itens_periodo.values('produto__nome', 'produto__id') \
+        .annotate(qtd=Sum('quantidade'), val=Sum(F('quantidade') * F('preco_unitario'))) \
+        .order_by('-val')[:5]
+
+    top_clientes = vendas_periodo.values('cliente__nome') \
+        .annotate(total_comprado=Sum('total'), qtd_compras=Count('id')) \
+        .order_by('-total_comprado')[:5]
+
+    context = {
+        'kpi_total_vendas': kpi_total_vendas,
+        'kpi_lucro': kpi_lucro,
+        'kpi_novos_clientes': kpi_novos_clientes,
+        'kpi_ticket_medio': kpi_ticket_medio,
+        
+        'chart_dates': json.dumps(chart_dates),
+        'chart_values': json.dumps(chart_values),
+        'cat_labels': json.dumps(cat_labels),
+        'cat_values': json.dumps(cat_values),
+        
+        'top_produtos': top_produtos,
+        'top_clientes': top_clientes,
+        
+        'data_hoje': obter_data_formatada(),
+    }
+    
+    return render(request, 'relatorios.html', context)

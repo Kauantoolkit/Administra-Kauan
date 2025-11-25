@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>{% block title %}Administra{% endblock %}</title>
 
     <link
@@ -399,13 +399,10 @@
             </a>
           </li>
           <li>
-            <a
-              href="{% url 'estoque' %}"
-              class="{% if request.resolver_match.url_name == 'estoque' %}active{% endif %}"
-            >
-              <span class="material-icons-outlined">inventory_2</span> Estoque
-            </a>
-          </li>
+          <a href="{% url 'estoque' %}" class="{% if request.resolver_match.url_name == 'estoque' %}active{% endif %}">
+            <span class="material-icons-outlined">inventory_2</span> Estoque
+          </a>
+        </li>
           <li>
     <a href="{% url 'funcionarios_list' %}"
        class="{% if request.resolver_match.url_name == 'funcionarios_list' %}active{% endif %}">
@@ -413,21 +410,18 @@
     </a>
 </li>
           <li>
-            <a
-              href="{% url 'fornecedores' %}"
-              class="{% if request.resolver_match.url_name == 'fornecedores' or 'fornecedor' in request.resolver_match.url_name %}active{% endif %}"
-            >
-              <span class="material-icons-outlined">local_shipping</span>
-              Fornecedores
+            <a href="{% url 'fornecedores' %}" class="{% if 'fornecedores' in request.path %}active{% endif %}">
+                <span class="material-icons-outlined">local_shipping</span>
+                Fornecedores
             </a>
-          </li>
+        </li>
           <li>
-            <a href="#">
+            <a href="{% url 'lista_vendas' %}" class="{% if request.resolver_match.url_name == 'lista_vendas' %}active{% endif %}">
               <span class="material-icons-outlined">point_of_sale</span> Vendas
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url 'relatorios' %}">
               <span class="material-icons-outlined">assessment</span> Relatórios
             </a>
           </li>

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Venda - Administra{% endblock %}
+
+{% block content %}
+<style>
+    .form-control { 
+        width: 100%; 
+        padding: 8px; 
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        box-sizing: border-box; 
+    }
+    
+    textarea.form-control {
+        resize: none;
+    }
+</style>
+
+<div class="header">
+    <h1>{{ titulo }}</h1>
+    <p style="color: #6c757d;">O estoque será baixado automaticamente.</p>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header"><h4>Dados Gerais</h4></div>
+        <div class="card-body">
+            <div style="margin-bottom: 1rem;">
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Cliente</label>
+                {{ form.cliente }}
+            </div>
+            <div>
+                <label style="font-weight: bold; display: block; margin-bottom: 5px;">Observações</label>
+                {{ form.observacoes }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Produto da Venda</h4>
+        </div>
+        <div class="card-body">
+            {{ formset.management_form }}
+
+            {% for form_item in formset %}
+                
+                {% for hidden in form_item.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                <div style="display: flex; gap: 20px;">
+                    <div style="flex: 3;">
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Produto</label>
+                        {{ form_item.produto }}
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">Quantidade</label>
+                        {{ form_item.quantidade }}
+                    </div>
+                </div>
+                
+                {% if form_item.errors %}
+                    <div style="color: red; margin-top: 10px;">
+                        {{ form_item.errors }}
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; text-align: right;">
+        <a href="{% url 'lista_vendas' %}" class="btn-action" style="display: inline-flex; margin-right: 1rem; text-decoration: none;">Cancelar</a>
+        <button type="submit" class="btn-action primary" style="border:none; font-size: 1rem; cursor: pointer;">
+            Salvar Venda
+        </button>
+    </div>
+</form>
+{% endblock %}
