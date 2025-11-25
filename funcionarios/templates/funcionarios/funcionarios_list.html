@@ -5,19 +5,14 @@
 {% block content %}
 
 <style>
-body { font-family: "Inter", sans-serif; color: #1D2939; background: #F7F8FA; }
-.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
-.header h1 { font-size:24px; font-weight:600; }
-.btn-action { padding:10px 18px; border-radius:8px; font-size:14px; background:#F0F2F5; cursor:pointer; text-decoration:none; color:#1D2939; transition:0.2s; border:none; display:inline-flex; align-items:center; }
-.btn-action.primary { background:#3B82F6; color:white; font-weight:500; }
-.btn-action:hover { opacity:.9; }
-.btn-action span.material-icons-outlined { margin-right:4px; font-size:18px; }
 
-.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; margin-bottom:1.5rem; }
-.stat-card { background:white; padding:20px; border-radius:12px; border:1px solid #E5E7EB; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; justify-content:space-between; align-items:center; }
-.stat-card-info h5 { font-size:14px; font-weight:500; color:#6B7280; margin-bottom:4px; }
-.stat-card-info h2 { font-size:28px; font-weight:700; }
-.stat-card-info p { font-size:13px; margin-top:4px; }
+
+
+
+
+
+
+
 .positive { color:#2ECC71; }
 .warning { color:#E8B200; }
 .stat-card-icon { width:48px; height:48px; border-radius:50%; background:#F3F4F6; display:flex; justify-content:center; align-items:center; }
@@ -58,12 +53,7 @@ table img { border-radius:50%; object-fit: cover; }
 /* Status: Cargo */
 .status-badge.cargo { background:#e9e7ff; color:#6b4ce6; }
 
-/* Ações (Olho, Lápis, Lixeira) */
-.actions { display:flex; gap:12px; }
-.actions a { color:#6B7280; }
-.actions a:last-child { color:#EF4444; }
-.material-icons-outlined { font-size:20px; cursor:pointer; }
-.material-icons-outlined:hover { opacity:.7; }
+
 
 
 
@@ -86,30 +76,49 @@ table img { border-radius:50%; object-fit: cover; }
         <div class="stat-card-info">
             <h5>Total de Funcionários</h5>
             <h2>{{ total_funcionarios }}</h2>
-            <p class="positive">+{{ aumento_mes }} mockadasso</p>
+            <p class="positive">
+                +{{ aumento_mes }}% em relação ao mês anterior
+            </p>
         </div>
         <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#3CB371;">groups</span></div>
     </div>
+
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Ativos Hoje</h5>
             <h2>{{ ativos_hoje }}</h2>
-            <p style="color:#6B7280;">{{ ativos_hoje }} mockados</p> </div>
+            <p style="color:#6B7280;">
+                Ontem: {{ ativos_ontem }}
+            </p>
+        </div>
         <div class="stat-card-icon"><span class="material-icons-outlined">check_circle</span></div>
     </div>
+
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Em Férias</h5>
             <h2>{{ ferias }}</h2>
-            <p class="warning">{{ ferias }} de mockado</p>
+            <p class="warning">
+                Mês passado: {{ ferias_mes_passado }}
+            </p>
         </div>
         <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#FFC107;">beach_access</span></div>
     </div>
+
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Salário Médio</h5>
             <h2>R$ {{ salario_medio }}</h2>
-            <p class="positive">mocadissimo</p>
+
+            {% if aumento_salarial >= 0 %}
+                <p class="positive">
+                    +{{ aumento_salarial }}% em relação ao mês passado
+                </p>
+            {% else %}
+                <p style="color:#EF4444;">
+                    {{ aumento_salarial }}% em relação ao mês passado
+                </p>
+            {% endif %}
         </div>
         <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#6B7280;">payments</span></div>
     </div>

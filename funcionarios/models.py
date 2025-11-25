@@ -26,6 +26,7 @@ class Funcionario(models.Model):
 
     salario = models.DecimalField(max_digits=10, decimal_places=2)
     data_admissao = models.DateField(default=timezone.now)
+    data_atualizacao = models.DateTimeField(auto_now=True)
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="ativo")
 
@@ -36,7 +37,6 @@ class Funcionario(models.Model):
 
     @property
     def codigo(self):
-        """Gera um código de funcionário baseado no ID do banco, tipo F001, F002..."""
         if self.id is None:
-            return "Novo"  # antes de salvar, ainda não há ID
+            return "Novo"
         return f"F{self.id:03d}"

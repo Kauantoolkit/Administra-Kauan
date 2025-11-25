@@ -1,4 +1,6 @@
 # funcionarios/views.py
+from datetime import timedelta
+from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -14,9 +16,74 @@ from .forms import FuncionarioForm
 # ---------------------------
 @login_required
 def funcionarios_list(request):
-    funcionarios = Funcionario.objects.all().order_by('-id')
+    # -------------------------------------------------------------------------
+    # BASE PARA ESTATÍSTICAS (SEM FILTROS)
+    # -------------------------------------------------------------------------
+    qs_base = Funcionario.objects.all()
 
-    # --- Filtros via GET ---
+    hoje = timezone.now().date()
+    ontem = hoje - timedelta(days=1)
+
+    # ----- TOTAL -----
+    total_funcionarios = qs_base.count()
+
+    # ----- MÊS PASSADO -----
+    mes_passado = hoje.replace(day=1) - timedelta(days=1)
+    inicio_mes_passado = mes_passado.replace(day=1)
+
+    funcionarios_mes_passado = qs_base.filter(
+        data_admissao__month=inicio_mes_passado.month,
+        data_admissao__year=inicio_mes_passado.year,
+    ).count()
+
+    if funcionarios_mes_passado > 0:
+        aumento_mes = round(
+            ((total_funcionarios - funcionarios_mes_passado) / funcionarios_mes_passado) * 100,
+            1
+        )
+    else:
+        aumento_mes = 0
+
+    # ----- ATIVOS -----
+    ativos_hoje = qs_base.filter(status="ativo").count()
+
+    # Agora funciona porque data_atualizacao é DateTimeField
+    ativos_ontem = qs_base.filter(
+        status="ativo",
+        data_atualizacao__date=ontem,
+    ).count()
+
+    # ----- FÉRIAS -----
+    ferias_hoje = qs_base.filter(status="ferias").count()
+
+    ferias_mes_passado = qs_base.filter(
+        status="ferias",
+        data_atualizacao__date__gte=inicio_mes_passado,
+        data_atualizacao__date__lte=mes_passado,
+    ).count()
+
+    # ----- SALÁRIO MÉDIO -----
+    salario_medio = qs_base.aggregate(avg=Avg("salario"))["avg"] or 0
+    salario_medio = round(salario_medio, 2)
+
+    salario_medio_mes_passado = qs_base.filter(
+        data_atualizacao__date__gte=inicio_mes_passado,
+        data_atualizacao__date__lte=mes_passado,
+    ).aggregate(avg=Avg("salario"))["avg"] or 0
+
+    if salario_medio_mes_passado > 0:
+        aumento_salarial = round(
+            ((salario_medio - salario_medio_mes_passado) / salario_medio_mes_passado) * 100,
+            1
+        )
+    else:
+        aumento_salarial = 0
+
+    # -------------------------------------------------------------------------
+    # LISTAGEM COM FILTROS (NÃO ALTERA AS ESTATÍSTICAS)
+    # -------------------------------------------------------------------------
+    funcionarios = qs_base.order_by('-id')
+
     nome = request.GET.get('nome', '')
     cpf = request.GET.get('cpf', '')
     cargo = request.GET.get('cargo', '')
@@ -31,27 +98,32 @@ def funcionarios_list(request):
     if status:
         funcionarios = funcionarios.filter(status=status)
 
-    # --- Estatísticas dos cards ---
-    total_funcionarios = funcionarios.count()
-    ativos_hoje = funcionarios.filter(status="ativo").count()
-    ferias = funcionarios.filter(status="ferias").count()
-
-    salario_medio = funcionarios.aggregate(Avg('salario'))['salario__avg'] or 0
-    salario_medio = round(salario_medio, 2)
-
-    cargos = Funcionario.objects.values_list("cargo", flat=True).distinct()
-
-    # --- Paginação ---
+    # -------------------------------------------------------------------------
+    # PAGINAÇÃO
+    # -------------------------------------------------------------------------
     paginator = Paginator(funcionarios, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    cargos = qs_base.values_list("cargo", flat=True).distinct()
 
     return render(request, "funcionarios/funcionarios_list.html", {
         "page_obj": page_obj,
+
+        # ESTATÍSTICAS COMPLETAS:
         "total_funcionarios": total_funcionarios,
+        "aumento_mes": aumento_mes,
+
         "ativos_hoje": ativos_hoje,
-        "ferias": ferias,
+        "ativos_ontem": ativos_ontem,
+
+        "ferias": ferias_hoje,
+        "ferias_mes_passado": ferias_mes_passado,
+
         "salario_medio": salario_medio,
+        "aumento_salarial": aumento_salarial,
+
+        # Filtros
         "cargos": cargos,
     })
 
@@ -70,9 +142,7 @@ def funcionario_create(request):
     else:
         form = FuncionarioForm()
 
-    return render(request, "funcionarios/funcionario_create.html", {
-        "form": form
-    })
+    return render(request, "funcionarios/funcionario_create.html", {"form": form})
 
 
 # ---------------------------
@@ -91,9 +161,7 @@ def funcionario_edit(request, pk):
     else:
         form = FuncionarioForm(instance=funcionario)
 
-    return render(request, "funcionarios/funcionario_edit.html", {
-        "form": form
-    })
+    return render(request, "funcionarios/funcionario_edit.html", {"form": form})
 
 
 # ---------------------------
@@ -102,9 +170,7 @@ def funcionario_edit(request, pk):
 @login_required
 def funcionario_detail(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
-    return render(request, "funcionarios/funcionario_detail.html", {
-        "funcionario": funcionario
-    })
+    return render(request, "funcionarios/funcionario_detail.html", {"funcionario": funcionario})
 
 
 # ---------------------------
@@ -119,6 +185,4 @@ def funcionario_delete(request, pk):
         messages.success(request, "Funcionário excluído com sucesso.")
         return redirect("funcionarios_list")
 
-    return render(request, "funcionarios/funcionario_confirm_delete.html", {
-        "funcionario": funcionario
-    })
+    return render(request, "funcionarios/funcionario_confirm_delete.html", {"funcionario": funcionario})
