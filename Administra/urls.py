@@ -17,10 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
+from django.shortcuts import redirect
 
 from Administra import settings
 
 urlpatterns = [
+    path('', lambda request: redirect('dashboard'), name='home'),
     path('admin/', admin.site.urls),
     path('contas/', include('contas.urls')),
     path('clientes/', include('clientes.urls')),

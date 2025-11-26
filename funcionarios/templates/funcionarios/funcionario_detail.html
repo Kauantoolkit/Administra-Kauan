@@ -22,7 +22,6 @@
 <div class="card">
     <div class="card-body" style="display:flex; gap:2rem;">
 
-        <!-- FOTO -->
         <div>
             {% if funcionario.foto %}
             <img src="{{ funcionario.foto.url }}" style="width:120px; height:120px; border-radius:100%;">
@@ -31,7 +30,7 @@
             {% endif %}
         </div>
 
-        <!-- DADOS -->
+
         <div style="font-size:1.1rem;">
             <h2 style="margin:0;">{{ funcionario.nome }}</h2>
             <p style="margin:0; color:#666;">ID: {{ funcionario.codigo }}</p>

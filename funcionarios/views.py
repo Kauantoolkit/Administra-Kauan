@@ -1,4 +1,3 @@
-# funcionarios/views.py
 from datetime import timedelta
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,24 +9,24 @@ from django.db.models import Avg
 from .models import Funcionario
 from .forms import FuncionarioForm
 
+import base64
+
+def file_to_base64(file):
+    return base64.b64encode(file.read()).decode('utf-8')
+
 
 # ---------------------------
 # LISTAGEM + ESTATÍSTICAS
 # ---------------------------
 @login_required
 def funcionarios_list(request):
-    # -------------------------------------------------------------------------
-    # BASE PARA ESTATÍSTICAS (SEM FILTROS)
-    # -------------------------------------------------------------------------
     qs_base = Funcionario.objects.all()
 
     hoje = timezone.now().date()
     ontem = hoje - timedelta(days=1)
 
-    # ----- TOTAL -----
     total_funcionarios = qs_base.count()
 
-    # ----- MÊS PASSADO -----
     mes_passado = hoje.replace(day=1) - timedelta(days=1)
     inicio_mes_passado = mes_passado.replace(day=1)
 
@@ -44,16 +43,13 @@ def funcionarios_list(request):
     else:
         aumento_mes = 0
 
-    # ----- ATIVOS -----
     ativos_hoje = qs_base.filter(status="ativo").count()
 
-    # Agora funciona porque data_atualizacao é DateTimeField
     ativos_ontem = qs_base.filter(
         status="ativo",
         data_atualizacao__date=ontem,
     ).count()
 
-    # ----- FÉRIAS -----
     ferias_hoje = qs_base.filter(status="ferias").count()
 
     ferias_mes_passado = qs_base.filter(
@@ -62,7 +58,6 @@ def funcionarios_list(request):
         data_atualizacao__date__lte=mes_passado,
     ).count()
 
-    # ----- SALÁRIO MÉDIO -----
     salario_medio = qs_base.aggregate(avg=Avg("salario"))["avg"] or 0
     salario_medio = round(salario_medio, 2)
 
@@ -79,9 +74,6 @@ def funcionarios_list(request):
     else:
         aumento_salarial = 0
 
-    # -------------------------------------------------------------------------
-    # LISTAGEM COM FILTROS (NÃO ALTERA AS ESTATÍSTICAS)
-    # -------------------------------------------------------------------------
     funcionarios = qs_base.order_by('-id')
 
     nome = request.GET.get('nome', '')
@@ -98,9 +90,6 @@ def funcionarios_list(request):
     if status:
         funcionarios = funcionarios.filter(status=status)
 
-    # -------------------------------------------------------------------------
-    # PAGINAÇÃO
-    # -------------------------------------------------------------------------
     paginator = Paginator(funcionarios, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -109,34 +98,26 @@ def funcionarios_list(request):
 
     return render(request, "funcionarios/funcionarios_list.html", {
         "page_obj": page_obj,
-
-        # ESTATÍSTICAS COMPLETAS:
         "total_funcionarios": total_funcionarios,
         "aumento_mes": aumento_mes,
-
         "ativos_hoje": ativos_hoje,
         "ativos_ontem": ativos_ontem,
-
         "ferias": ferias_hoje,
         "ferias_mes_passado": ferias_mes_passado,
-
         "salario_medio": salario_medio,
         "aumento_salarial": aumento_salarial,
-
-        # Filtros
         "cargos": cargos,
     })
 
 
-# ---------------------------
-# CRIAR FUNCIONÁRIO
-# ---------------------------
+
 @login_required
 def funcionario_create(request):
     if request.method == "POST":
         form = FuncionarioForm(request.POST, request.FILES)
+
         if form.is_valid():
-            form.save()
+            form.save()  # o form já converte foto para base64
             messages.success(request, "Funcionário cadastrado com sucesso!")
             return redirect("funcionarios_list")
     else:
@@ -145,9 +126,7 @@ def funcionario_create(request):
     return render(request, "funcionarios/funcionario_create.html", {"form": form})
 
 
-# ---------------------------
-# EDITAR FUNCIONÁRIO
-# ---------------------------
+
 @login_required
 def funcionario_edit(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
@@ -164,18 +143,14 @@ def funcionario_edit(request, pk):
     return render(request, "funcionarios/funcionario_edit.html", {"form": form})
 
 
-# ---------------------------
-# DETALHES DO FUNCIONÁRIO
-# ---------------------------
+
 @login_required
 def funcionario_detail(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
     return render(request, "funcionarios/funcionario_detail.html", {"funcionario": funcionario})
 
 
-# ---------------------------
-# EXCLUIR FUNCIONÁRIO
-# ---------------------------
+
 @login_required
 def funcionario_delete(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)

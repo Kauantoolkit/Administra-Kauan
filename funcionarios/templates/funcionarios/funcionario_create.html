@@ -6,84 +6,87 @@
 {% block content %}
 
 <style>
-:root {
-    --bg:#F5F7FA;
-    --white:#FFFFFF;
-    --border:#E4E7EC;
-    --text:#1D2939;
-    --text-muted:#667085;
-    --blue:#1570EF;
-    --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
-}
-
-body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--text); }
-
 .form-card {
-    background: var(--white);
-    padding: 28px;
+    background: #fff;
+    padding: 25px 30px;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     width: 100%;
-    max-width: 750px;
-    margin-top: 20px;
+    max-width: 900px;
+    margin: 0 auto 40px auto;
 }
 
-.form-card h1 { margin-bottom: 20px; }
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+.form-card h1 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #333;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin: 20px;
 }
 
-.form-label { font-size: 14px; font-weight: 500; color: var(--text-muted); }
-
-.form-input, .form-select, .form-file {
-    width: 100%;
-    height: 40px;
-    padding: 8px 12px;
+.form-label {
     font-size: 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: white;
+    font-weight: 500;
+    color: #444;
 }
 
-.form-file { padding: 6px 10px; }
+.form-input,
+.form-select,
+input[type="file"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafafa;
+    transition: 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    background: #fff;
+    border-color: #888;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 25px;
+    margin-top: 20px;
+}
 
 .img-preview {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
+    width: 90px;
+    height: 90px;
     object-fit: cover;
-    margin-bottom: 8px;
-    border: 1px solid var(--border);
+    border-radius: 50%;
+    border: 2px solid #ddd;
 }
 
 .btn-salvar {
-    margin-top: 24px;
-    padding: 10px 20px;
-    background: var(--blue);
+    margin-top: 30px;
+    width: 100%;
+    background: #4CAF50;
     color: white;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
     border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.btn-salvar:hover { background: #1366d6; }
-
-@media (max-width: 700px) {
-    .form-grid { grid-template-columns: 1fr; }
+.btn-salvar:hover {
+    background: #43a047;
 }
 </style>
+
 
 <div class="form-card">
     <h1>Novo Funcionário</h1>
@@ -101,21 +104,20 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        
-        <!-- Campo de imagem com preview -->
+
+        <!-- Campo de imagem -->
         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-            {% for field in form %}
-                {% if field.name == "foto" %}
-                    <img id="preview" class="img-preview" src="{% if field.value %}{{ field.value.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" alt="Pré-visualização">
-                    {{ field }}
-                {% endif %}
-            {% endfor %}
+            <img id="preview" class="img-preview" 
+                 src="{% static 'img/default-avatar.png' %}" 
+                 alt="Pré-visualização">
+
+            {{ form.foto_upload }}
         </div>
 
         <!-- Demais campos -->
         <div class="form-grid">
             {% for field in form %}
-                {% if field.name != "foto" %}
+                {% if field.name != "foto_upload" %}
                 <div class="form-group">
                     <label class="form-label">{{ field.label }}</label>
                     {{ field }}
@@ -132,16 +134,13 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 <script>
 $(document).ready(function(){
 
-    // Preview da imagem e obrigatoriedade
-    const imgField = $('input[type="file"][name="foto"]');
-    imgField.prop('required', true);
+    // Preview da imagem
+    const imgField = $('#id_foto');
     imgField.on('change', function(){
         const file = this.files[0];
         if(file){
             const reader = new FileReader();
-            reader.onload = function(e){
-                $('#preview').attr('src', e.target.result);
-            }
+            reader.onload = e => $('#preview').attr('src', e.target.result);
             reader.readAsDataURL(file);
         }
     });
@@ -156,9 +155,8 @@ $(document).ready(function(){
         v = v.replace(/\.(\d{3})(\d)/,'.$1-$2');
         $(this).val(v);
     });
-    cpfField.on('keypress', function(e){ if(e.which < 48 || e.which > 57) e.preventDefault(); });
 
-    // Máscara Telefone (fixo ou celular)
+    // Máscara Telefone
     const telField = $('input[name="telefone"]');
     telField.on('input', function(){
         let v = $(this).val().replace(/\D/g,'').substring(0,11);
@@ -171,7 +169,6 @@ $(document).ready(function(){
         }
         $(this).val(v);
     });
-    telField.on('keypress', function(e){ if(e.which < 48 || e.which > 57) e.preventDefault(); });
 
 });
 </script>

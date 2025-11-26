@@ -128,8 +128,6 @@ AUTH_USER_MODEL = 'contas.CustomUser'
 
 
 
-# Diretório físico para arquivos enviados pelo usuário
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# URL para acessar arquivos de mídia no navegador
 MEDIA_URL = '/media/'

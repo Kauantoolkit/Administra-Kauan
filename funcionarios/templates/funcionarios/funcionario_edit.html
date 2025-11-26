@@ -44,20 +44,25 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Imagem atual + campo -->
+
         <div class="form-group" style="display:flex; align-items:center;">
-            {% if form.instance.foto %}
-                <img id="preview" class="img-preview" src="{{ form.instance.foto.url }}" alt="Foto do Funcionário">
+            {% if form.instance.foto_base64 %}
+                <img id="preview" class="img-preview"
+                     src="data:image/*;base64,{{ form.instance.foto_base64 }}"
+                     alt="Foto do Funcionário">
             {% else %}
-                <img id="preview" class="img-preview" src="{% static 'img/default-avatar.png' %}" alt="Foto do Funcionário">
+                <img id="preview" class="img-preview"
+                     src="{% static 'img/default-avatar.png' %}"
+                     alt="Foto do Funcionário">
             {% endif %}
-            {{ form.foto }}
+
+            <input type="file" name="foto_upload" id="id_foto" class="form-input" />
         </div>
 
         <!-- Demais campos -->
         <div class="form-grid">
             {% for field in form %}
-                {% if field.name != "foto" %}
+                {% if field.name != "foto_upload" %}
                 <div class="form-group">
                     <label class="form-label">{{ field.label }}</label>
                     {{ field }}
@@ -74,7 +79,6 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 <script>
 $(document).ready(function(){
 
-    // Preview da imagem
     $('#id_foto').on('change', function(){
         const file = this.files[0];
         if(file){
@@ -98,30 +102,25 @@ $(document).ready(function(){
     });
 
     // Máscara Telefone
-const telField = $('#id_telefone');
-telField.on('input', function(){
-    let v = $(this).val().replace(/\D/g,''); // remove tudo que não é número
+    const telField = $('#id_telefone');
+    telField.on('input', function(){
+        let v = $(this).val().replace(/\D/g,''); 
+        v = v.substring(0, 11);
 
-    // Limita a 11 dígitos
-    v = v.substring(0, 11);
+        if(v.length <= 10){
+            v = v.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
+            v = v.replace(/(\d{4})(\d{0,4})$/, '$1-$2');
+        } else {
+            v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            v = v.replace(/(\d{5})(\d{0,4})$/, '$1-$2');
+        }
 
-    if(v.length <= 10){
-        // Fixo: (XX) XXXX-XXXX
-        v = v.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
-        v = v.replace(/(\d{4})(\d{0,4})$/, '$1-$2');
-    } else {
-        // Celular: (XX) 9XXXX-XXXX
-        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-        v = v.replace(/(\d{5})(\d{0,4})$/, '$1-$2');
-    }
+        $(this).val(v);
+    });
 
-    $(this).val(v);
-});
-
-// Impede digitar caracteres não numéricos
-telField.on('keypress', function(e){ 
-    if(e.which < 48 || e.which > 57) e.preventDefault(); 
-});
+    telField.on('keypress', function(e){ 
+        if(e.which < 48 || e.which > 57) e.preventDefault(); 
+    });
 });
 </script>
 

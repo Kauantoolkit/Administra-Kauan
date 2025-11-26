@@ -6,56 +6,36 @@
 
 <style>
 
-
-
-
-
-
-
-
 .positive { color:#2ECC71; }
 .warning { color:#E8B200; }
 .stat-card-icon { width:48px; height:48px; border-radius:50%; background:#F3F4F6; display:flex; justify-content:center; align-items:center; }
 .stat-card-icon span { font-size:28px; color:#3B82F6; } /* Ícones azuis */
-.stat-card:nth-child(1) .stat-card-icon { background:rgba(60, 179, 113, 0.1); } /* Cor de fundo para "Total" */
-.stat-card:nth-child(2) .stat-card-icon { background:rgba(59, 130, 246, 0.1); } /* Cor de fundo para "Ativos" */
-.stat-card:nth-child(3) .stat-card-icon { background:rgba(255, 193, 7, 0.1); } /* Cor de fundo para "Férias" */
-.stat-card:nth-child(4) .stat-card-icon { background:rgba(240, 242, 245, 1); } /* Cor de fundo para "Salário" */
+.stat-card:nth-child(1) .stat-card-icon { background:rgba(60, 179, 113, 0.1); }
+.stat-card:nth-child(2) .stat-card-icon { background:rgba(59, 130, 246, 0.1); }
+.stat-card:nth-child(3) .stat-card-icon { background:rgba(255, 193, 7, 0.1); }
+.stat-card:nth-child(4) .stat-card-icon { background:rgba(240, 242, 245, 1); }
 .stat-card:nth-child(1) .stat-card-icon span { color:#3CB371; }
 .stat-card:nth-child(3) .stat-card-icon span { color:#FFC107; }
 .stat-card:nth-child(4) .stat-card-icon span { color:#6B7280; }
 
-
-/* 🔎 Filtros e Busca */
 .search-form { display:flex; gap:12px; margin-bottom:1.5rem; background:white; padding:16px; border-radius:12px; border:1px solid #E5E7EB; align-items:center; }
 .form-input { padding:10px 14px; border-radius:8px; border:1px solid #E5E7EB; background:#F9FAFB; font-size:14px; width:200px; }
 .form-input:focus { border-color:#3B82F6; background:white; outline:none; }
 .form-input-text { flex-grow: 1; min-width: 250px; }
 
-
-
 .card { background:white; padding:0; border-radius:12px; border:1px solid #E5E7EB; overflow:hidden; }
 .card-header { padding:16px 20px; border-bottom:1px solid #E5E7EB; display:flex; justify-content:space-between; align-items:center; }
 .card-header h4 { margin:0; font-size:18px; font-weight:600; }
 
-table th { font-size:13px; text-align:left; color:#6B7280; padding:12px 20px 12px 20px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
+table th { font-size:13px; text-align:left; color:#6B7280; padding:12px 20px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
 table td { padding:12px 20px; font-size:14px; vertical-align:middle; }
 table tr:not(:last-child) { border-bottom:1px solid #F4F4F4; }
 table img { border-radius:50%; object-fit: cover; }
 
-
 .status-badge { padding:4px 10px; border-radius:12px; font-size:12px; font-weight:500; display:inline-block; text-transform:capitalize; }
-
-/* Status: Ativo */
 .status-badge.ativo { background:#D1FAE5; color:#065F46; }
-/* Status: Férias */
 .status-badge.ferias { background:#FFFBEB; color:#B45309; }
-/* Status: Cargo */
 .status-badge.cargo { background:#e9e7ff; color:#6b4ce6; }
-
-
-
-
 
 .pagination-controls { display:flex; justify-content:flex-end; margin-top:1rem; padding:16px 20px; gap:0.5rem; border-top:1px solid #E5E7EB; }
 .pagination-controls .btn-action { padding:8px 16px; background:#E5E7EB; color:#4B5563; font-weight:500; }
@@ -174,10 +154,12 @@ table img { border-radius:50%; object-fit: cover; }
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            {% if f.foto %}
-                                <img src="{{ f.foto.url }}" style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
+                            {% if f.foto_base64 %}
+                                <img src="data:image/jpeg;base64,{{ f.foto_base64 }}" 
+                                     style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
                             {% else %}
-                                <img src="{% static 'img/default-user.png' %}" style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
+                                <img src="{% static 'img/default-avatar.png' %}" 
+                                     style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
                             {% endif %}
                             <div>
                                 <strong>{{ f.nome }}</strong><br>
@@ -186,7 +168,8 @@ table img { border-radius:50%; object-fit: cover; }
                         </div>
                     </td>
                     <td>{{ f.cpf }}</td>
-                    <td><span class="status-badge cargo">{{ f.cargo }}</span></td> <td>{{ f.email }}</td>
+                    <td><span class="status-badge cargo">{{ f.cargo }}</span></td>
+                    <td>{{ f.email }}</td>
                     <td>{{ f.telefone }}</td>
                     <td>{{ f.data_admissao|date:"d/m/Y" }}</td>
                     <td>R$ {{ f.salario }}</td>
@@ -196,7 +179,8 @@ table img { border-radius:50%; object-fit: cover; }
                         {% elif f.status == "ferias" %}
                         <span class="status-badge ferias">Férias</span>
                         {% else %}
-                        <span class="status-badge" style="background:#FDE8E8; color:#EF4444;">Inativo</span> {% endif %}
+                        <span class="status-badge" style="background:#FDE8E8; color:#EF4444;">Inativo</span>
+                        {% endif %}
                     </td>
                     <td class="actions">
                         <a href="{% url 'funcionario_detail' f.pk %}"><span class="material-icons-outlined">visibility</span></a>
@@ -216,7 +200,7 @@ table img { border-radius:50%; object-fit: cover; }
         {% if page_obj.has_previous %}
             <a href="?page={{ page_obj.previous_page_number }}" class="btn-action">Anterior</a>
         {% else %}
-             <span class="btn-action" style="opacity:0.5; pointer-events:none;">Anterior</span>
+            <span class="btn-action" style="opacity:0.5; pointer-events:none;">Anterior</span>
         {% endif %}
         
         <a href="#" class="btn-action current">{{ page_obj.number }}</a>
