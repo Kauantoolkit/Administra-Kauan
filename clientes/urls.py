@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:pk>/editar/', views.editar_cliente, name='editar_cliente'),
     path('<int:pk>/excluir/', views.excluir_cliente, name='excluir_cliente'),
     path('exportar/', views.exportar_clientes_csv, name='exportar_clientes'),
+    path('historico/', views.historico_logs, name='historico_sistema'),
 ]
