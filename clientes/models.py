@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 class Cliente(models.Model):
 
@@ -43,3 +44,31 @@ class Cliente(models.Model):
 
     def __str__(self):
         return self.nome
+    
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class LogAcao(models.Model):
+    ACOES = (
+        ('CRIACAO', 'Criação'),
+        ('ALTERACAO', 'Alteração'),
+        ('EXCLUSAO', 'Exclusão'),
+    )
+
+    ENTIDADES = (
+        ('CLIENTE', 'Cliente'),
+        ('PRODUTO', 'Produto'),
+        ('ESTOQUE', 'Estoque'),
+        ('VENDA', 'Venda'),
+    )
+
+    entidade = models.CharField(max_length=20, choices=ENTIDADES)
+    entidade_id = models.IntegerField(null=True, blank=True)  
+    acao = models.CharField(max_length=20, choices=ACOES)
+    descricao = models.TextField()
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    datahora = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.entidade} - {self.acao} - {self.datahora}"

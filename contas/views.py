@@ -13,8 +13,7 @@ from django.contrib.messages.constants import INFO, SUCCESS, ERROR
 from django.db.models import Sum
 from django.utils import timezone
 from vendas.models import Venda, ItemVenda
-from clientes.models import Cliente
-from vendas.models import Produto
+from clientes.models import Cliente, LogAcao
 from django.contrib import messages
 import csv
 from django.http import HttpResponse
@@ -98,7 +97,14 @@ def entrada_estoque_geral_view(request):
             movimento = form.save(commit=False)
             movimento.tipo_movimento = 'ENTRADA'
             movimento.save()
-            
+            LogAcao.objects.create(
+                entidade="ESTOQUE",
+                entidade_id=movimento.produto.id,
+                acao="ALTERACAO",
+                descricao=f'Entrada de {movimento.quantidade} unidades para o produto "{movimento.produto.nome}".',
+                usuario=request.user
+            )
+
             return redirect('estoque')
     else:
         form = MovimentoEstoqueForm()
@@ -163,6 +169,13 @@ def novo_produto_view(request):
         if form.is_valid():
             produto = form.save()
 
+            LogAcao.objects.create(
+                entidade="PRODUTO",
+                entidade_id=produto.id,
+                acao="CRIACAO",
+                descricao=f'Produto "{produto.nome}" foi criado.',
+                usuario=request.user
+            )
             return redirect('estoque')
     else:
         form = ProdutoForm()
@@ -210,6 +223,13 @@ def fornecedor_criar(request):
         form = FornecedorForm(request.POST)
         if form.is_valid():
             form.save()
+            LogAcao.objects.create(
+                entidade="FORNECEDOR",
+                entidade_id=form.id,
+                acao="CRIACAO",
+                descricao=f'Fornecedor "{form.nome_fantasia}" criado.',
+                usuario=request.user
+            )
             messages.success(request, 'Fornecedor cadastrado com sucesso!')
             return redirect('fornecedores')
     else:
@@ -237,6 +257,13 @@ def fornecedor_editar(request, pk):
         form = FornecedorForm(request.POST, instance=fornecedor)
         if form.is_valid():
             form.save()
+            LogAcao.objects.create(
+                entidade="FORNECEDOR",
+                entidade_id=fornecedor.id,
+                acao="ALTERACAO",
+                descricao=f'Fornecedor "{fornecedor.nome_fantasia}" editado.',
+                usuario=request.user
+            )
             messages.success(request, 'Fornecedor atualizado com sucesso!')
             return redirect('fornecedores')
     else:
@@ -263,6 +290,13 @@ def fornecedor_deletar(request, pk):
     if request.method == 'POST':
         nome = fornecedor.nome_fantasia
         fornecedor.delete()
+        LogAcao.objects.create(
+            entidade="FORNECEDOR",
+            entidade_id=pk,
+            acao="EXCLUSAO",
+            descricao=f'Fornecedor "{nome}" foi excluído.',
+            usuario=request.user
+        )
         messages.success(request, f'Fornecedor "{nome}" deletado com sucesso!')
         return redirect('fornecedores')
     
@@ -383,6 +417,13 @@ def entrada_estoque_geral_view(request):
             movimento = form.save(commit=False)
             movimento.tipo_movimento = 'ENTRADA'
             movimento.save()
+            LogAcao.objects.create(
+                entidade="ESTOQUE",
+                entidade_id=movimento.produto.id,
+                acao="ALTERACAO",
+                descricao=f'Movimento de estoque: {movimento.tipo_movimento} — {movimento.quantidade} unidades do produto "{movimento.produto.nome}".',
+                usuario=request.user
+            )
             add_estoque_message(request, f'Entrada de {movimento.quantidade} unidades de {movimento.produto.nome} registrada com sucesso.', level=SUCCESS)
             return redirect('estoque')
     else:
@@ -416,6 +457,13 @@ def excluir_produto_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     nome = produto.nome
     produto.delete()
+    LogAcao.objects.create(
+        entidade="PRODUTO",
+        entidade_id=pk,
+        acao="EXCLUSAO",
+        descricao=f'Produto "{nome}" foi excluído do sistema.',
+        usuario=request.user
+    )
     add_estoque_message(request, f'O produto "{nome}" foi removido com sucesso.', level=SUCCESS)
     return redirect('estoque')
 
@@ -465,6 +513,14 @@ def editar_produto_view(request, pk):
         except ValueError:
             produto.quantidade_estoque = 0
         produto.save()
+
+        LogAcao.objects.create(
+            entidade="PRODUTO",
+            entidade_id=produto.id,
+            acao="ALTERACAO",
+            descricao=f'Produto "{produto.nome}" foi alterado.',
+            usuario=request.user
+        )
         add_estoque_message(request, f'Produto "{produto.nome}" atualizado com sucesso!', level=SUCCESS)
         return redirect("estoque")
     return render(request, "edicao_produto.html", {"produto": produto, "categorias": categorias})
