@@ -72,14 +72,14 @@ def editar_venda(request, pk):
         formset = ItemVendaFormSet(request.POST, instance=venda)
         if form.is_valid() and formset.is_valid():
             with transaction.atomic():
-                form.save()  # salva status, cliente e observações
+                form.save()
                 items = formset.save(commit=False)
                 for item in items:
                     item.venda = venda
                     if not item.preco_unitario:
                         item.preco_unitario = item.produto.venda
                     item.save()
-                # Remover itens marcados para exclusão
+
                 for item in formset.deleted_objects:
                     item.delete()
                 venda.total = sum([i.subtotal() for i in venda.itens.all()])
