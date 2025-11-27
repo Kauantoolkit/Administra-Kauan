@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Confirmar exclusão{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h4>Excluir Funcionário</h4>
+  </div>
+  <div class="card-body">
+    <p>Você tem certeza que deseja excluir o funcionário <strong>{{ funcionario.nome }}</strong> (ID: {{ funcionario.codigo }})?</p>
+
+    <form method="post" style="display:flex; gap:0.5rem;">
+      {% csrf_token %}
+      <button type="submit" class="btn-action" style="background:#dc3545; color:#fff; border-color:#dc3545;">
+        Confirmar exclusão
+      </button>
+
+      <a href="{% url 'funcionarios_list' %}" class="btn-action" role="button">Cancelar</a>
+    </form>
+
+    <hr>
+    <p style="color:#6c757d; font-size:0.9rem;">
+      Observação: esta ação removerá apenas o registro de funcionário. Se quiser também apagar o usuário vinculado, descomente a parte correspondente na view.
+    </p>
+  </div>
+</div>
+{% endblock %}
