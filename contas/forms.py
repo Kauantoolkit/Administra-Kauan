@@ -14,7 +14,20 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'nome', 'cpf') 
+        fields = ('email', 'nome', 'cpf')
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError('Este email já está cadastrado no sistema.')
+        return email
+    
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf')
+        if cpf:
+            if CustomUser.objects.filter(cpf=cpf).exists():
+                raise forms.ValidationError('Este CPF já está cadastrado no sistema.')
+        return cpf 
 
 
 class CustomUserChangeForm(UserChangeForm):
