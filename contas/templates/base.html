@@ -426,10 +426,10 @@
             </a>
           </li>
           <li>
-            <a href="#">
+            <a href="{% url 'historico_sistema' %}" class="{% if request.resolver_match.url_name == 'historico_sistema' %}active{% endif %}">
               <span class="material-icons-outlined">history</span> Histórico
             </a>
-          </li>
+</li>
         </ul>
 
         <div class="sidebar-footer">
