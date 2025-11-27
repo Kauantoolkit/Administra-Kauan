@@ -61,7 +61,6 @@ margin: 30px; width: 60%; }
             <input type="file" name="foto_upload" id="id_foto" class="form-input" />
         </div>
 
-        <!-- Demais campos -->
         <div class="form-grid">
             {% for field in form %}
                 {% if field.name != "foto_upload" %}
@@ -92,7 +91,6 @@ $(document).ready(function(){
         }
     });
 
-    // Máscara CPF
     const cpfField = $('#id_cpf');
     cpfField.attr('maxlength', 14);
     cpfField.on('input', function(){
@@ -103,7 +101,6 @@ $(document).ready(function(){
         $(this).val(v);
     });
 
-    // Máscara Telefone
     const telField = $('#id_telefone');
     telField.on('input', function(){
         let v = $(this).val().replace(/\D/g,''); 

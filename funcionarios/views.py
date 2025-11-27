@@ -15,9 +15,7 @@ def file_to_base64(file):
     return base64.b64encode(file.read()).decode('utf-8')
 
 
-# ---------------------------
-# LISTAGEM + ESTATÍSTICAS
-# ---------------------------
+
 @login_required
 def funcionarios_list(request):
     qs_base = Funcionario.objects.all()
@@ -117,7 +115,7 @@ def funcionario_create(request):
         form = FuncionarioForm(request.POST, request.FILES)
 
         if form.is_valid():
-            form.save()  # o form já converte foto para base64
+            form.save()
             messages.success(request, "Funcionário cadastrado com sucesso!")
             return redirect("funcionarios_list")
     else:

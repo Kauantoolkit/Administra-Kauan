@@ -114,7 +114,6 @@ input[type="file"] {
             {{ form.foto_upload }}
         </div>
 
-        <!-- Demais campos -->
         <div class="form-grid">
             {% for field in form %}
                 {% if field.name != "foto_upload" %}
@@ -134,7 +133,6 @@ input[type="file"] {
 <script>
 $(document).ready(function(){
 
-    // Preview da imagem
     const imgField = $('#id_foto');
     imgField.on('change', function(){
         const file = this.files[0];
@@ -145,7 +143,7 @@ $(document).ready(function(){
         }
     });
 
-    // Máscara CPF
+
     const cpfField = $('input[name="cpf"]');
     cpfField.attr('maxlength', 14);
     cpfField.on('input', function(){
