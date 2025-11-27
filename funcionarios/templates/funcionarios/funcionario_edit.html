@@ -18,12 +18,14 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
 .form-card { background: var(--white); padding: 28px; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); width: 100%; max-width: 750px; margin-top: 20px; }
 .form-card h1 { margin-bottom: 20px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; margin: 20px; }
 .form-label { font-size: 14px; font-weight: 500; color: var(--text-muted); }
 .form-input, .form-select, .form-file { width: 100%; height: 40px; padding: 8px 12px; font-size: 14px; border: 1px solid var(--border); border-radius: 8px; background: white; }
 .img-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right:10px; border: 1px solid var(--border); }
 .btn-salvar { margin-top: 24px; padding: 10px 20px; background: var(--blue); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
 .btn-salvar:hover { background: #1366d6; }
+#foto_upload { border: none; padding: 0; height: auto;
+margin: 30px; width: 60%; }
 @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
 </style>
 
