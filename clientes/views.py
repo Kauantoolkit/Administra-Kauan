@@ -5,7 +5,8 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from django.db.models import Avg
-from .models import Cliente
+
+from .models import Cliente, LogAcao
 from .forms import ClienteForm
 import csv
 from django.http import HttpResponse
@@ -115,7 +116,14 @@ def novo_cliente(request):
         form = ClienteForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            cliente = form.save()
+            registrar_log(
+                entidade='CLIENTE',
+                entidade_id=cliente.id,
+                acao='CRIACAO',
+                descricao=f"Cliente '{cliente.nome}' foi criado.",
+                usuario=request.user if request.user.is_authenticated else None
+            )
             return redirect('lista_clientes')
 
     else:
@@ -140,8 +148,15 @@ def editar_cliente(request, pk):
     if request.method == "POST":
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
-            form.save()
-            return redirect("lista_clientes")
+           cliente_editado = form.save()
+        registrar_log(
+                entidade='CLIENTE',
+                entidade_id=cliente_editado.id,
+                acao='ALTERACAO',
+                descricao=f"Cliente '{cliente_editado.nome}' foi alterado.",
+                usuario=request.user if request.user.is_authenticated else None
+        )
+        return redirect("lista_clientes")
     else:
         form = ClienteForm(instance=cliente)
 
@@ -152,7 +167,20 @@ def excluir_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
     if request.method == 'POST':
+
+        id_cliente = cliente.id
+        nome_cliente = cliente.nome
+        
         cliente.delete()
+
+        registrar_log(
+            entidade='CLIENTE',
+            entidade_id=id_cliente,
+            acao='EXCLUSAO',
+            descricao=f"Cliente '{nome_cliente}' foi excluído.",
+            usuario=request.user if request.user.is_authenticated else None
+        )
+
         return redirect("lista_clientes")
 
     return render(request, "clientes/excluir_cliente.html", {"cliente": cliente})
@@ -192,3 +220,18 @@ def exportar_clientes_csv(request):
         ])
 
     return response
+
+def historico_logs(request):
+    logs = LogAcao.objects.all().order_by('-datahora') 
+    return render(request, 'historico_sistema.html', {'logs': logs})
+
+def registrar_log(entidade, entidade_id, acao, descricao, usuario):
+    LogAcao.objects.create(
+        entidade=entidade,
+        entidade_id=entidade_id,
+        acao=acao,
+        descricao=descricao,
+        usuario=usuario
+    )
+
+

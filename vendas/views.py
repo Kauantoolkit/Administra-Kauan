@@ -6,6 +6,8 @@ from .models import Venda, ItemVenda
 from .forms import VendaForm, ItemVendaFormSet
 from contas.models import MovimentoEstoque
 from django.core.paginator import Paginator
+from clientes.views import registrar_log
+
 
 @login_required
 def lista_vendas(request):
@@ -56,6 +58,14 @@ def criar_venda(request):
                 cliente.ultima_compra = venda.data_venda.date()
                 cliente.valor_total_comprado += total_venda 
                 cliente.save()
+
+                registrar_log(
+                    entidade='VENDA',
+                    entidade_id=venda.id,
+                    acao='CRIACAO',
+                    descricao=f"Venda #{venda.id} criada para o cliente {cliente.nome} no valor de R$ {total_venda:.2f}",
+                    usuario=request.user
+                )
                 
                 return redirect('lista_vendas')
     else:
@@ -88,6 +98,14 @@ def editar_venda(request, pk):
                 
                 venda.total = sum([i.subtotal() for i in venda.itens.all()])
                 venda.save()
+
+                registrar_log(
+                    entidade='VENDA',
+                    entidade_id=venda.id,
+                    acao='ALTERACAO',
+                    descricao=f"Venda #{venda.id} alterada. Novo total: R$ {venda.total:.2f}",
+                    usuario=request.user
+                )
                 
                 return redirect('lista_vendas')
     else:
@@ -112,7 +130,20 @@ def excluir_venda(request, pk):
                     observacao=f"Estorno de Venda Excluída #{venda.id}",
                     usuario=request.user
                 )
+
+            venda_id = venda.id
+            cliente_nome = venda.cliente.nome
+            valor_total = venda.total
+            
             venda.delete()
+
+            registrar_log(
+                entidade='VENDA',
+                entidade_id=venda_id,
+                acao='EXCLUSAO',
+                descricao=f"Venda #{venda_id} excluída. Cliente: {cliente_nome}. Total: R$ {valor_total:.2f}",
+                usuario=request.user
+            )
         return redirect('lista_vendas')
     
     return render(request, 'vendas/confirmar_exclusao.html', {'object': venda})

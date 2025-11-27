@@ -23,7 +23,6 @@
       
       <p class="{% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
         {% if perc_vendas > 0 %}+{% endif %}{{ perc_vendas|floatformat:1 }}%
-        <small style="color: #999; font-weight: normal;">vs ontem</small>
       </p>
     </div>
     <div class="stat-card-icon {% if perc_vendas >= 0 %}positive{% else %}negative{% endif %}">
@@ -38,7 +37,6 @@
       
       <p class="{% if perc_produtos >= 0 %}positive{% else %}negative{% endif %}">
         {% if perc_produtos > 0 %}+{% endif %}{{ perc_produtos|floatformat:1 }}%
-        <small style="color: #999; font-weight: normal;">vs ontem</small>
       </p>
     </div>
     <div class="stat-card-icon">
@@ -53,7 +51,6 @@
       
       <p class="{% if perc_clientes >= 0 %}positive{% else %}negative{% endif %}">
         {% if perc_clientes > 0 %}+{% endif %}{{ perc_clientes|floatformat:1 }}%
-        <small style="color: #999; font-weight: normal;">novos vs ontem</small>
       </p>
     </div>
     <div class="stat-card-icon">
@@ -116,14 +113,11 @@
           <a href="{% url 'criar_venda' %}" class="btn-action primary">
             <span class="material-icons-outlined">add_shopping_cart</span> Nova Venda
           </a>
-          <a href="#" class="btn-action">
+          <a href="{% url 'novo_cliente' %}" class="btn-action">
             <span class="material-icons-outlined">person_add</span> Novo Cliente
           </a>
           <a href="{% url 'novo_produto' %}" class="btn-action">
             <span class="material-icons-outlined">add_box</span> Novo Produto
-          </a>
-          <a href="#" class="btn-action">
-            <span class="material-icons-outlined">assessment</span> Gerar Relatório
           </a>
         </div>
       </div>
@@ -153,14 +147,6 @@
             </div>
           </li>
           {% endif %}
-
-          <li class="alert alert-warning">
-            <span class="material-icons-outlined">backup</span>
-            <div>
-              <strong>Backup Pendente</strong>
-              <p style="margin:0; font-size: 0.9rem;">Último backup há 2 dias.</p>
-            </div>
-          </li>
         </ul>
       </div>
     </div>
