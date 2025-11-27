@@ -55,7 +55,7 @@ def lista_clientes(request):
 
     media_banco = clientes_qs.filter(valor_total_comprado__gt=0).aggregate(media=Avg('valor_total_comprado'))['media']
   
-    ticket_medio = float(media_banco) if media_banco else 0.00
+    ticket_medio = round(float(media_banco), 2) if media_banco else 0.00
 
     ticket_mes_passado = 0
 
