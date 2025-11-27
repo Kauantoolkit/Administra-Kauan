@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Administra</title>
     
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -82,7 +81,6 @@
             font-size: 0.9rem;
         }
 
-        /* Esconder labels padrão do Django */
         form label {
             display: none;
         }
@@ -153,7 +151,6 @@
             color: #cbd5e0;
         }
 
-        /* Mensagens de erro e sucesso */
         .messages {
             list-style: none;
             margin-bottom: 1.5rem;
@@ -223,7 +220,6 @@
             color: #4299e1;
         }
 
-        /* Estilo para mensagens de erro do formulário */
         .errorlist {
             list-style: none;
             background-color: #fff5f5;
@@ -297,7 +293,6 @@
             font-size: 0.75rem;
         }
 
-        /* Responsividade */
         @media (max-width: 480px) {
             .container {
                 padding: 2rem 1.5rem;
@@ -377,7 +372,6 @@
         <form method="POST" id="loginForm">
             {% csrf_token %}
 
-            <!-- Email -->
             <div class="form-group">
                 <label class="form-group-label" for="id_username">Email</label>
                 {{ form.username.errors }}
@@ -393,7 +387,6 @@
                 </div>
             </div>
 
-            <!-- Senha -->
             <div class="form-group">
                 <label class="form-group-label" for="id_password">Senha</label>
                 {{ form.password.errors }}
@@ -425,7 +418,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle para mostrar/esconder senha
             const toggleButton = document.querySelector('.toggle-password');
             if (toggleButton) {
                 toggleButton.addEventListener('click', function() {

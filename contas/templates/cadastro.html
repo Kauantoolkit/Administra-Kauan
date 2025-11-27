@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Administra</title>
     
-    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -82,12 +81,10 @@
             font-size: 0.9rem;
         }
 
-        /* Esconder labels padrão do Django */
         form label {
             display: none;
         }
 
-        /* Esconder help_text padrão */
         .helptext {
             display: none;
         }
@@ -158,7 +155,6 @@
             color: #cbd5e0;
         }
 
-        /* Estilo para mensagens de erro */
         .errorlist {
             list-style: none;
             background-color: #fff5f5;
@@ -179,7 +175,6 @@
             overflow-wrap: break-word;
         }
 
-        /* Dicas de senha */
         .password-hints {
             background-color: #edf2f7;
             border-radius: 8px;
@@ -262,7 +257,6 @@
             font-size: 0.75rem;
         }
 
-        /* Responsividade */
         @media (max-width: 480px) {
             .container {
                 padding: 2rem 1.5rem;
@@ -344,7 +338,6 @@
         <form method="POST" id="cadastroForm">
             {% csrf_token %}
 
-            <!-- Email -->
             <div class="form-group">
                 <label class="form-group-label" for="id_email">Email</label>
                 {{ form.email.errors }}
@@ -359,7 +352,6 @@
                 </div>
             </div>
 
-            <!-- Nome Completo -->
             <div class="form-group">
                 <label class="form-group-label" for="id_nome">Nome completo</label>
                 {{ form.nome.errors }}
@@ -374,7 +366,6 @@
                 </div>
             </div>
 
-            <!-- CPF -->
             <div class="form-group">
                 <label class="form-group-label" for="id_cpf">CPF</label>
                 {{ form.cpf.errors }}
@@ -389,7 +380,6 @@
                 </div>
             </div>
 
-            <!-- Senha -->
             <div class="form-group">
                 <label class="form-group-label" for="id_password1">Senha</label>
                 {{ form.password1.errors }}
@@ -403,7 +393,6 @@
                     <i class="fas fa-eye toggle-password" data-target="id_password1"></i>
                 </div>
                 
-                <!-- Dicas de senha -->
                 <div class="password-hints">
                     <ul>
                         <li>Sua senha não pode ser muito parecida com o resto das suas informações pessoais.</li>
@@ -414,7 +403,6 @@
                 </div>
             </div>
 
-            <!-- Confirmação de Senha -->
             <div class="form-group">
                 <label class="form-group-label" for="id_password2">Confirmação de senha</label>
                 {{ form.password2.errors }}
@@ -446,7 +434,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Máscara de CPF
             const campoCpf = document.getElementById('id_cpf');
             if (campoCpf) {
                 campoCpf.addEventListener('input', function(e) {
@@ -460,7 +447,6 @@
                 });
             }
 
-            // Toggle para mostrar/esconder senha
             const toggleButtons = document.querySelectorAll('.toggle-password');
             toggleButtons.forEach(button => {
                 button.addEventListener('click', function() {
