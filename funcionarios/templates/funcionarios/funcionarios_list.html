@@ -10,12 +10,10 @@
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr)); /* 220px ≈ 13.75rem */
+    grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr));
     gap: 1rem; 
     margin-bottom: 1.5rem;
 }
-
-
 
 .stat-card:nth-child(1) .stat-card-icon { background:rgba(60, 179, 113, 0.1); }
 .stat-card:nth-child(1) .stat-card-icon span { color:#3CB371; }
@@ -26,116 +24,150 @@
 .stat-card:nth-child(4) .stat-card-icon { background:rgba(240, 242, 245, 1); }
 .stat-card:nth-child(4) .stat-card-icon span { color:#6B7280; }
 
-
-
-
 .card { background:white; padding:0; border-radius:12px; border:1px solid #E5E7EB; overflow:hidden; margin-bottom:24px; }
 .card-header { padding:16px 20px; border-bottom:1px solid #E5E7EB; display:flex; justify-content:space-between; align-items:center; }
 .card-header h4 { margin:0; font-size:18px; font-weight:600; }
-
 
 table th { font-size:13px; text-align:left; color:#6B7280; padding:12px 20px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
 table td { padding:12px 20px; font-size:14px; vertical-align:middle; }
 table tr:not(:last-child) { border-bottom:1px solid #F4F4F4; }
 table img { border-radius:50%; object-fit:cover; }
 
-
 .status-badge { padding:4px 10px; border-radius:12px; font-size:12px; font-weight:500; display:inline-block; text-transform:capitalize; }
 .status-badge.ativo { background:#D1FAE5; color:#065F46; }
 .status-badge.ferias { background:#FFFBEB; color:#B45309; }
 .status-badge.cargo { background:#e9e7ff; color:#6b4ce6; }
 
-
 .pagination-controls { display:flex; justify-content:flex-end; margin-top:1rem; padding:16px 20px; gap:0.5rem; border-top:1px solid #E5E7EB; }
-.pagination-controls .btn-action { padding:8px 16px; background:#E5E7EB; color:#4B5563; font-weight:500; text-decoration:none; }
+.pagination-controls .btn-action { padding:8px 16px; background:#E5E7EB; color:#4B5563; font-weight:500; text-decoration:none; border-radius: 6px; }
 .pagination-controls .btn-action.current { background:#3B82F6; color:white; pointer-events:none; }
-
 
 .actions a { text-decoration:none; margin-right:8px; display:inline-flex; align-items:center; }
 .icon-view { color:#3B82F6; }
 .icon-edit { color:#10B981; }
 .icon-delete { color:#EF4444; }
+
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-input {
+    padding: 10px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.btn-search {
+    padding: 10px 20px;
+    background-color: #3B82F6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+.btn-search:hover { background-color: #2563EB; }
+
 </style>
 
 
 <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <h1>Funcionários</h1>
-    <a href="{% url 'funcionario_create' %}" class="btn-action primary">
+    <a href="{% url 'funcionario_create' %}" class="btn-action primary" style="background:#3B82F6; color:white; padding:10px 16px; border-radius:8px; text-decoration:none; display:flex; align-items:center; gap:5px;">
         <span class="material-icons-outlined">add</span>
         Novo Funcionário
     </a>
 </div>
 
-
 <div class="stats-grid">
-    <div class="stat-card">
+    <div class="stat-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #E5E7EB; display:flex; justify-content:space-between;">
         <div class="stat-card-info">
-            <h5>Total de Funcionários</h5>
-            <h2>{{ total_funcionarios }}</h2>
-            <p class="positive">+{{ aumento_mes }}% em relação ao mês anterior</p>
+            <h5 style="color:#6B7280; font-size:14px; margin:0;">Total de Funcionários</h5>
+            <h2 style="font-size:24px; font-weight:700; margin:5px 0;">{{ total_funcionarios }}</h2>
+            <p class="positive" style="font-size:13px; margin:0;">+{{ aumento_mes }}% em relação ao mês anterior</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined">groups</span></div>
+        <div class="stat-card-icon" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <span class="material-icons-outlined">groups</span>
+        </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #E5E7EB; display:flex; justify-content:space-between;">
         <div class="stat-card-info">
-            <h5>Ativos Hoje</h5>
-            <h2>{{ ativos_hoje }}</h2>
-            <p style="color:#6B7280;">Ontem: {{ ativos_ontem }}</p>
+            <h5 style="color:#6B7280; font-size:14px; margin:0;">Ativos Hoje</h5>
+            <h2 style="font-size:24px; font-weight:700; margin:5px 0;">{{ ativos_hoje }}</h2>
+            <p style="color:#6B7280; font-size:13px; margin:0;">Ontem: {{ ativos_ontem }}</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined">check_circle</span></div>
+        <div class="stat-card-icon" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <span class="material-icons-outlined">check_circle</span>
+        </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #E5E7EB; display:flex; justify-content:space-between;">
         <div class="stat-card-info">
-            <h5>Em Férias</h5>
-            <h2>{{ ferias }}</h2>
-            <p class="warning">Mês passado: {{ ferias_mes_passado }}</p>
+            <h5 style="color:#6B7280; font-size:14px; margin:0;">Em Férias</h5>
+            <h2 style="font-size:24px; font-weight:700; margin:5px 0;">{{ ferias }}</h2>
+            <p class="warning" style="font-size:13px; margin:0;">Mês passado: {{ ferias_mes_passado }}</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined">beach_access</span></div>
+        <div class="stat-card-icon" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <span class="material-icons-outlined">beach_access</span>
+        </div>
     </div>
 
-    <div class="stat-card">
+    <div class="stat-card" style="background:white; padding:20px; border-radius:12px; border:1px solid #E5E7EB; display:flex; justify-content:space-between;">
         <div class="stat-card-info">
-            <h5>Salário Médio</h5>
-            <h2>R$ {{ salario_medio }}</h2>
+            <h5 style="color:#6B7280; font-size:14px; margin:0;">Salário Médio</h5>
+            <h2 style="font-size:24px; font-weight:700; margin:5px 0;">R$ {{ salario_medio }}</h2>
             {% if aumento_salarial >= 0 %}
-                <p class="positive">+{{ aumento_salarial }}% em relação ao mês passado</p>
+                <p class="positive" style="font-size:13px; margin:0;">+{{ aumento_salarial }}% em relação ao mês passado</p>
             {% else %}
-                <p style="color:#EF4444;">{{ aumento_salarial }}% em relação ao mês passado</p>
+                <p style="color:#EF4444; font-size:13px; margin:0;">{{ aumento_salarial }}% em relação ao mês passado</p>
             {% endif %}
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined">payments</span></div>
+        <div class="stat-card-icon" style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <span class="material-icons-outlined">payments</span>
+        </div>
     </div>
 </div>
 
-
 <form method="get" class="search-form">
-    <input type="text" name="nome" placeholder="Nome do funcionário..." class="form-input form-input-text" value="{{ request.GET.nome }}">
-    <input type="text" name="cpf" placeholder="CPF..." class="form-input" value="{{ request.GET.cpf }}">
-    <select name="cargo" class="form-input">
+    <input type="text" name="nome" placeholder="Nome do funcionário..." class="form-input" style="flex: 2;" value="{{ request.GET.nome }}">
+    
+    <input type="text" name="cpf" id="id_cpf_search" placeholder="CPF (000.000.000-00)" class="form-input" style="flex: 1;" value="{{ request.GET.cpf }}" maxlength="14">
+    
+    <select name="cargo" class="form-input" style="flex: 1;">
         <option value="">Todos os cargos</option>
         {% for cargo in cargos %}
             <option value="{{ cargo }}" {% if request.GET.cargo == cargo %}selected{% endif %}>{{ cargo }}</option>
         {% endfor %}
     </select>
-    <select name="status" class="form-input">
+    
+    <select name="status" class="form-input" style="flex: 1;">
         <option value="">Todos os status</option>
         <option value="ativo" {% if request.GET.status == "ativo" %}selected{% endif %}>Ativo</option>
         <option value="ferias" {% if request.GET.status == "ferias" %}selected{% endif %}>Férias</option>
         <option value="inativo" {% if request.GET.status == "inativo" %}selected{% endif %}>Inativo</option>
     </select>
-    <button type="submit" class="btn-action primary"><span class="material-icons-outlined">search</span>Buscar</button>
+    
+    <button type="submit" class="btn-search"><span class="material-icons-outlined">search</span>Buscar</button>
 </form>
 
 
 <div class="card">
     <div class="card-header">
         <h4>Lista de Funcionários</h4>
-        <div style="display:flex; gap:1rem;">
-            <a href="#" class="btn-action">Exportar</a>
-            <a href="#" class="btn-action">Ponto</a>
-        </div>
     </div>
     <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
@@ -168,7 +200,7 @@ table img { border-radius:50%; object-fit:cover; }
                             </div>
                         </div>
                     </td>
-                    <td>{{ f.cpf }}</td>
+                    <td style="white-space:nowrap;">{{ f.cpf }}</td>
                     <td><span class="status-badge cargo">{{ f.cargo }}</span></td>
                     <td>{{ f.email }}</td>
                     <td>{{ f.telefone }}</td>
@@ -189,6 +221,12 @@ table img { border-radius:50%; object-fit:cover; }
                         <a href="{% url 'funcionario_delete' f.pk %}"><span class="material-icons-outlined icon-delete">delete</span></a>
                     </td>
                 </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align:center; padding:2rem; color:#6B7280;">
+                        Nenhum funcionário encontrado com esses filtros.
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -200,7 +238,7 @@ table img { border-radius:50%; object-fit:cover; }
             Mostrando 1 a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} funcionários
         </p>
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="btn-action">Anterior</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}" class="btn-action">Anterior</a>
         {% else %}
             <span class="btn-action" style="opacity:0.5; pointer-events:none;">Anterior</span>
         {% endif %}
@@ -208,11 +246,33 @@ table img { border-radius:50%; object-fit:cover; }
         <a href="#" class="btn-action current">{{ page_obj.number }}</a>
 
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="btn-action">Próximo</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}" class="btn-action">Próximo</a>
         {% else %}
             <span class="btn-action" style="opacity:0.5; pointer-events:none;">Próximo</span>
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cpfInput = document.getElementById('id_cpf_search');
+
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 11) value = value.slice(0, 11);
+
+            if (value.length > 9) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d+).*$/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/^(\d{3})(\d{3})(\d+).*$/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/^(\d{3})(\d+).*$/, '$1.$2');
+            }
+            
+            e.target.value = value;
+        });
+    });
+</script>
 
 {% endblock %}
