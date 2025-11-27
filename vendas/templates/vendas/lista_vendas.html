@@ -4,93 +4,181 @@
 
 {% block content %}
 <style>
-.badge-status {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
+    .card .card-body {
+        padding: 0;
+        overflow-x: auto;
+    }
 
-.badge-fechada {
-    background-color: #d1e7dd;
-    color: #0f5132;
-}
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        text-align: left;
+    }
 
-.badge-cancelada {
-    background-color: #f8d7da;
-    color: #842029;
-}
+    .table thead th {
+        background-color: #f8f9fa; 
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.8rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
 
-.badge-orcamento {
-    background-color: #fff3cd;
-    color: #664d03;
-}
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .table td {
+        padding: 0.8rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f4f4f4;
+        color: #333;
+        font-size: 0.9rem;
+    }
+    
+    .table td strong {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .badge-status {
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+
+    .badge-FECHADA { background-color: #e9f7ef; color: #198754; border: 1px solid #d4edda; }
+    .badge-CANCELADA { background-color: #fef4f5; color: #dc3545; border: 1px solid #f8d7da; }
+    .badge-ORCAMENTO { background-color: #f9f9e7; color: #ffc107; border: 1px solid #fff3cd; }
+    .badge-EM_ANDAMENTO { background-color: #e7f0ff; color: #0d6efd; border: 1px solid #cfe2ff; }
+    
+    
+    .actions-cell {
+        white-space: nowrap;
+        width: 100px;
+    }
+    
+    .actions-cell a {
+        margin-right: 0.5rem;
+        color: #6c757d;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .actions-cell a:hover { color: #0d6efd; }
+    .actions-cell .material-icons-outlined { font-size: 1.1rem; }
+
+    .pagination-container {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .page-link {
+        text-decoration: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        color: #0d6efd;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .page-link:hover:not(.disabled) {
+        background-color: #e9ecef;
+        border-color: #0d6efd;
+    }
+
+    .page-link.disabled {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #f8f9fa;
+        border-color: #e9ecef;
+    }
+
+    .current-page {
+        padding: 0.4rem 0.8rem;
+        color: #495057;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
 </style>
 
 <div class="header">
-  <div>
-      <h1>Vendas</h1>
-      <p style="color: #6c757d; margin: 0;">Gerencie suas transações comerciais</p>
-  </div>
-  
-  <a href="{% url 'criar_venda' %}" class="btn-action primary" style="width: auto; display: inline-flex;">
-      <span class="material-icons-outlined">add</span> Nova Venda
-  </a>
+    <div>
+        <h1>Vendas</h1>
+        <p style="color: #6c757d; margin: 0;">Gerencie suas transações comerciais</p>
+    </div>
+    <a href="{% url 'criar_venda' %}" class="btn-action primary">
+        <span class="material-icons-outlined">add</span> Nova Venda
+    </a>
 </div>
 
 <div class="card">
-    <div class="card-body" style="padding: 0;">
-        
-        <table class="table" style="width: 100%; border-collapse: collapse;">
+    <div class="card-body">
+        <table class="table">
             <thead>
-                <tr style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;">
-                    <th style="padding: 1rem; text-align: left;">ID</th>
-                    <th style="padding: 1rem; text-align: left;">Cliente</th>
-                    <th style="padding: 1rem; text-align: left;">Data</th>
-                    <th style="padding: 1rem; text-align: left;">Status</th>
-                    <th style="padding: 1rem; text-align: left;">Total</th>
-                    <th style="padding: 1rem; text-align: left;">Ações</th>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th class="actions-cell">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for venda in vendas %}
-                <tr style="border-bottom: 1px solid #e9ecef;">
-                    <td style="padding: 1rem;">#{{ venda.id }}</td>
-                    <td style="padding: 1rem;">
-                        <strong>{{ venda.cliente.nome }}</strong>
-                    </td>
-                    <td style="padding: 1rem;">{{ venda.data_venda|date:"d/m/Y H:i" }}</td>
-                    <td style="padding: 1rem;">
-                        <span class="badge-status badge-{{ venda.status }}">
+                <tr>
+                    <td>#{{ venda.id }}</td>
+                    <td><strong>{{ venda.cliente.nome }}</strong></td>
+                    <td>{{ venda.data_venda|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% with status_class=venda.status|upper %}
+                        <span class="badge-status badge-{{ status_class }}">
                             {{ venda.get_status_display }}
                         </span>
+                        {% endwith %}
                     </td>
-                    <td style="padding: 1rem; font-weight: bold;">R$ {{ venda.total|floatformat:2 }}</td>
-                    
-                    <td style="padding: 1rem; display: flex; gap: 10px;">
-                        <a href="{% url 'editar_venda' venda.id %}" style="color: #7F56D9; text-decoration: none;" title="Editar Venda">
+                    <td><strong>R$ {{ venda.total|floatformat:2 }}</strong></td>
+                    <td class="actions-cell">
+                        <a href="{% url 'editar_venda' venda.id %}" title="Editar">
                             <span class="material-icons-outlined">edit</span>
                         </a>
-                        
-                        <a href="{% url 'excluir_venda' venda.id %}" style="color: #F04438; text-decoration: none;" title="Excluir Venda">
+                        <a href="{% url 'excluir_venda' venda.id %}" title="Excluir">
                             <span class="material-icons-outlined">delete</span>
                         </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem; color: #6c757d;">
-                        <span class="material-icons-outlined" style="font-size: 3rem; display: block; margin-bottom: 0.5rem;">shopping_bag</span>
-                        Nenhuma venda registrada ainda.
+                    <td colspan="6" style="text-align:center; padding:3rem; color:#6c757d; background-color: #fff;">
+                        <span class="material-icons-outlined" style="font-size:3.5rem; display:block; margin-bottom:0.75rem;">shopping_bag</span>
+                        Ainda não há **vendas registradas**. Clique em "Nova Venda" para começar.
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
         {% if vendas.has_other_pages %}
         <div class="pagination-container">
             <div class="pagination">
-                
                 {% if vendas.has_previous %}
                     <a href="?page={{ vendas.previous_page_number }}" class="page-link">&laquo; Anterior</a>
                 {% else %}
@@ -98,69 +186,18 @@
                 {% endif %}
 
                 <span class="current-page">
-                    Página {{ vendas.number }} de {{ vendas.paginator.num_pages }}
+                    Página **{{ vendas.number }}** de **{{ vendas.paginator.num_pages }}**
                 </span>
 
-                
                 {% if vendas.has_next %}
                     <a href="?page={{ vendas.next_page_number }}" class="page-link">Próxima &raquo;</a>
                 {% else %}
                     <span class="page-link disabled">Próxima &raquo;</span>
                 {% endif %}
-                
             </div>
         </div>
         {% endif %}
     </div>
-</div> 
-<style>
-    .pagination-container {
-        padding: 1.5rem;
-        border-top: 1px solid #e9ecef;
-        display: flex;
-        justify-content: center;
-    }
-    
-    .pagination {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: #f8f9fa;
-        padding: 5px 10px;
-        border-radius: 8px;
-    }
-
-    .page-link {
-        padding: 8px 16px;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        color: #0d6efd;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    .page-link:hover:not(.disabled) {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-    }
-
-    .page-link.disabled {
-        color: #6c757d;
-        pointer-events: none;
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-    }
-
-    .current-page {
-        font-size: 0.9rem;
-        color: #495057;
-        font-weight: 600;
-        margin: 0 10px;
-    }
-</style>
+</div>
 
 {% endblock %}
