@@ -23,7 +23,7 @@
     --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
 }
 
-body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--text); }
+
 
 .page-header-content { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; }
 .page-header-content h1 { font-size: 26px; font-weight: 600; }
@@ -203,15 +203,42 @@ body { background: var(--bg); font-family: "Inter", sans-serif; color: var(--tex
     </div>
 
     <div class="search-filter-area">
-        <form method="get" class="search-form">
-            <input type="text" name="nome" class="input-text" placeholder="Nome..." value="{{ request.GET.nome }}">
-            <input type="text" name="cpf" class="input-text" placeholder="CPF..." value="{{ request.GET.cpf }}">
-            <input type="text" name="email" class="input-text" placeholder="Email..." value="{{ request.GET.email }}">
-            <button type="submit" class="btn-buscar">
-                <span class="material-icons-outlined">search</span> Buscar
-            </button>
-        </form>
-    </div>
+    <form method="GET" action="" style="display: flex; align-items: center; gap: 12px; width: 100%;">
+        
+        <input 
+            type="text" 
+            name="nome" 
+            class="input-text" 
+            placeholder="Nome..." 
+            value="{{ request.GET.nome }}"
+        >
+        
+        <input 
+            type="text" 
+            name="cpf" 
+            class="input-text" 
+            placeholder="CPF..." 
+            value="{{ request.GET.cpf }}"
+        >
+        
+        <input 
+            type="text" 
+            name="email" 
+            class="input-text" 
+            placeholder="Email..." 
+            value="{{ request.GET.email }}"
+        >
+        
+        <button type="submit" class="btn-buscar">
+            <span class="material-icons-outlined">search</span> Buscar
+        </button>
+
+        <a href="{% url 'lista_clientes' %}" style="margin-left: 5px; text-decoration: none; color: #666; font-size: 14px;">
+            Limpar
+        </a>
+        
+    </form>
+</div>
 
     <div class="table-responsive">
         <table class="data-table">
