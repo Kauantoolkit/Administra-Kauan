@@ -2,107 +2,469 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Administra</title>
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body {
-            font-family: sans-serif; 
-            display: grid; 
-            place-items: center; 
-            min-height: 100vh; 
-            background-color: #f4f7fa;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #5b6fdb;
+            padding: 20px;
         }
         
         .container {
-            background: #fff; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            padding: 2rem; 
-            width: 360px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.4s ease-out;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
-        .container h2 {
-            text-align: center; 
-            margin-top: 0;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .container p {
-            color: #555;
-        }
-        
-        form p { 
-            display: flex; 
-            flex-direction: column; 
-            margin-bottom: 1rem; 
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        form label { 
-            margin-bottom: 5px; 
-            font-weight: 600; 
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: #5b6fdb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 12px rgba(91, 111, 219, 0.3);
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 28px;
+        }
+
+        .header h2 {
+            font-size: 1.75rem;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #718096;
             font-size: 0.9rem;
         }
 
-        form input { 
-            padding: 10px 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px;
+        form label {
+            display: none;
+        }
+
+        .helptext {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            width: 100%;
+            overflow: visible;
+        }
+
+        .form-group-label {
+            display: block;
+            color: #4a5568;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: #a0aec0;
             font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: #5b6fdb;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            color: #2d3748;
+            background-color: #f7fafc;
+        }
+
+        form input:focus {
+            outline: none;
+            border-color: #5b6fdb;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(91, 111, 219, 0.1);
+        }
+
+        form input::placeholder {
+            color: #cbd5e0;
         }
 
         .errorlist {
-            color: #a94442;
-            background-color: #f2dede;
-            border: 1px solid #ebccd1;
-            padding: 10px;
-            border-radius: 4px;
-            list-style-type: none;
-            margin: 0 0 1rem 0;
-            padding-left: 10px; 
+            list-style: none;
+            background-color: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .errorlist li {
+            color: #c53030;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .password-hints {
+            background-color: #edf2f7;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .password-hints ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .password-hints li {
+            color: #4a5568;
+            padding: 4px 0;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.4;
+        }
+
+        .password-hints li:before {
+            content: "•";
+            color: #5b6fdb;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .btn-cadastrar {
+            width: 100%;
+            padding: 14px;
+            background: #5b6fdb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(91, 111, 219, 0.3);
+        }
+
+        .btn-cadastrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 111, 219, 0.4);
+            background: #4a5ec8;
+        }
+
+        .btn-cadastrar:active {
+            transform: translateY(0);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .footer-text a {
+            color: #5b6fdb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer-text a:hover {
+            color: #4a5ec8;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+                max-width: 95%;
+            }
+
+            .header h2 {
+                font-size: 1.5rem;
+            }
+
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logo-icon i {
+                font-size: 24px;
+            }
+
+            form input[type="text"],
+            form input[type="email"],
+            form input[type="password"] {
+                padding: 10px 12px 10px 38px;
+                font-size: 0.9rem;
+            }
+
+            .input-icon {
+                left: 12px;
+                font-size: 0.9rem;
+            }
+
+            .toggle-password {
+                right: 12px;
+                font-size: 0.9rem;
+            }
+
+            .password-hints {
+                padding: 12px;
+                font-size: 0.75rem;
+            }
+
+            .btn-cadastrar {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h2 {
+                font-size: 1.35rem;
+            }
+
+            .password-hints li {
+                font-size: 0.7rem;
+                padding: 3px 0;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div class="header">
+            <div class="logo-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <h2>Administra</h2>
+            <p>Sistema de Gestão Comercial</p>
+        </div>
 
-        <h2 style="text-align: center; margin-top: 0;">Administra</h2>
-        <p style="text-align: center; margin-top: -10px; color: #555;">Sistema de Gestão Comercial</p>
-
-        <form method="POST">
+        <form method="POST" id="cadastroForm">
             {% csrf_token %}
 
-            {{ form.as_p }}
+            <div class="form-group">
+                <label class="form-group-label" for="id_email">Email</label>
+                {{ form.email.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" 
+                           name="email" 
+                           id="id_email" 
+                           placeholder="seu@email.com" 
+                           value="{{ form.email.value|default:'' }}"
+                           required>
+                </div>
+            </div>
 
-            <button type="submit" style="width: 100%; padding: 10px; background-color: #0d6efd; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                Cadastrar
+            <div class="form-group">
+                <label class="form-group-label" for="id_nome">Nome completo</label>
+                {{ form.nome.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" 
+                           name="nome" 
+                           id="id_nome" 
+                           placeholder="João Silva" 
+                           value="{{ form.nome.value|default:'' }}"
+                           required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-group-label" for="id_cpf">CPF</label>
+                {{ form.cpf.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card input-icon"></i>
+                    <input type="text" 
+                           name="cpf" 
+                           id="id_cpf" 
+                           placeholder="000.000.000-00" 
+                           value="{{ form.cpf.value|default:'' }}"
+                           maxlength="14">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-group-label" for="id_password1">Senha</label>
+                {{ form.password1.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" 
+                           name="password1" 
+                           id="id_password1" 
+                           placeholder="••••••••" 
+                           required>
+                    <i class="fas fa-eye toggle-password" data-target="id_password1"></i>
+                </div>
+                
+                <div class="password-hints">
+                    <ul>
+                        <li>Sua senha não pode ser muito parecida com o resto das suas informações pessoais.</li>
+                        <li>Sua senha precisa conter pelo menos 8 caracteres.</li>
+                        <li>Sua senha não pode ser uma senha comumente utilizada.</li>
+                        <li>Sua senha não pode ser inteiramente numérica.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-group-label" for="id_password2">Confirmação de senha</label>
+                {{ form.password2.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" 
+                           name="password2" 
+                           id="id_password2" 
+                           placeholder="••••••••" 
+                           required>
+                    <i class="fas fa-eye toggle-password" data-target="id_password2"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-cadastrar">
+                <i class="fas fa-user-plus"></i> Cadastrar
             </button>
         </form>
 
-        <p style="text-align: center; margin-top: 1rem;">
+        <p class="footer-text">
             Já tem conta? <a href="{% url 'login' %}">Entre aqui</a>
         </p>
+
+        <div class="copyright">
+            © 2025 Administra - Sistema de Gestão<br>
+            Versão 1.0.0
+        </div>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const campoCpf = document.getElementById('id_cpf');
 
-        if (campoCpf) {
-            campoCpf.addEventListener('input', function(e) {
-                let valor = e.target.value;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const campoCpf = document.getElementById('id_cpf');
+            if (campoCpf) {
+                campoCpf.addEventListener('input', function(e) {
+                    let valor = e.target.value;
+                    valor = valor.replace(/\D/g, "");
+                    valor = valor.substring(0, 11);
+                    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+                    valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                    e.target.value = valor;
+                });
+            }
 
-                valor = valor.replace(/\D/g, "");
-
-                valor = valor.substring(0, 11);
-
-                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-                valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
-                valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-
-                e.target.value = valor;
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
             });
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>

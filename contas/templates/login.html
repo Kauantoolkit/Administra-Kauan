@@ -1,112 +1,441 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Administra</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-      body {
-        font-family: sans-serif;
-        display: grid;
-        place-items: center;
-        min-height: 100vh;
-        background-color: #f4f7fa;
-        margin: 0;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      .container {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        padding: 2rem;
-        width: 360px;
-      }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #5b6fdb;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.4s ease-out;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
 
-      .container h2 {
-        text-align: center;
-        margin-top: 0;
-      }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-      .container p {
-        color: #555;
-      }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-      form p {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 1rem;
-      }
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: #5b6fdb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 12px rgba(91, 111, 219, 0.3);
+        }
 
-      form label {
-        margin-bottom: 5px;
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
+        .logo-icon i {
+            color: white;
+            font-size: 28px;
+        }
 
-      form input {
-        padding: 10px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 1rem;
-      }
+        .header h2 {
+            font-size: 1.75rem;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
 
-      .btn {
-        width: 100%;
-        padding: 10px;
-        background-color: #0d6efd;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-      }
+        .header p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
 
-      .messages {
-        list-style-type: none;
-        padding: 0;
-        margin: 0 0 1rem 0;
-      }
+        form label {
+            display: none;
+        }
 
-      .messages li.error {
-        color: #a94442;
-        background-color: #f2dede;
-        border: 1px solid #ebccd1;
-        padding: 10px;
-        border-radius: 4px;
-      }
-      
-      .messages li.success {
-        color: #3c763d;
-        background-color: #dff0d8;
-        border: 1px solid #d6e9c6;
-        padding: 10px;
-        border-radius: 4px;
-      }
+        .form-group {
+            margin-bottom: 1.25rem;
+            width: 100%;
+            overflow: visible;
+        }
+
+        .form-group-label {
+            display: block;
+            color: #4a5568;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: #a0aec0;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        .toggle-password:hover {
+            color: #5b6fdb;
+        }
+
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"] {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            color: #2d3748;
+            background-color: #f7fafc;
+        }
+
+        form input:focus {
+            outline: none;
+            border-color: #5b6fdb;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(91, 111, 219, 0.1);
+        }
+
+        form input::placeholder {
+            color: #cbd5e0;
+        }
+
+        .messages {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        .messages li {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .messages li.error {
+            background-color: #fff5f5;
+            border-left: 4px solid #f56565;
+            color: #c53030;
+        }
+
+        .messages li.error:before {
+            content: "\f06a";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: #f56565;
+        }
+
+        .messages li.success {
+            background-color: #f0fff4;
+            border-left: 4px solid #48bb78;
+            color: #2f855a;
+        }
+
+        .messages li.success:before {
+            content: "\f058";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: #48bb78;
+        }
+
+        .messages li.info {
+            background-color: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            color: #2c5282;
+        }
+
+        .messages li.info:before {
+            content: "\f05a";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: #4299e1;
+        }
+
+        .errorlist {
+            list-style: none;
+            background-color: #fff5f5;
+            border-left: 4px solid #f56565;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .errorlist li {
+            color: #c53030;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .btn-entrar {
+            width: 100%;
+            padding: 14px;
+            background: #5b6fdb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(91, 111, 219, 0.3);
+        }
+
+        .btn-entrar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 111, 219, 0.4);
+            background: #4a5ec8;
+        }
+
+        .btn-entrar:active {
+            transform: translateY(0);
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .footer-text a {
+            color: #5b6fdb;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .footer-text a:hover {
+            color: #4a5ec8;
+            text-decoration: underline;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+                max-width: 95%;
+            }
+
+            .header h2 {
+                font-size: 1.5rem;
+            }
+
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logo-icon i {
+                font-size: 24px;
+            }
+
+            form input[type="text"],
+            form input[type="email"],
+            form input[type="password"] {
+                padding: 10px 12px 10px 38px;
+                font-size: 0.9rem;
+            }
+
+            .input-icon {
+                left: 12px;
+                font-size: 0.9rem;
+            }
+
+            .toggle-password {
+                right: 12px;
+                font-size: 0.9rem;
+            }
+
+            .btn-entrar {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h2 {
+                font-size: 1.35rem;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
+
     <div class="container">
-      <h2 style="text-align: center; margin-top: 0">Administra</h2>
-      <p style="text-align: center; margin-top: -10px; color: #555">
-        Sistema de Gestão Comercial
-      </p>
+        <div class="header">
+            <div class="logo-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <h2>Administra</h2>
+            <p>Sistema de Gestão Comercial</p>
+        </div>
 
-      {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-      <form method="POST">
-        {% csrf_token %} {{ form.as_p }}
+        <form method="POST" id="loginForm">
+            {% csrf_token %}
 
-        <button type="submit" class="btn">Entrar</button>
-      </form>
+            <div class="form-group">
+                <label class="form-group-label" for="id_username">Email</label>
+                {{ form.username.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" 
+                           name="username" 
+                           id="id_username" 
+                           placeholder="seu@email.com" 
+                           value="{{ form.username.value|default:'' }}"
+                           autofocus 
+                           required>
+                </div>
+            </div>
 
-      <p style="text-align: center; margin-top: 1rem">
-        Não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se aqui</a>
-      </p>
+            <div class="form-group">
+                <label class="form-group-label" for="id_password">Senha</label>
+                {{ form.password.errors }}
+                <div class="input-wrapper">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" 
+                           name="password" 
+                           id="id_password" 
+                           placeholder="••••••••" 
+                           required>
+                    <i class="fas fa-eye toggle-password" data-target="id_password"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-entrar">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+        </form>
+
+        <p class="footer-text">
+            Não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se aqui</a>
+        </p>
+
+        <div class="copyright">
+            © 2025 Administra - Sistema de Gestão<br>
+            Versão 1.0.0
+        </div>
     </div>
-  </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.querySelector('.toggle-password');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
 </html>
