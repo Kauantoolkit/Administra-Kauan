@@ -53,14 +53,11 @@ def lista_clientes(request):
     txt_total_mes = f"{diff_mes:+} este mês"
 
     media_banco = clientes_qs.filter(valor_total_comprado__gt=0).aggregate(media=Avg('valor_total_comprado'))['media']
-    
-    # Garante que seja um número (float)
+  
     ticket_medio = float(media_banco) if media_banco else 0.00
 
-    # Valor de referência para o mês passado (Fixo, pois Cliente não tem histórico)
     ticket_mes_passado = 0
 
-    # Cálculo da variação percentual
     if ticket_mes_passado > 0:
         perc_variacao = ((ticket_medio - ticket_mes_passado) / ticket_mes_passado) * 100
     else:
