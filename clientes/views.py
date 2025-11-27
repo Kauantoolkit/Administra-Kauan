@@ -148,15 +148,17 @@ def editar_cliente(request, pk):
     if request.method == "POST":
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
-           cliente_editado = form.save()
-        registrar_log(
+            cliente_editado = form.save()
+            
+            registrar_log(
                 entidade='CLIENTE',
                 entidade_id=cliente_editado.id,
                 acao='ALTERACAO',
                 descricao=f"Cliente '{cliente_editado.nome}' foi alterado.",
                 usuario=request.user if request.user.is_authenticated else None
-        )
-        return redirect("lista_clientes")
+            )
+            return redirect("lista_clientes")
+            
     else:
         form = ClienteForm(instance=cliente)
 
