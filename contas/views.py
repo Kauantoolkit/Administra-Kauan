@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm
+from .forms import CustomUserCreationForm, EmailAuthenticationForm, ProdutoForm, BuscaEstoqueForm, MovimentoEstoqueForm, EntradaProdutoEspecificoForm, FornecedorForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, F, Q, Count
@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 import datetime
 import locale
 from django.http import JsonResponse
-from .models import Categoria, Produto, MovimentoEstoque
+from .models import Categoria, Produto, MovimentoEstoque, Fornecedor
 from .messages.estoque_storage import EstoqueStorage
 from django.contrib.messages.constants import INFO, SUCCESS, ERROR
 from django.db.models import Sum
@@ -217,17 +217,16 @@ def fornecedores_view(request):
 
 @login_required
 def fornecedor_criar(request):
-    from .forms import FornecedorForm
-    
     if request.method == 'POST':
         form = FornecedorForm(request.POST)
         if form.is_valid():
-            form.save()
+            fornecedor = form.save()
+            
             LogAcao.objects.create(
                 entidade="FORNECEDOR",
-                entidade_id=form.id,
+                entidade_id=fornecedor.id,
                 acao="CRIACAO",
-                descricao=f'Fornecedor "{form.nome_fantasia}" criado.',
+                descricao=f'Fornecedor "{fornecedor.nome_fantasia}" criado.',
                 usuario=request.user
             )
             messages.success(request, 'Fornecedor cadastrado com sucesso!')
@@ -247,21 +246,18 @@ def fornecedor_criar(request):
 
 @login_required
 def fornecedor_editar(request, pk):
-    from .models import Fornecedor
-    from .forms import FornecedorForm
-    from django.shortcuts import get_object_or_404
-    
     fornecedor = get_object_or_404(Fornecedor, pk=pk)
     
     if request.method == 'POST':
         form = FornecedorForm(request.POST, instance=fornecedor)
         if form.is_valid():
-            form.save()
+            fornecedor_salvo = form.save()
+            
             LogAcao.objects.create(
                 entidade="FORNECEDOR",
-                entidade_id=fornecedor.id,
+                entidade_id=fornecedor_salvo.id,
                 acao="ALTERACAO",
-                descricao=f'Fornecedor "{fornecedor.nome_fantasia}" editado.',
+                descricao=f'Fornecedor "{fornecedor_salvo.nome_fantasia}" editado.',
                 usuario=request.user
             )
             messages.success(request, 'Fornecedor atualizado com sucesso!')
@@ -282,17 +278,17 @@ def fornecedor_editar(request, pk):
 
 @login_required
 def fornecedor_deletar(request, pk):
-    from .models import Fornecedor
-    from django.shortcuts import get_object_or_404
-    
     fornecedor = get_object_or_404(Fornecedor, pk=pk)
     
     if request.method == 'POST':
         nome = fornecedor.nome_fantasia
+        id_antigo = fornecedor.id 
+        
         fornecedor.delete()
+        
         LogAcao.objects.create(
             entidade="FORNECEDOR",
-            entidade_id=pk,
+            entidade_id=id_antigo,
             acao="EXCLUSAO",
             descricao=f'Fornecedor "{nome}" foi excluído.',
             usuario=request.user
