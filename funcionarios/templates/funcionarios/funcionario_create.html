@@ -1,174 +1,127 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Novo Funcionário{% endblock %}
+{% block title %}Editar Funcionário{% endblock %}
 
 {% block content %}
-
 <style>
-.form-card {
-    background: #fff;
-    padding: 25px 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto 40px auto;
+:root {
+    --bg:#F5F7FA;
+    --white:#FFFFFF;
+    --border:#E4E7EC;
+    --text:#1D2939;
+    --text-muted:#667085;
+    --blue:#1570EF;
+    --shadow:0 1px 3px rgba(16,24,40,0.08),0 1px 2px rgba(16,24,40,0.03);
 }
-
-.form-card h1 {
-    font-size: 24px;
-    margin-bottom: 25px;
-    font-weight: 600;
-    color: #333;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.form-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #444;
-}
-
-.form-input,
-.form-select,
-input[type="file"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #dcdcdc;
-    border-radius: 8px;
-    font-size: 14px;
-    background: #fafafa;
-    transition: 0.2s;
-}
-
-.form-input:focus,
-.form-select:focus {
-    background: #fff;
-    border-color: #888;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px 25px;
-    margin-top: 20px;
-}
-
-.img-preview {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-}
-
-.btn-salvar {
-    margin-top: 30px;
-    width: 100%;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-salvar:hover {
-    background: #43a047;
-}
+body { background: var(--bg); font-family:"Inter",sans-serif; color:var(--text); }
+.form-card{background:var(--white);padding:28px;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow);width:100%;max-width:750px;margin-top:20px;}
+.form-card h1{margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.form-group{display:flex;flex-direction:column;gap:6px;margin:20px;}
+.form-label{font-size:14px;font-weight:500;color:var(--text-muted);}
+.form-input,.form-select,.form-file{width:100%;height:40px;padding:8px 12px;font-size:14px;border:1px solid var(--border);border-radius:8px;background:white;}
+.img-preview{width:100px;height:100px;object-fit:cover;border-radius:50%;margin-right:10px;border:1px solid var(--border);}
+.btn-salvar{margin-top:24px;padding:10px 20px;background:var(--blue);color:white;border-radius:8px;font-weight:600;cursor:pointer;border:none;}
+.btn-salvar:hover{background:#1366d6;}
+#foto_upload{border:none;padding:0;height:auto;margin:30px;width:60%;}
+@media (max-width:700px){.form-grid{grid-template-columns:1fr}}
 </style>
 
-
 <div class="form-card">
-    <h1>Novo Funcionário</h1>
+    <h1>Editar Funcionário</h1>
 
     {% if form.errors %}
-    <div style="background:#ffe1e1; border:1px solid #ff9a9a; padding:12px; border-radius:8px; margin-bottom:16px; color:#b30000;">
-        <strong>Corrija os seguintes erros:</strong>
-        <ul>
-            {% for field, errors in form.errors.items %}
-                <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+        <div style="background:#ffe1e1;border:1px solid #ff9a9a;padding:12px;border-radius:8px;margin-bottom:16px;color:#b30000;">
+            <strong>Corrija os seguintes erros:</strong>
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <!-- Campo de imagem -->
-        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-            <img id="preview" class="img-preview" 
-                 src="{% static 'img/default-avatar.png' %}" 
-                 alt="Pré-visualização">
-
-            {{ form.foto_upload }}
+        <div class="form-group" style="display:flex;align-items:center;">
+            {% if form.instance.foto_base64 %}
+                <img id="preview" class="img-preview"
+                     src="data:image/*;base64,{{ form.instance.foto_base64 }}"
+                     alt="Foto do Funcionário">
+            {% else %}
+                <img id="preview" class="img-preview"
+                     src="{% static 'img/default-avatar.png' %}"
+                     alt="Foto do Funcionário">
+            {% endif %}
+            <input type="file" name="foto_upload" id="id_foto" class="form-input"/>
         </div>
 
         <div class="form-grid">
             {% for field in form %}
                 {% if field.name != "foto_upload" %}
-                <div class="form-group">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn-salvar">Salvar Funcionário</button>
+        <button type="submit" class="btn-salvar">Atualizar Funcionário</button>
     </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script>
-$(document).ready(function(){
+$(function () {
 
-    const imgField = $('#id_foto');
-    imgField.on('change', function(){
+    $('#id_foto').on('change', function () {
         const file = this.files[0];
-        if(file){
-            const reader = new FileReader();
-            reader.onload = e => $('#preview').attr('src', e.target.result);
-            reader.readAsDataURL(file);
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor, selecione apenas arquivos de imagem (jpg, png, gif).');
+            $(this).val('');
+            $('#preview').attr('src', '{% static "img/default-avatar.png" %}');
+            return;
         }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('#preview').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
     });
 
-
-    const cpfField = $('input[name="cpf"]');
-    cpfField.attr('maxlength', 14);
-    cpfField.on('input', function(){
-        let v = $(this).val().replace(/\D/g,'');
-        v = v.replace(/^(\d{3})(\d)/,'$1.$2');
-        v = v.replace(/^(\d{3})\.(\d{3})(\d)/,'$1.$2.$3');
-        v = v.replace(/\.(\d{3})(\d)/,'.$1-$2');
+    const cpfField = $('#id_cpf');
+    cpfField.attr('maxlength', 14).on('input', function () {
+        let v = $(this).val().replace(/\D/g, '');
+        v = v.replace(/^(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+        v = v.replace(/\.(\d{3})(\d)/, '.$1-$2');
         $(this).val(v);
     });
 
-    // Máscara Telefone
-    const telField = $('input[name="telefone"]');
-    telField.on('input', function(){
-        let v = $(this).val().replace(/\D/g,'').substring(0,11);
-        if(v.length <= 10){
+    const telField = $('#id_telefone');
+    telField.on('input', function () {
+        let v = $(this).val().replace(/\D/g, '').substring(0, 11);
+
+        if (v.length <= 10) {
             v = v.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
             v = v.replace(/(\d{4})(\d{0,4})$/, '$1-$2');
         } else {
             v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
             v = v.replace(/(\d{5})(\d{0,4})$/, '$1-$2');
         }
+
         $(this).val(v);
     });
 
+    telField.on('keypress', function (e) {
+        if (e.which < 48 || e.which > 57) e.preventDefault();
+    });
 });
 </script>
-
 {% endblock content %}

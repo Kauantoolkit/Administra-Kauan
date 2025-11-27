@@ -5,45 +5,60 @@
 {% block content %}
 
 <style>
-
 .positive { color:#2ECC71; }
 .warning { color:#E8B200; }
-.stat-card-icon { width:48px; height:48px; border-radius:50%; background:#F3F4F6; display:flex; justify-content:center; align-items:center; }
-.stat-card-icon span { font-size:28px; color:#3B82F6; } /* Ícones azuis */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13.75rem, 1fr)); /* 220px ≈ 13.75rem */
+    gap: 1rem; 
+    margin-bottom: 1.5rem;
+}
+
+
+
 .stat-card:nth-child(1) .stat-card-icon { background:rgba(60, 179, 113, 0.1); }
-.stat-card:nth-child(2) .stat-card-icon { background:rgba(59, 130, 246, 0.1); }
-.stat-card:nth-child(3) .stat-card-icon { background:rgba(255, 193, 7, 0.1); }
-.stat-card:nth-child(4) .stat-card-icon { background:rgba(240, 242, 245, 1); }
 .stat-card:nth-child(1) .stat-card-icon span { color:#3CB371; }
+.stat-card:nth-child(2) .stat-card-icon { background:rgba(59, 130, 246, 0.1); }
+.stat-card:nth-child(2) .stat-card-icon span { color:#3B82F6; }
+.stat-card:nth-child(3) .stat-card-icon { background:rgba(255, 193, 7, 0.1); }
 .stat-card:nth-child(3) .stat-card-icon span { color:#FFC107; }
+.stat-card:nth-child(4) .stat-card-icon { background:rgba(240, 242, 245, 1); }
 .stat-card:nth-child(4) .stat-card-icon span { color:#6B7280; }
 
-.search-form { display:flex; gap:12px; margin-bottom:1.5rem; background:white; padding:16px; border-radius:12px; border:1px solid #E5E7EB; align-items:center; }
-.form-input { padding:10px 14px; border-radius:8px; border:1px solid #E5E7EB; background:#F9FAFB; font-size:14px; width:200px; }
-.form-input:focus { border-color:#3B82F6; background:white; outline:none; }
-.form-input-text { flex-grow: 1; min-width: 250px; }
 
-.card { background:white; padding:0; border-radius:12px; border:1px solid #E5E7EB; overflow:hidden; }
+
+
+.card { background:white; padding:0; border-radius:12px; border:1px solid #E5E7EB; overflow:hidden; margin-bottom:24px; }
 .card-header { padding:16px 20px; border-bottom:1px solid #E5E7EB; display:flex; justify-content:space-between; align-items:center; }
 .card-header h4 { margin:0; font-size:18px; font-weight:600; }
+
 
 table th { font-size:13px; text-align:left; color:#6B7280; padding:12px 20px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; }
 table td { padding:12px 20px; font-size:14px; vertical-align:middle; }
 table tr:not(:last-child) { border-bottom:1px solid #F4F4F4; }
-table img { border-radius:50%; object-fit: cover; }
+table img { border-radius:50%; object-fit:cover; }
+
 
 .status-badge { padding:4px 10px; border-radius:12px; font-size:12px; font-weight:500; display:inline-block; text-transform:capitalize; }
 .status-badge.ativo { background:#D1FAE5; color:#065F46; }
 .status-badge.ferias { background:#FFFBEB; color:#B45309; }
 .status-badge.cargo { background:#e9e7ff; color:#6b4ce6; }
 
+
 .pagination-controls { display:flex; justify-content:flex-end; margin-top:1rem; padding:16px 20px; gap:0.5rem; border-top:1px solid #E5E7EB; }
-.pagination-controls .btn-action { padding:8px 16px; background:#E5E7EB; color:#4B5563; font-weight:500; }
+.pagination-controls .btn-action { padding:8px 16px; background:#E5E7EB; color:#4B5563; font-weight:500; text-decoration:none; }
 .pagination-controls .btn-action.current { background:#3B82F6; color:white; pointer-events:none; }
 
+
+.actions a { text-decoration:none; margin-right:8px; display:inline-flex; align-items:center; }
+.icon-view { color:#3B82F6; }
+.icon-edit { color:#10B981; }
+.icon-delete { color:#EF4444; }
 </style>
 
-<div class="header">
+
+<div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
     <h1>Funcionários</h1>
     <a href="{% url 'funcionario_create' %}" class="btn-action primary">
         <span class="material-icons-outlined">add</span>
@@ -51,25 +66,22 @@ table img { border-radius:50%; object-fit: cover; }
     </a>
 </div>
 
+
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Total de Funcionários</h5>
             <h2>{{ total_funcionarios }}</h2>
-            <p class="positive">
-                +{{ aumento_mes }}% em relação ao mês anterior
-            </p>
+            <p class="positive">+{{ aumento_mes }}% em relação ao mês anterior</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#3CB371;">groups</span></div>
+        <div class="stat-card-icon"><span class="material-icons-outlined">groups</span></div>
     </div>
 
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Ativos Hoje</h5>
             <h2>{{ ativos_hoje }}</h2>
-            <p style="color:#6B7280;">
-                Ontem: {{ ativos_ontem }}
-            </p>
+            <p style="color:#6B7280;">Ontem: {{ ativos_ontem }}</p>
         </div>
         <div class="stat-card-icon"><span class="material-icons-outlined">check_circle</span></div>
     </div>
@@ -78,61 +90,53 @@ table img { border-radius:50%; object-fit: cover; }
         <div class="stat-card-info">
             <h5>Em Férias</h5>
             <h2>{{ ferias }}</h2>
-            <p class="warning">
-                Mês passado: {{ ferias_mes_passado }}
-            </p>
+            <p class="warning">Mês passado: {{ ferias_mes_passado }}</p>
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#FFC107;">beach_access</span></div>
+        <div class="stat-card-icon"><span class="material-icons-outlined">beach_access</span></div>
     </div>
 
     <div class="stat-card">
         <div class="stat-card-info">
             <h5>Salário Médio</h5>
             <h2>R$ {{ salario_medio }}</h2>
-
             {% if aumento_salarial >= 0 %}
-                <p class="positive">
-                    +{{ aumento_salarial }}% em relação ao mês passado
-                </p>
+                <p class="positive">+{{ aumento_salarial }}% em relação ao mês passado</p>
             {% else %}
-                <p style="color:#EF4444;">
-                    {{ aumento_salarial }}% em relação ao mês passado
-                </p>
+                <p style="color:#EF4444;">{{ aumento_salarial }}% em relação ao mês passado</p>
             {% endif %}
         </div>
-        <div class="stat-card-icon"><span class="material-icons-outlined" style="color:#6B7280;">payments</span></div>
+        <div class="stat-card-icon"><span class="material-icons-outlined">payments</span></div>
     </div>
 </div>
+
 
 <form method="get" class="search-form">
     <input type="text" name="nome" placeholder="Nome do funcionário..." class="form-input form-input-text" value="{{ request.GET.nome }}">
     <input type="text" name="cpf" placeholder="CPF..." class="form-input" value="{{ request.GET.cpf }}">
-
     <select name="cargo" class="form-input">
         <option value="">Todos os cargos</option>
         {% for cargo in cargos %}
-        <option value="{{ cargo }}" {% if request.GET.cargo == cargo %}selected{% endif %}>{{ cargo }}</option>
+            <option value="{{ cargo }}" {% if request.GET.cargo == cargo %}selected{% endif %}>{{ cargo }}</option>
         {% endfor %}
     </select>
-
     <select name="status" class="form-input">
         <option value="">Todos os status</option>
         <option value="ativo" {% if request.GET.status == "ativo" %}selected{% endif %}>Ativo</option>
         <option value="ferias" {% if request.GET.status == "ferias" %}selected{% endif %}>Férias</option>
         <option value="inativo" {% if request.GET.status == "inativo" %}selected{% endif %}>Inativo</option>
     </select>
-
-    <button type="submit" class="btn-action primary" style="flex-shrink: 0;"><span class="material-icons-outlined">search</span>Buscar</button>
+    <button type="submit" class="btn-action primary"><span class="material-icons-outlined">search</span>Buscar</button>
 </form>
+
 
 <div class="card">
     <div class="card-header">
         <h4>Lista de Funcionários</h4>
         <div style="display:flex; gap:1rem;">
             <a href="#" class="btn-action">Exportar</a>
-            <a href="#" class="btn-action">Ponto</a> </div>
+            <a href="#" class="btn-action">Ponto</a>
+        </div>
     </div>
-
     <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
             <thead>
@@ -148,18 +152,15 @@ table img { border-radius:50%; object-fit: cover; }
                     <th>Ações</th>
                 </tr>
             </thead>
-
             <tbody>
                 {% for f in page_obj %}
                 <tr>
                     <td>
                         <div style="display:flex; align-items:center; gap:10px;">
                             {% if f.foto_base64 %}
-                                <img src="data:image/jpeg;base64,{{ f.foto_base64 }}" 
-                                     style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
+                                <img src="data:image/jpeg;base64,{{ f.foto_base64 }}" style="width:40px; height:40px;">
                             {% else %}
-                                <img src="{% static 'img/default-avatar.png' %}" 
-                                     style="width:40px; height:40px; border-radius:50%; object-fit: cover;">
+                                <img src="{% static 'img/default-avatar.png' %}" style="width:40px; height:40px;">
                             {% endif %}
                             <div>
                                 <strong>{{ f.nome }}</strong><br>
@@ -175,17 +176,17 @@ table img { border-radius:50%; object-fit: cover; }
                     <td>R$ {{ f.salario }}</td>
                     <td>
                         {% if f.status == "ativo" %}
-                        <span class="status-badge ativo">Ativo</span>
+                            <span class="status-badge ativo">Ativo</span>
                         {% elif f.status == "ferias" %}
-                        <span class="status-badge ferias">Férias</span>
+                            <span class="status-badge ferias">Férias</span>
                         {% else %}
-                        <span class="status-badge" style="background:#FDE8E8; color:#EF4444;">Inativo</span>
+                            <span class="status-badge" style="background:#FDE8E8; color:#EF4444;">Inativo</span>
                         {% endif %}
                     </td>
                     <td class="actions">
-                        <a href="{% url 'funcionario_detail' f.pk %}"><span class="material-icons-outlined">visibility</span></a>
-                        <a href="{% url 'funcionario_edit' f.pk %}"><span class="material-icons-outlined">edit</span></a>
-                        <a href="{% url 'funcionario_delete' f.pk %}"><span class="material-icons-outlined">delete</span></a>
+                        <a href="{% url 'funcionario_detail' f.pk %}"><span class="material-icons-outlined icon-view">visibility</span></a>
+                        <a href="{% url 'funcionario_edit' f.pk %}"><span class="material-icons-outlined icon-edit">edit</span></a>
+                        <a href="{% url 'funcionario_delete' f.pk %}"><span class="material-icons-outlined icon-delete">delete</span></a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -193,8 +194,9 @@ table img { border-radius:50%; object-fit: cover; }
         </table>
     </div>
 
+
     <div class="pagination-controls">
-        <p style="margin-right: auto; font-size:14px; color:#6B7280;">
+        <p style="margin-right:auto; font-size:14px; color:#6B7280;">
             Mostrando 1 a {{ page_obj.end_index }} de {{ page_obj.paginator.count }} funcionários
         </p>
         {% if page_obj.has_previous %}
@@ -202,7 +204,7 @@ table img { border-radius:50%; object-fit: cover; }
         {% else %}
             <span class="btn-action" style="opacity:0.5; pointer-events:none;">Anterior</span>
         {% endif %}
-        
+
         <a href="#" class="btn-action current">{{ page_obj.number }}</a>
 
         {% if page_obj.has_next %}
