@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Editar Funcionário{% endblock %}
+{% block title %}Novo Funcionário{% endblock %}
 
 {% block content %}
 <style>
@@ -29,7 +29,7 @@ body { background: var(--bg); font-family:"Inter",sans-serif; color:var(--text);
 </style>
 
 <div class="form-card">
-    <h1>Editar Funcionário</h1>
+    <h1>Novo Funcionário</h1>
 
     {% if form.errors %}
         <div style="background:#ffe1e1;border:1px solid #ff9a9a;padding:12px;border-radius:8px;margin-bottom:16px;color:#b30000;">
@@ -69,7 +69,7 @@ body { background: var(--bg); font-family:"Inter",sans-serif; color:var(--text);
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn-salvar">Atualizar Funcionário</button>
+        <button type="submit" class="btn-salvar">Cadastrar Funcionário</button>
     </form>
 </div>
 
