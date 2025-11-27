@@ -220,13 +220,11 @@ def fornecedor_criar(request):
     if request.method == 'POST':
         form = FornecedorForm(request.POST)
         if form.is_valid():
-            # Salva o fornecedor e guarda a instância criada na variável 'fornecedor'
             fornecedor = form.save()
             
-            # Agora sim podemos acessar fornecedor.nome_fantasia
             LogAcao.objects.create(
                 entidade="FORNECEDOR",
-                entidade_id=fornecedor.id, # Agora funciona!
+                entidade_id=fornecedor.id,
                 acao="CRIACAO",
                 descricao=f'Fornecedor "{fornecedor.nome_fantasia}" criado.',
                 usuario=request.user
@@ -284,7 +282,6 @@ def fornecedor_deletar(request, pk):
     
     if request.method == 'POST':
         nome = fornecedor.nome_fantasia
-        # Salva o ID antes de deletar para usar no log (opcional, mas boa prática)
         id_antigo = fornecedor.id 
         
         fornecedor.delete()
