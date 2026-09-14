@@ -78,3 +78,16 @@ sistema com a marca de cada cliente, sem tocar no código.
 ```bash
 python manage.py test
 ```
+
+## Deploy sem VPS (pelo navegador, inclusive do celular)
+
+O repositório traz um blueprint pronto (`render.yaml`). No painel do Render:
+**New → Blueprint → escolher este repositório**. Ele provisiona o banco, gera a
+`SECRET_KEY`, roda migrações e sobe o serviço. Os únicos campos a preencher são
+`ADMIN_EMAIL` e `ADMIN_SENHA`, usados para criar o primeiro login.
+
+Limitações do plano gratuito, que importam para decidir: o serviço hiberna após
+15 minutos sem acesso e leva cerca de 1 minuto para acordar no próximo acesso, e
+o PostgreSQL gratuito expira em 30 dias. Serve para testar e demonstrar, não
+para a loja de um cliente — para isso use a VPS (`deploy/instalar_vps.sh`) ou um
+plano pago.

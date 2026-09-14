@@ -53,6 +53,14 @@ if not SECRET_KEY:
 ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,[::1]')
 CSRF_TRUSTED_ORIGINS = _env_list('DJANGO_CSRF_TRUSTED_ORIGINS')
 
+# Plataformas de deploy (Render, Railway) publicam o dominio gerado em uma
+# variavel propria. Sem isto seria preciso editar o .env a cada deploy.
+for _var in ('RENDER_EXTERNAL_HOSTNAME', 'RAILWAY_PUBLIC_DOMAIN'):
+    _host = _env(_var)
+    if _host and _host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(_host)
+        CSRF_TRUSTED_ORIGINS.append(f'https://{_host}')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

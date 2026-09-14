@@ -1,0 +1,35 @@
+# Blueprint de deploy. No painel do Render: New > Blueprint > escolher este
+# repositório. Tudo abaixo é provisionado automaticamente.
+databases:
+  - name: administra-db
+    databaseName: administra
+    user: administra
+    plan: free
+
+services:
+  - type: web
+    name: administra
+    runtime: python
+    plan: free
+    branch: claude/stoic-planck-wzsypx
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Administra.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: administra-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true          # o Render gera e guarda; ninguém digita
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_TIME_ZONE
+        value: America/Sao_Paulo
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "true"
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: ADMIN_EMAIL
+        sync: false                  # você preenche na hora do deploy
+      - key: ADMIN_SENHA
+        sync: false
