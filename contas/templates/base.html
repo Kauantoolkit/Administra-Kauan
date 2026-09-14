@@ -400,14 +400,107 @@
         flex-grow: 1;
         min-width: 250px;
       }
+
+      /* ---------- Mensagens ---------- */
+      .mensagens { list-style: none; padding: 0; margin: 0 0 1.5rem 0; }
+      .mensagens li {
+        padding: 0.9rem 1rem; border-radius: 8px; margin-bottom: 0.75rem;
+        font-weight: 500; border: 1px solid transparent;
+      }
+      .mensagens .success { background: #e8f5e9; color: #1b5e20; border-color: #c8e6c9; }
+      .mensagens .error   { background: #fde8e8; color: #b42318; border-color: #f5c2c0; }
+      .mensagens .warning { background: #fff8e1; color: #8a6100; border-color: #ffe7a3; }
+      .mensagens .info    { background: #e7f0ff; color: #0b4fa8; border-color: #c9ddff; }
+
+      /* ---------- Tabelas roláveis ---------- */
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tabela { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+      .tabela th, .tabela td {
+        padding: 0.8rem 0.75rem; text-align: left; border-bottom: 1px solid #eef0f3;
+        white-space: nowrap;
+      }
+      .tabela thead th { color: #667085; font-weight: 600; font-size: 0.8rem;
+        text-transform: uppercase; letter-spacing: 0.02em; }
+
+      /* ---------- Formulários ---------- */
+      .form-vertical .campo { margin-bottom: 1rem; }
+      .form-vertical label { display: block; margin-bottom: 0.35rem; font-weight: 500; }
+      .form-vertical input, .form-vertical select, .form-vertical textarea {
+        width: 100%; box-sizing: border-box; padding: 0.7rem 0.85rem;
+        border: 1px solid #d0d5dd; border-radius: 8px; font-size: 16px;
+      }
+      .ajuda { color: #667085; font-size: 0.85rem; }
+      .erro { color: #b42318; font-size: 0.85rem; display: block; margin-top: 0.25rem; }
+
+      /* ---------- Cabecalho mobile ---------- */
+      .topbar { display: none; }
+      .sidebar-backdrop { display: none; }
+
+      /* ---------- Responsivo ----------
+         A sidebar era fixa em 260px e comia dois tercos de uma tela de celular.
+         Abaixo de 900px ela vira uma gaveta acionada pelo botao do topo.      */
+      @media (max-width: 900px) {
+        .topbar {
+          display: flex; align-items: center; gap: 0.75rem;
+          position: sticky; top: 0; z-index: 30;
+          background: #fff; border-bottom: 1px solid #e9ecef;
+          padding: 0.75rem 1rem;
+        }
+        .topbar button {
+          background: none; border: 1px solid #e4e7ec; border-radius: 8px;
+          padding: 0.45rem 0.6rem; cursor: pointer; display: grid; place-items: center;
+        }
+        .topbar .titulo { font-weight: 700; color: #0d6efd; }
+
+        .layout-container { display: block; }
+
+        .sidebar {
+          position: fixed; inset: 0 auto 0 0; z-index: 50;
+          width: 82vw; max-width: 300px;
+          transform: translateX(-100%); transition: transform 0.25s ease;
+          box-shadow: 0 0 40px rgba(16, 24, 40, 0.18);
+        }
+        body.menu-aberto .sidebar { transform: translateX(0); }
+        body.menu-aberto .sidebar-backdrop {
+          display: block; position: fixed; inset: 0; z-index: 40;
+          background: rgba(16, 24, 40, 0.45);
+        }
+
+        .main-content { padding: 1rem; }
+        .header { flex-direction: column; align-items: flex-start; gap: 0.75rem;
+          margin-bottom: 1.25rem; }
+        .header h1 { font-size: 1.35rem; }
+        .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .stat-card { padding: 1rem; }
+        .stat-card-info h2 { font-size: 1.4rem; }
+        .stat-card-icon { width: 40px; height: 40px; font-size: 1.6rem; }
+        .dashboard-layout { grid-template-columns: 1fr; }
+        .search-form { padding: 12px; }
+        .form-input, .form-input-text { width: 100%; min-width: 0; }
+        .actions-footer { flex-direction: column-reverse; }
+        .actions-footer > * { width: 100%; justify-content: center; text-align: center; }
+      }
+
+      @media (max-width: 520px) {
+        .stats-grid { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
+    <header class="topbar">
+      <button type="button" id="abrir-menu" aria-label="Abrir menu" aria-expanded="false">
+        <span class="material-icons-outlined">menu</span>
+      </button>
+      <span class="titulo">{{ loja.nome_loja|default:"Administra" }}</span>
+    </header>
+
+    <div class="sidebar-backdrop" id="fechar-menu"></div>
+
     <div class="layout-container">
       <aside class="sidebar">
         <div class="sidebar-header">
-          Administra
-          <span>Sistema de Gestão</span>
+          {{ loja.nome_loja|default:"Administra" }}
+          <span>{{ loja.slogan|default:"Sistema de Gestão" }}</span>
         </div>
 
         <ul class="nav-menu">
@@ -479,16 +572,44 @@
           <div class="user-profile">
             <span>{{ user.nome|default:'Usuário' }}</span>
 
-            <a href="{% url 'logout' %}">Sair</a>
+            <form method="post" action="{% url 'logout' %}" style="margin-left:auto;">
+              {% csrf_token %}
+              <button type="submit" style="background:none;border:none;color:#dc3545;
+                font-weight:500;cursor:pointer;padding:0;font-size:inherit;">Sair</button>
+            </form>
           </div>
         </div>
       </aside>
 
-      <main class="main-content">{% block content %} {% endblock %}</main>
+      <main class="main-content">
+        {% if messages %}
+        <ul class="mensagens">
+          {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% block content %} {% endblock %}
+      </main>
     </div>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        const alerts = document.querySelectorAll(".alert");
+        const abrir = document.getElementById("abrir-menu");
+        const fechar = document.getElementById("fechar-menu");
+        if (abrir) {
+          abrir.addEventListener("click", function () {
+            const aberto = document.body.classList.toggle("menu-aberto");
+            abrir.setAttribute("aria-expanded", String(aberto));
+          });
+        }
+        if (fechar) {
+          fechar.addEventListener("click", function () {
+            document.body.classList.remove("menu-aberto");
+            if (abrir) abrir.setAttribute("aria-expanded", "false");
+          });
+        }
+
+        const alerts = document.querySelectorAll(".alert, .mensagens li");
 
         if (alerts.length > 0) {
           setTimeout(function () {

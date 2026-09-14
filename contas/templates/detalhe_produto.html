@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ produto.nome }}{% endblock %}
+
+{% block content %}
+<div class="header">
+  <div>
+    <h1>{{ produto.nome }}</h1>
+    <p class="header-info">SKU {{ produto.sku }}{% if produto.codigo_barras %} · EAN {{ produto.codigo_barras }}{% endif %}</p>
+  </div>
+  <div class="header-info">
+    <a class="btn-action" href="{% url 'estoque' %}">Voltar</a>
+    <a class="btn-action primary" href="{% url 'editar_produto' produto.pk %}">Editar</a>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Em estoque</h5>
+      <h2>{{ produto.estoque_formatado }}</h2>
+      <p>alerta em {{ produto.quantidade_minima_alerta|floatformat:3 }} {{ produto.sigla_unidade }}</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Preço de venda</h5>
+      <h2>R$ {{ produto.venda|floatformat:2 }}</h2>
+      <p>por {{ produto.sigla_unidade }}</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Custo</h5>
+      <h2>R$ {{ produto.custo|floatformat:2 }}</h2>
+      <p>valor em estoque: R$ {{ produto.valor_total_estoque|floatformat:2 }}</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-info">
+      <h5>Vendido por</h5>
+      <h2 style="font-size:1.3rem;">{{ produto.get_unidade_medida_display }}</h2>
+      <p>{% if produto.aceita_fracao %}aceita fração{% else %}apenas inteiros{% endif %}</p>
+    </div>
+  </div>
+</div>
+
+{% if variacoes %}
+<div class="card" style="margin-bottom:1.5rem;">
+  <div class="card-header"><h4>Grade (tamanho / cor)</h4></div>
+  <div class="card-body table-wrap">
+    <table class="tabela">
+      <thead><tr><th>Variação</th><th>SKU</th><th>Preço</th><th>Estoque</th></tr></thead>
+      <tbody>
+        {% for v in variacoes %}
+        <tr>
+          <td>{{ v.rotulo }}</td>
+          <td>{{ v.sku }}</td>
+          <td>R$ {{ v.preco_efetivo|floatformat:2 }}</td>
+          <td>{{ v.quantidade_estoque|floatformat:3 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <h4>Últimos movimentos</h4>
+    <a href="{% url 'entrada_produto' produto.pk %}">Registrar entrada</a>
+  </div>
+  <div class="card-body table-wrap">
+    <table class="tabela">
+      <thead><tr><th>Data</th><th>Tipo</th><th>Quantidade</th><th>Usuário</th><th>Observação</th></tr></thead>
+      <tbody>
+        {% for m in historico %}
+        <tr>
+          <td>{{ m.data_movimento|date:"d/m/Y H:i" }}</td>
+          <td>{{ m.get_tipo_movimento_display }}</td>
+          <td>{{ m.quantidade|floatformat:3 }}</td>
+          <td>{{ m.usuario.nome|default:"—" }}</td>
+          <td>{{ m.observacao|default:"" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Nenhum movimento registrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

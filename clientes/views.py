@@ -57,7 +57,12 @@ def lista_clientes(request):
   
     ticket_medio = round(float(media_banco), 2) if media_banco else 0.00
 
-    ticket_mes_passado = 0
+    media_mes_passado = clientes_qs.filter(
+        valor_total_comprado__gt=0,
+        data_cadastro__month=mes_passado,
+        data_cadastro__year=ano_passado,
+    ).aggregate(media=Avg('valor_total_comprado'))['media']
+    ticket_mes_passado = round(float(media_mes_passado), 2) if media_mes_passado else 0.00
 
     if ticket_mes_passado > 0:
         perc_variacao = ((ticket_medio - ticket_mes_passado) / ticket_mes_passado) * 100
@@ -110,6 +115,7 @@ def lista_clientes(request):
     return render(request, 'clientes/lista_clientes.html', context)
 
 
+@login_required
 def novo_cliente(request):
     if request.method == 'POST':
 
@@ -133,15 +139,12 @@ def novo_cliente(request):
 
 
 
+@login_required
 def ver_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     return render(request, "clientes/ver_cliente.html", {"cliente": cliente})
 
 @login_required
-def clientes_view(request):
-    return render(request, 'clientes.html')
-
-
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -165,6 +168,7 @@ def editar_cliente(request, pk):
     return render(request, "clientes/editar_cliente.html", {"form": form, "cliente": cliente})
 
 
+@login_required
 def excluir_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -187,6 +191,7 @@ def excluir_cliente(request, pk):
 
     return render(request, "clientes/excluir_cliente.html", {"cliente": cliente})
 
+@login_required
 def exportar_clientes_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
@@ -223,11 +228,25 @@ def exportar_clientes_csv(request):
 
     return response
 
+@login_required
 def historico_logs(request):
-    logs = LogAcao.objects.all().order_by('-datahora') 
-    return render(request, 'historico_sistema.html', {'logs': logs})
+    logs = LogAcao.objects.select_related('usuario').order_by('-datahora')
 
-def registrar_log(entidade, entidade_id, acao, descricao, usuario):
+    entidade = (request.GET.get('entidade') or '').strip()
+    if entidade:
+        logs = logs.filter(entidade=entidade)
+
+    page_obj = Paginator(logs, 25).get_page(request.GET.get('page'))
+    return render(request, 'historico_sistema.html', {
+        'logs': page_obj,
+        'page_obj': page_obj,
+        'entidade': entidade,
+        'entidades': LogAcao.ENTIDADES,
+    })
+
+def registrar_log(entidade, entidade_id, acao, descricao, usuario=None):
+    if usuario is not None and not getattr(usuario, 'is_authenticated', False):
+        usuario = None
     LogAcao.objects.create(
         entidade=entidade,
         entidade_id=entidade_id,

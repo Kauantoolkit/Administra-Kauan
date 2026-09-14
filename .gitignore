@@ -38,6 +38,8 @@ staticfiles/
 .env
 *.env
 .env.*
+# O exemplo NAO contem segredo e deve ser versionado.
+!.env.example
 
 # Arquivos de Sistema Operacional
 .DS_Store
@@ -47,3 +49,5 @@ staticfiles/
 # Windows
 Thumbs.db
 ehthumbs.db
+# Ambiente virtual dentro do projeto
+.venv/

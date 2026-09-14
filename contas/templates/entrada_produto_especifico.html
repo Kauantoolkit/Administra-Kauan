@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Entrada — {{ produto.nome }}{% endblock %}
+
+{% block content %}
+<div class="header">
+  <div>
+    <h1>Entrada de estoque</h1>
+    <p class="header-info">{{ produto.nome }} · saldo atual {{ produto.estoque_formatado }}</p>
+  </div>
+</div>
+
+<div class="card" style="max-width:640px;">
+  <div class="card-body">
+    <form method="post" class="form-vertical">
+      {% csrf_token %}
+
+      <p class="ajuda">
+        Este produto é vendido por <strong>{{ produto.get_unidade_medida_display }}</strong>.
+        {% if produto.aceita_fracao %}
+          Use vírgula ou ponto para frações (ex.: 1{{ '' }}.750).
+        {% else %}
+          Informe apenas números inteiros.
+        {% endif %}
+      </p>
+
+      {% for field in form %}
+        <div class="campo">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small class="ajuda">{{ field.help_text }}</small>{% endif %}
+          {% for erro in field.errors %}<small class="erro">{{ erro }}</small>{% endfor %}
+        </div>
+      {% endfor %}
+
+      {% for erro in form.non_field_errors %}<p class="erro">{{ erro }}</p>{% endfor %}
+
+      <div class="actions-footer">
+        <a class="btn-action" href="{% url 'estoque' %}">Cancelar</a>
+        <button type="submit" class="btn-action primary">Registrar entrada</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

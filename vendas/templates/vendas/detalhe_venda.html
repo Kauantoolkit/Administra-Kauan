@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Venda #{{ venda.id }}{% endblock %}
+
+{% block content %}
+<div class="header">
+  <div>
+    <h1>Venda #{{ venda.id }}</h1>
+    <p class="header-info">
+      {{ venda.data_venda|date:"d/m/Y H:i" }} · {{ venda.nome_cliente }} ·
+      {{ venda.get_status_display }} · {{ venda.get_forma_pagamento_display }}
+    </p>
+  </div>
+  <div class="header-info">
+    <a class="btn-action" href="{% url 'lista_vendas' %}">Voltar</a>
+    <a class="btn-action primary" href="{% url 'editar_venda' venda.pk %}">Editar</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body table-wrap">
+    <table class="tabela">
+      <thead>
+        <tr><th>Produto</th><th>Quantidade</th><th>Preço unit.</th><th>Desconto</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody>
+        {% for item in itens %}
+        <tr>
+          <td>{{ item.descricao_completa }}</td>
+          <td>{{ item.quantidade_formatada }}</td>
+          <td>R$ {{ item.preco_unitario|floatformat:2 }} / {{ item.produto.sigla_unidade }}</td>
+          <td>R$ {{ item.desconto_item|floatformat:2 }}</td>
+          <td>R$ {{ item.subtotal|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><th colspan="4" style="text-align:right;">Subtotal</th><th>R$ {{ venda.subtotal|floatformat:2 }}</th></tr>
+        <tr><th colspan="4" style="text-align:right;">Desconto</th><th>− R$ {{ venda.desconto|floatformat:2 }}</th></tr>
+        <tr><th colspan="4" style="text-align:right;">Acréscimo</th><th>+ R$ {{ venda.acrescimo|floatformat:2 }}</th></tr>
+        <tr><th colspan="4" style="text-align:right;">Total</th><th>R$ {{ venda.total|floatformat:2 }}</th></tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+{% if venda.observacoes %}
+<div class="card" style="margin-top:1.5rem;">
+  <div class="card-header"><h4>Observações</h4></div>
+  <div class="card-body">{{ venda.observacoes|linebreaks }}</div>
+</div>
+{% endif %}
+
+{% if venda.status != 'cancelada' %}
+<form method="post" action="{% url 'cancelar_venda' venda.pk %}" class="actions-footer">
+  {% csrf_token %}
+  <button type="submit" class="btn-remove">Cancelar venda e estornar estoque</button>
+</form>
+{% endif %}
+{% endblock %}
