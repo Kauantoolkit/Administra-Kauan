@@ -8,6 +8,9 @@ services:
     plan: free
     region: oregon
     branch: claude/stoic-planck-wzsypx
+    # Explicito de proposito: sem isto o servico pode ficar parado num commit
+    # antigo enquanto a branch avanca, e se testa uma versao que nao e a atual.
+    autoDeploy: true
     buildCommand: "./build.sh"
     startCommand: "./start.sh"
     envVars:
