@@ -12,8 +12,4 @@ python manage.py migrate --no-input
 python manage.py seed_inicial --demo
 python manage.py criar_admin
 
-# Estado de acesso no log da partida. Sem shell no plano gratuito, esta e a
-# unica forma de saber por que um login falhou. Nao imprime senha.
-python manage.py diagnostico_acesso
-
 exec gunicorn Administra.wsgi:application --bind "0.0.0.0:${PORT:-8000}"
