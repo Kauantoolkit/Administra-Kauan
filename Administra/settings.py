@@ -171,6 +171,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# Mostra na tela o motivo da falha de CSRF. O padrao do Django o omite
+# quando DEBUG=false, e sem shell na hospedagem nao ha como investigar.
+CSRF_FAILURE_VIEW = 'contas.views.csrf_failure'
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'

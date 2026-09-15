@@ -108,3 +108,24 @@ class LoginPorEmailTests(TestCase):
         self.assertEqual(
             cliente.get('/contas/dashboard/').status_code, 200
         )
+
+
+class CsrfFalhouTests(TestCase):
+    """A pagina padrao do Django esconde o motivo quando DEBUG=false."""
+
+    def test_motivo_aparece_na_pagina(self):
+        cliente = Client(SERVER_NAME='localhost', enforce_csrf_checks=True)
+        resposta = cliente.post(
+            '/contas/login/', {'username': 'a@a.com', 'password': 'x'}, secure=True
+        )
+        self.assertEqual(resposta.status_code, 403)
+        corpo = resposta.content.decode()
+        self.assertIn('Sessão expirada', corpo)
+        self.assertIn('Referer', corpo)
+
+    def test_pagina_oferece_volta_para_o_login(self):
+        cliente = Client(SERVER_NAME='localhost', enforce_csrf_checks=True)
+        resposta = cliente.post(
+            '/contas/login/', {'username': 'a@a.com', 'password': 'x'}, secure=True
+        )
+        self.assertIn('/contas/login/', resposta.content.decode())

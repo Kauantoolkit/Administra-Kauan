@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sessão expirada</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           background: #f8f9fa; color: #101828; margin: 0; padding: 24px 16px; }
+    .caixa { max-width: 560px; margin: 0 auto; background: #fff; border: 1px solid #e4e7ec;
+             border-radius: 12px; padding: 24px; }
+    h1 { font-size: 1.3rem; margin: 0 0 0.5rem 0; }
+    p { color: #475467; line-height: 1.5; }
+    ul { color: #475467; line-height: 1.6; padding-left: 1.2rem; }
+    code { background: #f2f4f7; padding: 2px 6px; border-radius: 4px;
+           font-size: 0.85rem; word-break: break-all; }
+    .motivo { background: #fff8e1; border: 1px solid #ffe7a3; border-radius: 8px;
+              padding: 12px; margin: 16px 0; font-size: 0.9rem; }
+    .btn { display: inline-block; margin-top: 8px; background: #1570EF; color: #fff;
+           padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="caixa">
+    <h1>Sessão expirada</h1>
+    <p>
+      O formulário ficou aberto tempo demais ou o navegador não guardou os
+      cookies do site. Volte e envie novamente.
+    </p>
+
+    <div class="motivo">
+      <strong>Detalhe técnico:</strong><br>
+      <code>{{ reason }}</code>
+    </div>
+
+    <p>Se isso se repetir:</p>
+    <ul>
+      <li>Saia da aba anônima — sem cookies, o envio sempre falha.</li>
+      <li>Permita cookies para este site nas configurações do navegador.</li>
+      <li>Desligue a proteção de rastreamento apenas para este endereço.</li>
+    </ul>
+
+    <a class="btn" href="{% url 'login' %}">Voltar para o login</a>
+  </div>
+</body>
+</html>
