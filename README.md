@@ -81,13 +81,17 @@ python manage.py test
 
 ## Deploy sem VPS (pelo navegador, inclusive do celular)
 
-O repositório traz um blueprint pronto (`render.yaml`). No painel do Render:
-**New → Blueprint → escolher este repositório**. Ele provisiona o banco, gera a
-`SECRET_KEY`, roda migrações e sobe o serviço. Os únicos campos a preencher são
-`ADMIN_EMAIL` e `ADMIN_SENHA`, usados para criar o primeiro login.
+Use o link de deploy direto, que le o `render.yaml` deste repositorio e pula a
+navegacao do painel:
 
-Limitações do plano gratuito, que importam para decidir: o serviço hiberna após
-15 minutos sem acesso e leva cerca de 1 minuto para acordar no próximo acesso, e
-o PostgreSQL gratuito expira em 30 dias. Serve para testar e demonstrar, não
-para a loja de um cliente — para isso use a VPS (`deploy/instalar_vps.sh`) ou um
-plano pago.
+    https://render.com/deploy?repo=https://github.com/Kauantoolkit/Administra-Kauan/tree/claude/stoic-planck-wzsypx
+
+So dois campos sao pedidos: `ADMIN_EMAIL` e `ADMIN_SENHA`, usados para criar o
+primeiro login. O resto (SECRET_KEY, migracoes, dados de demonstracao) e
+automatico.
+
+O banco e SQLite em disco efemero, recriado a cada partida pelo `start.sh`.
+Isso mantem o sistema sempre de pe, mas **nada que voce digitar sobrevive a
+hibernacao** (15 min sem acesso). E um ambiente de demonstracao, nao de uso
+real. Para guardar dados, defina `DATABASE_URL` apontando para um Postgres, ou
+instale em VPS com `deploy/instalar_vps.sh`.
