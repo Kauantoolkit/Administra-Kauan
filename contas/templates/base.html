@@ -133,6 +133,15 @@
         color: #6c757d;
       }
 
+      /* Subtitulo de cabecalho. Note que .header-info e um container flex:
+         usada num paragrafo, quebraria a frase em colunas. */
+      .subtitulo {
+        margin: 0.35rem 0 0 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+        max-width: 70ch;
+      }
+
       .status-badge {
         background-color: #198754;
         color: #fff;
@@ -483,6 +492,55 @@
 
       @media (max-width: 520px) {
         .stats-grid { grid-template-columns: 1fr; }
+      }
+
+      /* ---------- Telas internas no celular ----------
+         As listagens foram escritas com estilos embutidos e larguras fixas.
+         Estas regras alcancam todas de uma vez, pelas classes aplicadas nos
+         wrappers, sem reescrever cada template. */
+      @media (max-width: 720px) {
+        /* Tabela rola na horizontal em vez de esticar a pagina inteira. */
+        .main-content table {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          white-space: nowrap;
+        }
+        .main-content table th,
+        .main-content table td { padding-left: 10px; padding-right: 10px; }
+
+        /* Grades de cartoes: uma coluna. */
+        .stats-grid,
+        .cards-grid,
+        .kpi-grid { grid-template-columns: 1fr !important; }
+
+        /* Wrapper com padding embutido de 32px sufoca a tela. */
+        .tela-interna { padding: 16px !important; }
+
+        /* Cabecalho: titulo em cima, acoes embaixo ocupando a largura. */
+        .tela-cabecalho {
+          flex-direction: column;
+          align-items: stretch !important;
+          gap: 12px;
+        }
+        /* Mesmos cabecalhos, nas telas que ja usavam classes proprias. */
+        .page-header-content,
+        .card-header,
+        .table-footer {
+          flex-direction: column;
+          align-items: stretch !important;
+          gap: 12px;
+        }
+
+        .tela-acoes { flex-direction: column; width: 100%; }
+        .tela-acoes > a,
+        .tela-acoes > button {
+          justify-content: center;
+          width: 100%;
+          box-sizing: border-box;
+        }
       }
     </style>
   </head>

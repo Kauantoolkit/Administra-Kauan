@@ -5,7 +5,7 @@
 <div class="header">
   <div>
     <h1>Venda #{{ venda.id }}</h1>
-    <p class="header-info">
+    <p class="subtitulo">
       {{ venda.data_venda|date:"d/m/Y H:i" }} · {{ venda.nome_cliente }} ·
       {{ venda.get_status_display }} · {{ venda.get_forma_pagamento_display }}
     </p>

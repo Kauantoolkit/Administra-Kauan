@@ -5,7 +5,7 @@
 <div class="header">
   <div>
     <h1>{{ produto.nome }}</h1>
-    <p class="header-info">SKU {{ produto.sku }}{% if produto.codigo_barras %} · EAN {{ produto.codigo_barras }}{% endif %}</p>
+    <p class="subtitulo">SKU {{ produto.sku }}{% if produto.codigo_barras %} · EAN {{ produto.codigo_barras }}{% endif %}</p>
   </div>
   <div class="header-info">
     <a class="btn-action" href="{% url 'estoque' %}">Voltar</a>

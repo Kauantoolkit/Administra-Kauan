@@ -70,14 +70,14 @@
     }
 </style>
 
-<div style="background-color: #F5F7FA; font-family: 'Inter', sans-serif; color: #101828; padding: 32px; width: 100%; box-sizing: border-box; min-height: 100vh;">
+<div class="tela-interna" style="background-color: #F5F7FA; font-family: 'Inter', sans-serif; color: #101828; padding: 32px; width: 100%; box-sizing: border-box; min-height: 100vh;">
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+    <div class="tela-cabecalho" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
         <div>
             <h1 style="font-size: 24px; font-weight: 600; margin: 0 0 4px 0; color: #101828;">Controle de Estoque</h1>
             <p style="color: #667085; font-size: 14px; margin: 0;">Gerencie produtos, preços e quantidades</p>
         </div>
-        <div style="display: flex; gap: 12px;">
+        <div class="tela-acoes" style="display: flex; gap: 12px;">
             <a href="{% url 'entrada_estoque' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #12B76A; color: white;">
                 <span class="material-icons-outlined" style="font-size:18px;">add_shopping_cart</span> Entrada Estoque
             </a>
@@ -167,9 +167,9 @@
     </form>
 
     <div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 12px; overflow: hidden; width: 100%;">
-        <div style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; display: flex; justify-content: space-between; align-items: center;">
+        <div class="tela-cabecalho" style="padding: 16px 24px; border-bottom: 1px solid #E4E7EC; display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 16px; font-weight: 600; margin: 0; color: #101828;">Lista de Produtos</h3>
-            <div style="display: flex; gap: 8px;">
+            <div class="tela-acoes" style="display: flex; gap: 8px;">
                 
                 <a href="{% url 'exportar_estoque' %}?{{ request.GET.urlencode }}" style="background: #F9FAFB; border: 1px solid #E4E7EC; color: #667085; padding: 8px 12px; font-size: 13px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500; transition: all 0.2s;">
                     <span class="material-icons-outlined" style="font-size: 16px;">file_download</span> Exportar
