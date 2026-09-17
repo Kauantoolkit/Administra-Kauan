@@ -78,12 +78,12 @@
             <p style="color: #667085; font-size: 14px; margin: 0;">Gerencie produtos, preços e quantidades</p>
         </div>
         <div class="tela-acoes" style="display: flex; gap: 12px;">
-            <a href="{% url 'entrada_estoque' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #12B76A; color: white;">
+            {% if pode.movimentar_estoque %}<a href="{% url 'entrada_estoque' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #12B76A; color: white;">
                 <span class="material-icons-outlined" style="font-size:18px;">add_shopping_cart</span> Entrada Estoque
-            </a>
-            <a href="{% url 'novo_produto' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #1570EF; color: white;">
+            </a>{% endif %}
+            {% if pode.gerenciar_produtos %}<a href="{% url 'novo_produto' %}" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; background: #1570EF; color: white;">
                 <span class="material-icons-outlined" style="font-size:18px;">inventory_2</span> Novo Produto
-            </a>
+            </a>{% endif %}
         </div>
     </div>
 

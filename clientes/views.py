@@ -8,13 +8,15 @@ from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from django.db.models import Avg
 
+from contas import permissoes as P
+
 from .models import Cliente, LogAcao
 from .forms import ClienteForm
 import csv
 from django.http import HttpResponse
 
 
-@login_required
+@P.requer(P.VER_CLIENTES)
 def lista_clientes(request):
 
     clientes_qs = Cliente.objects.all().order_by('-data_cadastro')
@@ -117,7 +119,7 @@ def lista_clientes(request):
     return render(request, 'clientes/lista_clientes.html', context)
 
 
-@login_required
+@P.requer(P.GERENCIAR_CLIENTES)
 def novo_cliente(request):
     if request.method == 'POST':
 
@@ -141,12 +143,12 @@ def novo_cliente(request):
 
 
 
-@login_required
+@P.requer(P.VER_CLIENTES)
 def ver_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     return render(request, "clientes/ver_cliente.html", {"cliente": cliente})
 
-@login_required
+@P.requer(P.GERENCIAR_CLIENTES)
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -170,7 +172,7 @@ def editar_cliente(request, pk):
     return render(request, "clientes/editar_cliente.html", {"form": form, "cliente": cliente})
 
 
-@login_required
+@P.requer(P.GERENCIAR_CLIENTES)
 def excluir_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -211,7 +213,7 @@ def excluir_cliente(request, pk):
 
     return render(request, "clientes/excluir_cliente.html", {"cliente": cliente})
 
-@login_required
+@P.requer(P.VER_CLIENTES)
 def exportar_clientes_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="clientes.csv"'
@@ -248,7 +250,7 @@ def exportar_clientes_csv(request):
 
     return response
 
-@login_required
+@P.requer(P.VER_HISTORICO)
 def historico_logs(request):
     logs = LogAcao.objects.select_related('usuario').order_by('-datahora')
 

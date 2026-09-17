@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Avg
 
+from contas import permissoes as P
+
 from .models import Funcionario
 from .forms import FuncionarioForm
 
@@ -16,7 +18,7 @@ def file_to_base64(file):
 
 
 
-@login_required
+@P.requer(P.VER_FUNCIONARIOS)
 def funcionarios_list(request):
     qs_base = Funcionario.objects.all()
 
@@ -109,7 +111,7 @@ def funcionarios_list(request):
 
 
 
-@login_required
+@P.requer(P.GERENCIAR_FUNCIONARIOS)
 def funcionario_create(request):
     if request.method == "POST":
         form = FuncionarioForm(request.POST, request.FILES)
@@ -125,7 +127,7 @@ def funcionario_create(request):
 
 
 
-@login_required
+@P.requer(P.GERENCIAR_FUNCIONARIOS)
 def funcionario_edit(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
 
@@ -142,14 +144,14 @@ def funcionario_edit(request, pk):
 
 
 
-@login_required
+@P.requer(P.VER_FUNCIONARIOS)
 def funcionario_detail(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
     return render(request, "funcionarios/funcionario_detail.html", {"funcionario": funcionario})
 
 
 
-@login_required
+@P.requer(P.GERENCIAR_FUNCIONARIOS)
 def funcionario_delete(request, pk):
     funcionario = get_object_or_404(Funcionario, pk=pk)
 

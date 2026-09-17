@@ -583,6 +583,7 @@
               <span class="material-icons-outlined">dashboard</span> Dashboard
             </a>
           </li>
+          {% if pode.ver_clientes %}
           <li>
             <a
               href="{% url 'lista_clientes' %}"
@@ -591,6 +592,8 @@
               <span class="material-icons-outlined">people</span> Clientes
             </a>
           </li>
+          {% endif %}
+          {% if pode.ver_estoque %}
           <li>
             <a
               href="{% url 'estoque' %}"
@@ -599,6 +602,8 @@
               <span class="material-icons-outlined">inventory_2</span> Estoque
             </a>
           </li>
+          {% endif %}
+          {% if pode.ver_funcionarios %}
           <li>
             <a
               href="{% url 'funcionarios_list' %}"
@@ -607,6 +612,8 @@
               <span class="material-icons-outlined">badge</span> Funcionários
             </a>
           </li>
+          {% endif %}
+          {% if pode.ver_fornecedores %}
           <li>
             <a
               href="{% url 'fornecedores' %}"
@@ -616,6 +623,8 @@
               Fornecedores
             </a>
           </li>
+          {% endif %}
+          {% if pode.vender %}
           <li>
             <a
               href="{% url 'lista_vendas' %}"
@@ -624,11 +633,15 @@
               <span class="material-icons-outlined">point_of_sale</span> Vendas
             </a>
           </li>
+          {% endif %}
+          {% if pode.ver_relatorios %}
           <li>
             <a href="{% url 'relatorios' %}">
               <span class="material-icons-outlined">assessment</span> Relatórios
             </a>
           </li>
+          {% endif %}
+          {% if pode.ver_historico %}
           <li>
             <a
               href="{% url 'historico_sistema' %}"
@@ -637,11 +650,17 @@
               <span class="material-icons-outlined">history</span> Histórico
             </a>
           </li>
+          {% endif %}
         </ul>
 
         <div class="sidebar-footer">
           <div class="user-profile">
-            <span>{{ user.nome|default:'Usuário' }}</span>
+            <span>
+              {{ user.nome|default:'Usuário' }}
+              <small style="display:block;font-weight:400;color:#6c757d;">
+                {{ user.get_papel_display|default:'' }}
+              </small>
+            </span>
 
             <form method="post" action="{% url 'logout' %}" style="margin-left:auto;">
               {% csrf_token %}

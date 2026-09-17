@@ -24,7 +24,8 @@ from .forms import (
     CustomUserCreationForm, EmailAuthenticationForm, EntradaProdutoEspecificoForm,
     FornecedorForm, MovimentoEstoqueForm, ProdutoForm,
 )
-from .models import Categoria, Fornecedor, MovimentoEstoque, Produto
+from . import permissoes as P
+from .models import Categoria, CustomUser, Fornecedor, MovimentoEstoque, Produto
 from .utils import obter_data_formatada
 
 
@@ -44,16 +45,52 @@ def csrf_failure(request, reason='', template_name='csrf_falhou.html'):
 
 
 def cadastro_view(request):
+    """
+    Criação de usuário.
+
+    Enquanto não existe nenhum usuário, a tela fica aberta: é a instalação
+    inicial, e quem cria a primeira conta é o dono da loja. A partir daí o
+    cadastro passa a exigir permissão — antes disto qualquer visitante criava
+    uma conta e saía registrando vendas e exportando a base de clientes.
+    """
+    primeira_instalacao = not CustomUser.objects.exists()
+
+    if not primeira_instalacao and not P.pode(request.user, P.GERENCIAR_FUNCIONARIOS):
+        messages.error(
+            request,
+            'Somente o responsável pela loja pode criar novos acessos.',
+        )
+        return redirect('login' if not request.user.is_authenticated else 'dashboard')
+
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST, definir_papel=not primeira_instalacao)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Conta criada com sucesso. Faça login.')
-            return redirect('login')
+            usuario = form.save()
+            if primeira_instalacao:
+                # Primeiro acesso da loja: quem instala é o dono.
+                usuario.papel = 'PROPRIETARIO'
+                usuario.is_staff = usuario.is_superuser = True
+                usuario.save()
+                messages.success(
+                    request,
+                    'Conta de proprietário criada. Faça login para começar.',
+                )
+                return redirect('login')
+
+            messages.success(
+                request,
+                f'Acesso criado para {usuario.email} '
+                f'({usuario.get_papel_display()}).',
+            )
+            return redirect('dashboard')
         messages.error(request, 'Verifique os dados informados.')
     else:
-        form = CustomUserCreationForm()
-    return render(request, 'cadastro.html', {'form': form})
+        form = CustomUserCreationForm(definir_papel=not primeira_instalacao)
+
+    return render(request, 'cadastro.html', {
+        'form': form,
+        'primeira_instalacao': primeira_instalacao,
+    })
 
 
 def login_view(request):
@@ -160,7 +197,7 @@ def _filtrar_produtos(request, queryset):
     return queryset
 
 
-@login_required
+@P.requer(P.VER_ESTOQUE)
 def estoque_view(request):
     produtos_list = _filtrar_produtos(
         request, Produto.objects.select_related('categoria')
@@ -205,7 +242,7 @@ def estoque_view(request):
     return render(request, 'estoque.html', context)
 
 
-@login_required
+@P.requer(P.VER_ESTOQUE)
 def detalhe_produto_view(request, pk):
     produto = get_object_or_404(Produto.objects.select_related('categoria'), pk=pk)
     return render(request, 'detalhe_produto.html', {
@@ -217,7 +254,7 @@ def detalhe_produto_view(request, pk):
     })
 
 
-@login_required
+@P.requer(P.GERENCIAR_PRODUTOS)
 def novo_produto_view(request):
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES)
@@ -241,7 +278,7 @@ def novo_produto_view(request):
     return render(request, 'novo_produto.html', {'form': form})
 
 
-@login_required
+@P.requer(P.GERENCIAR_PRODUTOS)
 def editar_produto_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
 
@@ -267,7 +304,7 @@ def editar_produto_view(request, pk):
     })
 
 
-@login_required
+@P.requer(P.GERENCIAR_PRODUTOS)
 @require_POST
 def excluir_produto_view(request, pk):
     """Exclusão só por POST: antes, um GET qualquer apagava o produto."""
@@ -294,7 +331,7 @@ def excluir_produto_view(request, pk):
     return redirect('estoque')
 
 
-@login_required
+@P.requer(P.MOVIMENTAR_ESTOQUE)
 def entrada_estoque_geral_view(request):
     if request.method == 'POST':
         form = MovimentoEstoqueForm(request.POST)
@@ -329,7 +366,7 @@ def entrada_estoque_geral_view(request):
     return render(request, 'entrada_estoque_geral.html', {'form': form})
 
 
-@login_required
+@P.requer(P.MOVIMENTAR_ESTOQUE)
 def adicionar_estoque_view(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
 
@@ -364,7 +401,7 @@ def adicionar_estoque_view(request, pk):
     })
 
 
-@login_required
+@P.requer(P.VER_ESTOQUE)
 def detalhes_produto_ajax(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     return JsonResponse({
@@ -382,7 +419,7 @@ def detalhes_produto_ajax(request, pk):
     })
 
 
-@login_required
+@P.requer(P.VER_FORNECEDORES)
 def fornecedores_view(request):
     fornecedores = Fornecedor.objects.all()
     search_query = (request.GET.get('search') or '').strip()
@@ -405,7 +442,7 @@ def fornecedores_view(request):
     })
 
 
-@login_required
+@P.requer(P.GERENCIAR_FORNECEDORES)
 def fornecedor_criar(request):
     if request.method == 'POST':
         form = FornecedorForm(request.POST)
@@ -429,7 +466,7 @@ def fornecedor_criar(request):
     })
 
 
-@login_required
+@P.requer(P.GERENCIAR_FORNECEDORES)
 def fornecedor_editar(request, pk):
     fornecedor = get_object_or_404(Fornecedor, pk=pk)
 
@@ -456,7 +493,7 @@ def fornecedor_editar(request, pk):
     })
 
 
-@login_required
+@P.requer(P.GERENCIAR_FORNECEDORES)
 def fornecedor_deletar(request, pk):
     fornecedor = get_object_or_404(Fornecedor, pk=pk)
 
@@ -487,7 +524,7 @@ def _escrever_csv(nome_arquivo, cabecalho, linhas):
     return response
 
 
-@login_required
+@P.requer(P.VER_ESTOQUE)
 def exportar_estoque_csv(request):
     produtos = _filtrar_produtos(
         request, Produto.objects.select_related('categoria')
@@ -514,14 +551,14 @@ def exportar_estoque_csv(request):
     )
 
 
-@login_required
+@P.requer(P.VER_ESTOQUE)
 def imprimir_codigos_estoque(request):
     produtos = _filtrar_produtos(request, Produto.objects.all()).order_by('nome')
     linhas = [[p.nome, p.sku, p.codigo_barras or ''] for p in produtos]
     return _escrever_csv('lista_skus.csv', ['Produto', 'SKU', 'Cód. Barras'], linhas)
 
 
-@login_required
+@P.requer(P.VER_RELATORIOS)
 def relatorios(request):
     hoje = timezone.now()
     try:

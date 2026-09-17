@@ -1,4 +1,5 @@
-from .models import ConfiguracaoLoja
+from .models import ConfiguracaoLoja, CustomUser
+from .permissoes import capacidades
 
 
 def identidade_loja(request):
@@ -11,4 +12,13 @@ def identidade_loja(request):
     except Exception:
         # Antes da primeira migração o banco ainda não tem a tabela.
         config = None
-    return {'loja': config}
+    try:
+        instalacao_pendente = not CustomUser.objects.exists()
+    except Exception:
+        instalacao_pendente = False
+
+    return {
+        'loja': config,
+        'instalacao_pendente': instalacao_pendente,
+        'pode': {c: True for c in capacidades(getattr(request, 'user', None))},
+    }

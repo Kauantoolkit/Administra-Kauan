@@ -62,6 +62,29 @@ class CustomUserCreationForm(UserCreationForm):
         model = CustomUser
         fields = ('email', 'nome', 'cpf')
 
+    def __init__(self, *args, definir_papel=False, **kwargs):
+        """
+        `definir_papel` libera a escolha do perfil de acesso. Fica desligado no
+        cadastro inicial da loja, onde o primeiro usuário é sempre o dono.
+        """
+        super().__init__(*args, **kwargs)
+        if definir_papel:
+            self.fields['papel'] = forms.ChoiceField(
+                choices=CustomUser.PAPEL_CHOICES,
+                initial='OPERADOR',
+                label='Perfil de acesso',
+                widget=forms.Select(attrs={'class': 'form-control'}),
+            )
+
+    def save(self, commit=True):
+        usuario = super().save(commit=False)
+        papel = self.cleaned_data.get('papel')
+        if papel:
+            usuario.papel = papel
+        if commit:
+            usuario.save()
+        return usuario
+
     def clean_email(self):
         email = (self.cleaned_data.get('email') or '').lower().strip()
         if CustomUser.objects.filter(email__iexact=email).exists():

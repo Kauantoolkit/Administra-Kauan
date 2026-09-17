@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from clientes.views import registrar_log
+from contas import permissoes as P
 from contas.models import Produto
 
 from . import services
@@ -19,7 +20,7 @@ from .forms import ItemVendaFormSet, VendaForm
 from .models import Venda
 
 
-@login_required
+@P.requer(P.VENDER)
 def lista_vendas(request):
     vendas_list = Venda.objects.select_related('cliente').prefetch_related('itens')
 
@@ -120,7 +121,7 @@ def _salvar_venda(request, venda=None):
     return venda, form, formset
 
 
-@login_required
+@P.requer(P.VENDER)
 def criar_venda(request):
     if request.method == 'POST':
         venda, form, formset = _salvar_venda(request)
@@ -138,7 +139,7 @@ def criar_venda(request):
     })
 
 
-@login_required
+@P.requer(P.VENDER)
 def editar_venda(request, pk):
     venda = get_object_or_404(Venda, pk=pk)
     if request.method == 'POST':
@@ -158,7 +159,7 @@ def editar_venda(request, pk):
     })
 
 
-@login_required
+@P.requer(P.VENDER)
 def detalhe_venda(request, pk):
     venda = get_object_or_404(
         Venda.objects.select_related('cliente', 'operador'), pk=pk
@@ -169,7 +170,7 @@ def detalhe_venda(request, pk):
     })
 
 
-@login_required
+@P.requer(P.ANULAR_VENDA)
 def excluir_venda(request, pk):
     venda = get_object_or_404(Venda, pk=pk)
 
@@ -200,7 +201,7 @@ def excluir_venda(request, pk):
     return render(request, 'vendas/confirmar_exclusao.html', {'object': venda})
 
 
-@login_required
+@P.requer(P.ANULAR_VENDA)
 @require_POST
 def cancelar_venda(request, pk):
     """Cancela sem apagar o histórico — preferível a excluir."""
@@ -220,7 +221,7 @@ def cancelar_venda(request, pk):
     return redirect('lista_vendas')
 
 
-@login_required
+@P.requer(P.VENDER)
 def produto_info_json(request, pk):
     """Alimenta a tela de venda: unidade, preço, saldo e variações."""
     produto = get_object_or_404(Produto, pk=pk)

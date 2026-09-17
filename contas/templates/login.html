@@ -407,7 +407,12 @@
         </form>
 
         <p class="footer-text">
-            Não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se aqui</a>
+            {% if instalacao_pendente %}
+              Primeiro acesso?
+              <a href="{% url 'cadastro' %}">Criar a conta do proprietário</a>
+            {% else %}
+              Precisa de acesso? Fale com o responsável pela loja.
+            {% endif %}
         </p>
 
         <div class="copyright">
