@@ -187,6 +187,32 @@
     return "R$ " + valor.toFixed(2).replace(".", ",");
   }
 
+  // Le numero digitado no padrao brasileiro. parseFloat("1,250") devolve 1,
+  // o que fazia o subtotal ao vivo divergir do calculado no servidor.
+  function numero(texto) {
+    if (texto === null || texto === undefined) return 0;
+    var v = String(texto).trim().replace(/\s|R\$/g, "");
+    if (!v) return 0;
+    var temPonto = v.indexOf(".") >= 0, temVirgula = v.indexOf(",") >= 0;
+    if (temPonto && temVirgula) {
+      v = v.lastIndexOf(",") > v.lastIndexOf(".")
+        ? v.replace(/\./g, "").replace(",", ".")
+        : v.replace(/,/g, "");
+    } else if (temVirgula) {
+      v = (v.split(",").length - 1) > 1 ? v.replace(/,/g, "") : v.replace(",", ".");
+    } else if ((v.split(".").length - 1) > 1) {
+      v = v.replace(/\./g, "");
+    }
+    var n = parseFloat(v);
+    return isNaN(n) ? 0 : n;
+  }
+
+  // Mostra o numero como o lojista escreve.
+  function paraBr(valor, casas) {
+    var n = typeof valor === "number" ? valor : numero(valor);
+    return n.toFixed(casas === undefined ? 2 : casas).replace(".", ",");
+  }
+
   function buscarProduto(id) {
     if (cacheProduto[id]) return Promise.resolve(cacheProduto[id]);
     return fetch("/vendas/produto-info/" + id + "/")
@@ -213,18 +239,16 @@
       return;
     }
 
-    var passo = dados.aceita_fracao ? Math.pow(10, -dados.casas_decimais) : 1;
     if (qtd) {
-      qtd.step = dados.aceita_fracao ? passo.toFixed(dados.casas_decimais) : "1";
-      qtd.min = dados.quantidade_minima;
-      if (!qtd.value || parseFloat(qtd.value) <= 0) {
-        qtd.value = dados.quantidade_minima;
+      qtd.placeholder = paraBr(dados.quantidade_minima, dados.casas_decimais);
+      if (!qtd.value || numero(qtd.value) <= 0) {
+        qtd.value = paraBr(dados.quantidade_minima, dados.casas_decimais);
       }
     }
-    if (preco && !preco.value) preco.value = dados.preco;
+    if (preco && !preco.value) preco.value = paraBr(dados.preco);
 
     if (dica) {
-      var texto = "Vendido por " + dados.sigla + " · " + moeda(parseFloat(dados.preco)) + " / " + dados.sigla;
+      var texto = "Vendido por " + dados.sigla + " · " + moeda(numero(dados.preco)) + " / " + dados.sigla;
       if (dados.controla_estoque) texto += " · disponível: " + dados.estoque_formatado;
       if (dados.aceita_fracao) texto += " · aceita fração";
       dica.textContent = texto;
@@ -237,7 +261,7 @@
         dados.variacoes.forEach(function (v) {
           var opt = document.createElement("option");
           opt.value = v.id;
-          opt.textContent = v.rotulo + " — " + moeda(parseFloat(v.preco)) + " (" + parseFloat(v.estoque) + " em estoque)";
+          opt.textContent = v.rotulo + " — " + moeda(numero(v.preco)) + " (" + paraBr(v.estoque, 0) + " em estoque)";
           opt.dataset.preco = v.preco;
           selectVar.appendChild(opt);
         });
@@ -254,9 +278,9 @@
     var total = 0;
     container.querySelectorAll(".item-card").forEach(function (linha) {
       if (linha.style.display === "none") return;
-      var qtd = parseFloat((linha.querySelector(".js-quantidade") || {}).value) || 0;
-      var preco = parseFloat((linha.querySelector(".js-preco") || {}).value) || 0;
-      var desc = parseFloat((linha.querySelector('input[name$="-desconto_item"]') || {}).value) || 0;
+      var qtd = numero((linha.querySelector(".js-quantidade") || {}).value);
+      var preco = numero((linha.querySelector(".js-preco") || {}).value);
+      var desc = numero((linha.querySelector('input[name$="-desconto_item"]') || {}).value);
       var sub = Math.max(qtd * preco - desc, 0);
       var alvo = linha.querySelector(".js-subtotal");
       if (alvo) alvo.textContent = moeda(sub);
@@ -291,7 +315,7 @@
     if (e.target.classList.contains("js-variacao")) {
       var opt = e.target.selectedOptions[0];
       var campoPreco = linha.querySelector(".js-preco");
-      if (opt && opt.dataset.preco && campoPreco) campoPreco.value = opt.dataset.preco;
+      if (opt && opt.dataset.preco && campoPreco) campoPreco.value = paraBr(opt.dataset.preco);
       recalcular();
     }
   });

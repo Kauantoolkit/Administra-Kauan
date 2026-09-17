@@ -6,6 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCr
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from .fields import DecimalBrField
 from .models import (
     Categoria, ConfiguracaoLoja, CustomUser, Fornecedor, MovimentoEstoque,
     Produto, ProdutoVariacao, UNIDADES_FRACIONADAS,
@@ -93,6 +94,19 @@ class EmailAuthenticationForm(AuthenticationForm):
 
 
 class ProdutoForm(forms.ModelForm):
+    # Aceitam virgula; por isso texto com inputmode, e nao type="number".
+    def _campo_br(rotulo, minimo, exemplo):
+        return DecimalBrField(
+            label=rotulo, min_value=Decimal(minimo),
+            widget=forms.TextInput(attrs={'class': 'form-control',
+                                          'placeholder': exemplo}))
+
+    custo = _campo_br('Preço de Custo (R$)', '0', '0,00')
+    venda = _campo_br('Preço de Venda (R$)', '0', '0,00')
+    quantidade_minima_venda = _campo_br('Quantidade mínima por venda', '0.001', '1,000')
+    incremento_venda = _campo_br('Incremento permitido', '0.001', '1,000')
+    quantidade_minima_alerta = _campo_br('Qtd. Mínima para Alerta', '0', '5')
+
     class Meta:
         model = Produto
         fields = [
@@ -126,11 +140,11 @@ class ProdutoForm(forms.ModelForm):
             'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'categoria': forms.Select(attrs={'class': 'form-select'}),
             'unidade_medida': forms.Select(attrs={'class': 'form-select', 'id': 'id_unidade_medida'}),
-            'quantidade_minima_venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001', 'min': '0.001'}),
-            'incremento_venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001', 'min': '0.001'}),
-            'custo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
-            'venda': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
-            'quantidade_minima_alerta': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001', 'min': '0'}),
+            'quantidade_minima_venda': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '1,000'}),
+            'incremento_venda': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '1,000'}),
+            'custo': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00'}),
+            'venda': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00'}),
+            'quantidade_minima_alerta': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '5'}),
             'imagem': forms.FileInput(attrs={'class': 'form-control-file', 'accept': 'image/*'}),
         }
 
@@ -202,13 +216,20 @@ class _QuantidadePorUnidadeMixin:
 
 
 class MovimentoEstoqueForm(_QuantidadePorUnidadeMixin, forms.ModelForm):
+    quantidade = DecimalBrField(
+        label='Quantidade', min_value=Decimal('0.001'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,000'}))
+    custo_unitario = DecimalBrField(
+        label='Custo Unitário', min_value=Decimal('0'), required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,00'}))
+
     class Meta:
         model = MovimentoEstoque
         fields = ['produto', 'variacao', 'quantidade', 'custo_unitario',
                   'validade', 'observacao']
         widgets = {
-            'quantidade': forms.NumberInput(attrs={'step': '0.001', 'min': '0.001', 'inputmode': 'decimal'}),
-            'custo_unitario': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
+            'quantidade': forms.TextInput(attrs={'inputmode': 'decimal', 'placeholder': '0,000'}),
+            'custo_unitario': forms.TextInput(attrs={'inputmode': 'decimal', 'placeholder': '0,00'}),
             'validade': forms.DateInput(attrs={'type': 'date'}),
             'observacao': forms.Textarea(attrs={'rows': 3}),
         }
@@ -234,16 +255,28 @@ class MovimentoEstoqueForm(_QuantidadePorUnidadeMixin, forms.ModelForm):
         variacao = dados.get('variacao')
         if variacao and produto and variacao.produto_id != produto.id:
             self.add_error('variacao', 'Esta variação não pertence ao produto escolhido.')
+        elif produto and not variacao and produto.variacoes.exists():
+            self.add_error(
+                'variacao',
+                f'"{produto.nome}" tem grade (tamanho/cor). Escolha qual variação movimentar.',
+            )
         return dados
 
 
 class EntradaProdutoEspecificoForm(_QuantidadePorUnidadeMixin, forms.ModelForm):
+    quantidade = DecimalBrField(
+        label='Quantidade', min_value=Decimal('0.001'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,000'}))
+    custo_unitario = DecimalBrField(
+        label='Custo Unitário', min_value=Decimal('0'), required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,00'}))
+
     class Meta:
         model = MovimentoEstoque
         fields = ['variacao', 'quantidade', 'custo_unitario', 'validade', 'observacao']
         widgets = {
-            'quantidade': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.001', 'min': '0.001', 'inputmode': 'decimal'}),
-            'custo_unitario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'quantidade': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,000'}),
+            'custo_unitario': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00'}),
             'validade': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'observacao': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
@@ -253,13 +286,24 @@ class EntradaProdutoEspecificoForm(_QuantidadePorUnidadeMixin, forms.ModelForm):
         self.produto = produto
         if produto is not None:
             self.fields['variacao'].queryset = produto.variacoes.filter(ativo=True)
-            self.fields['quantidade'].widget.attrs['step'] = (
-                str(Decimal(1).scaleb(-produto.casas_decimais))
-            )
+            casas = produto.casas_decimais
+            exemplo = ('0,' + '0' * casas) if casas else '0'
+            self.fields['quantidade'].widget.attrs['placeholder'] = exemplo
         self.fields['variacao'].required = False
 
     def clean_quantidade(self):
         return self._validar_quantidade(self.produto, self.cleaned_data.get('quantidade'))
+
+    def clean_variacao(self):
+        variacao = self.cleaned_data.get('variacao')
+        if self.produto is None:
+            return variacao
+        if variacao is None and self.produto.variacoes.exists():
+            raise ValidationError(
+                f'"{self.produto.nome}" tem grade (tamanho/cor). '
+                f'Escolha qual variação movimentar.'
+            )
+        return variacao
 
 
 class ConfiguracaoLojaForm(forms.ModelForm):

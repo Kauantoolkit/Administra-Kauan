@@ -1,11 +1,23 @@
+from decimal import Decimal
+
 from django import forms
 from django.forms import inlineformset_factory
 
+from contas.fields import DecimalBrField
 from contas.models import Produto, ProdutoVariacao
 from .models import ItemVenda, Venda
 
 
 class VendaForm(forms.ModelForm):
+    desconto = DecimalBrField(
+        label='Desconto (R$)', min_value=Decimal('0'), required=False,
+        initial=Decimal('0.00'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,00'}))
+    acrescimo = DecimalBrField(
+        label='Acréscimo (R$)', min_value=Decimal('0'), required=False,
+        initial=Decimal('0.00'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,00'}))
+
     class Meta:
         model = Venda
         fields = ['cliente', 'status', 'forma_pagamento', 'desconto', 'acrescimo', 'observacoes']
@@ -13,8 +25,8 @@ class VendaForm(forms.ModelForm):
             'cliente': forms.Select(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
             'forma_pagamento': forms.Select(attrs={'class': 'form-control'}),
-            'desconto': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
-            'acrescimo': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'desconto': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00'}),
+            'acrescimo': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
@@ -23,23 +35,43 @@ class VendaForm(forms.ModelForm):
         self.fields['cliente'].required = False
         self.fields['cliente'].empty_label = 'Consumidor final (sem cadastro)'
 
+    def clean_desconto(self):
+        return self.cleaned_data.get('desconto') or Decimal('0.00')
+
+    def clean_acrescimo(self):
+        return self.cleaned_data.get('acrescimo') or Decimal('0.00')
+
 
 class ItemVendaForm(forms.ModelForm):
+    quantidade = DecimalBrField(
+        label='Quantidade', min_value=Decimal('0.001'),
+        widget=forms.TextInput(attrs={'class': 'form-control js-quantidade',
+                                      'placeholder': '1'}))
+    preco_unitario = DecimalBrField(
+        label='Preço unitário', min_value=Decimal('0'), required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control js-preco',
+                                      'placeholder': '0,00'}))
+    desconto_item = DecimalBrField(
+        label='Desconto', min_value=Decimal('0'), required=False,
+        initial=Decimal('0.00'),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0,00'}))
+
     class Meta:
         model = ItemVenda
         fields = ['produto', 'variacao', 'quantidade', 'preco_unitario', 'desconto_item']
         widgets = {
             'produto': forms.Select(attrs={'class': 'form-control js-produto'}),
             'variacao': forms.Select(attrs={'class': 'form-control js-variacao'}),
-            'quantidade': forms.NumberInput(attrs={
+            'quantidade': forms.TextInput(attrs={
                 'class': 'form-control js-quantidade',
-                'step': '0.001', 'min': '0.001', 'inputmode': 'decimal',
+                'inputmode': 'decimal', 'placeholder': '1',
             }),
-            'preco_unitario': forms.NumberInput(attrs={
-                'class': 'form-control js-preco', 'step': '0.01', 'min': '0',
+            'preco_unitario': forms.TextInput(attrs={
+                'class': 'form-control js-preco',
+                'inputmode': 'decimal', 'placeholder': '0,00',
             }),
-            'desconto_item': forms.NumberInput(attrs={
-                'class': 'form-control', 'step': '0.01', 'min': '0',
+            'desconto_item': forms.TextInput(attrs={
+                'class': 'form-control', 'inputmode': 'decimal', 'placeholder': '0,00',
             }),
         }
 
@@ -55,6 +87,8 @@ class ItemVendaForm(forms.ModelForm):
 
     def clean(self):
         dados = super().clean()
+        dados['desconto_item'] = dados.get('desconto_item') or Decimal('0.00')
+        self.instance.desconto_item = dados['desconto_item']
         produto = dados.get('produto')
         if produto and not dados.get('preco_unitario'):
             variacao = dados.get('variacao')

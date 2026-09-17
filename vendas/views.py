@@ -86,6 +86,16 @@ def _salvar_venda(request, venda=None):
             formset.save()
 
             venda.calcular_totais()
+
+            # So aqui o subtotal existe: na validacao do formulario os itens
+            # ainda nao foram gravados. Sem esta checagem um desconto maior que
+            # a venda era aceito e gravava um total de R$ 0,00 sem aviso.
+            if venda.desconto and venda.desconto > venda.subtotal:
+                raise ValidationError(
+                    f'O desconto (R$ {venda.desconto:.2f}) é maior que o '
+                    f'subtotal da venda (R$ {venda.subtotal:.2f}).'
+                )
+
             services.sincronizar_estoque(
                 venda, usuario=request.user, itens_anteriores=itens_anteriores
             )

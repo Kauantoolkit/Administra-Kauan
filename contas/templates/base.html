@@ -133,6 +133,19 @@
         color: #6c757d;
       }
 
+      /* Rodape de acoes de formulario. Usado por varias telas; a definicao
+         vivia no <style> de criar_venda.html e se perdeu quando o template
+         foi reescrito, deixando os botoes sem espacamento nem separacao. */
+      .actions-footer {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+      }
+
       /* Subtitulo de cabecalho. Note que .header-info e um container flex:
          usada num paragrafo, quebraria a frase em colunas. */
       .subtitulo {

@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.db.models import ProtectedError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -176,14 +178,32 @@ def excluir_cliente(request, pk):
 
         id_cliente = cliente.id
         nome_cliente = cliente.nome
-        
-        cliente.delete()
+
+        try:
+            cliente.delete()
+            descricao = f"Cliente '{nome_cliente}' foi excluído."
+            messages.success(request, f'Cliente "{nome_cliente}" excluído.')
+        except ProtectedError:
+            # Ha vendas apontando para este cliente. Apagar destruiria o
+            # historico financeiro, entao o cadastro e inativado. Antes disto
+            # a tela quebrava com erro 500 e o usuario nao entendia o motivo.
+            cliente.status = 'inativo'
+            cliente.save(update_fields=['status'])
+            descricao = (
+                f"Cliente '{nome_cliente}' foi inativado (possui vendas "
+                f"registradas e não pode ser excluído)."
+            )
+            messages.warning(
+                request,
+                f'"{nome_cliente}" tem vendas registradas e foi inativado em '
+                f'vez de excluído, para preservar o histórico.',
+            )
 
         registrar_log(
             entidade='CLIENTE',
             entidade_id=id_cliente,
             acao='EXCLUSAO',
-            descricao=f"Cliente '{nome_cliente}' foi excluído.",
+            descricao=descricao,
             usuario=request.user if request.user.is_authenticated else None
         )
 

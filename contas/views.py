@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Q, Sum
 from django.db.models.functions import TruncDay
@@ -301,7 +302,12 @@ def entrada_estoque_geral_view(request):
             movimento = form.save(commit=False)
             movimento.tipo_movimento = 'ENTRADA'
             movimento.usuario = request.user
-            movimento.save()
+            try:
+                movimento.save()
+            except ValidationError as exc:
+                for mensagem in exc.messages:
+                    messages.error(request, mensagem)
+                return render(request, 'entrada_estoque_geral.html', {'form': form})
             registrar_log(
                 entidade='ESTOQUE', entidade_id=movimento.produto.id, acao='ALTERACAO',
                 descricao=(
@@ -334,7 +340,14 @@ def adicionar_estoque_view(request, pk):
             movimento.produto = produto
             movimento.tipo_movimento = 'ENTRADA'
             movimento.usuario = request.user
-            movimento.save()
+            try:
+                movimento.save()
+            except ValidationError as exc:
+                for mensagem in exc.messages:
+                    messages.error(request, mensagem)
+                return render(request, 'entrada_produto_especifico.html', {
+                    'form': form, 'produto': produto,
+                })
             messages.success(
                 request,
                 f'Adicionado {produto.formatar_quantidade(movimento.quantidade)} '

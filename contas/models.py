@@ -520,6 +520,18 @@ class MovimentoEstoque(models.Model):
                 variacao = ProdutoVariacao.objects.select_for_update().get(
                     pk=self.variacao_id
                 )
+                if variacao.produto_id != produto.pk:
+                    raise ValidationError(
+                        'A variação informada não pertence a este produto.'
+                    )
+            elif produto.controla_estoque and produto.variacoes.exists():
+                # Sem isto o saldo do produto subia sem subir o de nenhuma
+                # variacao, e o total do pai deixava de bater com a soma da
+                # grade — divergencia silenciosa e dificil de rastrear.
+                raise ValidationError(
+                    f'"{produto.nome}" tem grade (tamanho/cor). Escolha a '
+                    f'variação a movimentar.'
+                )
 
             if self.tipo_movimento == 'SAIDA' and produto.controla_estoque:
                 disponivel = variacao.quantidade_estoque if variacao else produto.quantidade_estoque
